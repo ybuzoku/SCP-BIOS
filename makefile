@@ -28,6 +28,10 @@
 # (for simplicity, you can call this file loader.asm too) and change the 	#
 # sector you write scpbios.bin to in the dd command from seek=34 to 		#
 # seek=CHOSEN_SECTOR_NUMBER													#
+#																			#
+# Final note:																#
+# To add a second program at sector X on the disk you may do the following:	#
+# dd if=./prog2.bin of=./MyDisk.IMA bs=512 oseek=X conv=notrunc				#
 #############################################################################
 
 assemble:
@@ -52,16 +56,3 @@ fresh:
 	dd if=./Binaries/scpbios.bin of=./Images/TestImage.ima bs=512 seek=34 conv=notrunc
 
 	cp ./Images/TestImage.ima ./Images/TestImageMSD.ima
-
-#++++++++++++++++
-#Reference info
-#++++++++++++++++
-#To create new disk image
-#dd if=/dev/zero of=./MyDisk.IMA bs=512 count=numberOfSectors conv=notruc
-
-#To add a Bootsector to new disk image
-#dd if=./scpdosbs.bin of=./MyDisk.IMA bs=512 count=1 conv=notrunc
-
-#To add a second program at sector 82 on the disk we do the following
-#nasm PROG2.ASM -o prog2.bin -f bin -O0
-#dd if=./prog2.bin of=./MyDisk.IMA bs=512 oseek=82 conv=notrunc
