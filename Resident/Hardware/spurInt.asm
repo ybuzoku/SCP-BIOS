@@ -10,7 +10,7 @@ default_IRQ7:
     in al, pic1command    ;Get the ISR
     test al, 80h
     jne .exit
-    inc word [spurint1]
+    inc byte [spurint1]
     jmp short .e2    ;Avoid sending EOI
 .exit:
     mov al, EOI
@@ -36,7 +36,7 @@ default_IRQ15:
     test al, 80h
     mov al, EOI    ;Still need to send EOI to pic1
     jne .exit
-    inc word [spurint2]
+    inc byte [spurint2]
     jmp short .e2    ;Avoid sending EOI
 .exit:
     out pic2command, al
