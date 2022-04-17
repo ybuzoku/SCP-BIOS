@@ -5,7 +5,7 @@
 # nasm options are:															#
 # -O0 = NO OPTIMISATIONS, -l = Listing file.								#
 #																			#
-# Three make files:															#
+# Three make options:														#
 # make => Assembles the SCP/BIOS image and writes it to sector 34 of the 	#
 # 		  test disk image (sector 34 is the start of the FAT12/16 data area)#
 #																			#
