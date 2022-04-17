@@ -30,7 +30,7 @@ hciParse:
     int 30h
 .pr0:   ;If ctrlr failure or ports exhausted, ret to here for next ctrlr
     test cl, cl
-    jz end    ;No EHCI controllers or last controler? Exit
+    jz .noEHCI    ;No EHCI controllers or last controler?
     dec cl    ;Undo the absolute count from above
     mov al, cl
     call USB.setupEHCIcontroller
@@ -65,4 +65,7 @@ hciParse:
     int 30h
     jmp short .exit
 .echiInitMsg db 0Ah,0Dh,"Initialising USB and EHCI root hubs...",0
+.noEHCI:
+;For now, since all MSD based work goes through ehci, jump to the end
+    jmp end
 .exit:
