@@ -65,3 +65,9 @@ ATA:
     pop rbx
     pop rax
     ret
+
+.switchDrive:
+;Switches drive from master/slave to slave/master
+;Sets/clears bit 7 of irq14/15Mutex 
+;Bit 7 ataX Clear => Master
+;Bit

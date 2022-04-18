@@ -24,9 +24,9 @@ default_IRQ7:
 ;----------------------------------------------------------------
 default_IRQ15:
     push rax
-    cmp byte [ir15_mutex], 1    ;Check if mutex set
+    cmp byte [ata1CmdByte], 1    ;Check if mutex set
     jne .spurcheck              ;If not set, then just check spur
-    mov byte [ir15_mutex], 0    ;Exit and check spur
+    mov byte [ata1CmdByte], 0    ;Exit and check spur
 .spurcheck:
     mov al, 0Bh    ;Read ISR 
     out pic2command, al

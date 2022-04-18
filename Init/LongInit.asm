@@ -173,7 +173,6 @@ longmode_ep:
     stosb       ;ideNumberOfControllers
     mov cx, 2*ideTableEntrySize ;ideControllerTable
     rep stosb
-    stosb       ;fdiskNumber
     mov cx, 4*fdiskEntry_size
     rep stosb
     mov cx, 10*int33TblEntrySize

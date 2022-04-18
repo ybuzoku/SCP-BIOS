@@ -26,8 +26,6 @@ IDE:
     cmp dword [rdi + idLBASectrs], 0    ;Shouldn't be 0
 
     jmp short .ideInitEnd
-.bad:
-    jmp short .ideInitEnd
 ;===========================
 ;     Callable procs       :
 ;===========================
@@ -57,5 +55,7 @@ IDE:
     stc
     jmp short .actexit
 
-;Must be the end of the file
+;============================
+;     Exit target label     :
+;============================
 .ideInitEnd:
