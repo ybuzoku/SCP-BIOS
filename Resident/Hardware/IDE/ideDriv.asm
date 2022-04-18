@@ -30,10 +30,12 @@ IDE:
 ;al should contain either A0/B0 for master/slave
 ;rdi points to the buffer
 ;Carry set if failed.
-    push rax            ;save the master/slave bit temporarily
-    add dx, 7            ;dx at base + 7
+    xchg bx, bx
+    push rbx
+    mov bl, al            ;save the master/slave bit temporarily
+    add edx, 7            ;dx at base + 7
 .l1:
-    in al, dx
+    in al, dx             ;Check for float
     cmp al, 0FFh
     je .exitfail
     test al, 10000000b
@@ -41,24 +43,18 @@ IDE:
 
     jmp short $ + 2            ;IO cycle kill
     cli
-.l2:
-    in al, dx
-    test al, al
-    jz .exitfail
-    test al, 01000000b
-    jz .l2
-
+    
     xor al, al
-    sub dx, 5            ;dx at base + 2
+    sub edx, 5            ;dx at base + 2
     out dx, al
-    inc dx               ;dx at base + 3
+    inc edx               ;dx at base + 3
     out dx, al
-    inc dx               ;dx at base + 4
+    inc edx               ;dx at base + 4
     out dx, al
-    inc dx               ;dx at base + 5
+    inc edx               ;dx at base + 5
     out dx, al
-    inc dx               ;dx at base + 6
-    pop rax              ;Get the master/slave bit back
+    inc edx               ;dx at base + 6
+    mov al, bl            ;Get the master/slave bit back
     out dx, al            
     inc dx               ;dx at base + 7
     mov al, 0ECh         ;ECh = Identify drive command
@@ -70,16 +66,15 @@ IDE:
     test al, 00001000b   ;Check DRQ, to be set for data ready
     jz .l3
 
-    sub dx, 7            ;dx at base + 0
-    push rcx
-    mov cx, 100h         ;100h words to be copied
+    sub edx, 7            ;dx at base + 0
+    mov ecx, 100h         ;100h words to be copied
     rep insw
     clc
-    sti
     jmp short .exit
 
 .exitfail:
     stc
 .exit:
-    pop rax
+    sti
+    pop rbx
     ret
