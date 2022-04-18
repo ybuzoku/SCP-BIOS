@@ -137,8 +137,8 @@ ideTableEntrySize     equ 10h
 fdd_base        equ    3F0h
 ;----------------------ATA equates---------------------------
 struc fdiskEntry
-    .signature  resq 1  ;Bit 0 set = LBA 48 supported
-    ;Obsolete and really shouldnt be used
+    .signature  resb 1 
+    ;CHS really shouldnt be used
     .wHeads     resw 1  ;Number of CHS Heads
     .wCylinder  resw 1  ;Number of CHS Cylinders
     .wSecTrc    resw 1  ;Number of CHS Sectors per Track

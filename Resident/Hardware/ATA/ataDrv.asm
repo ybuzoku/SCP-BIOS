@@ -68,6 +68,6 @@ ATA:
 
 .switchDrive:
 ;Switches drive from master/slave to slave/master
-;Sets/clears bit 7 of irq14/15Mutex 
+;Sets/clears bit 7 of ataXCmdByte 
 ;Bit 7 ataX Clear => Master
-;Bit
+;Called with dx = ataXbase
