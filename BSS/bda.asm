@@ -204,8 +204,8 @@ ideControllerTable:     resb  2*ideTableEntrySize ;Max 2 controllers
 ;           ATA Tables                  :
 ;----------------------------------------
 fdiskNumber:    resb 1  ;Number of fixed disks in system
-fdiskTable:     resb 4*fdiskTableEntrySize  ;Max 4 fixed disks
-; - BIOS address of device
+fdiskTable:     resb 4*fdiskEntry_size  ;Max 4 fixed disks
+; bAddress - BIOS address of device [+ 0]
 ;----------------------------------------
 ;            Int33h Table Area          :
 ;----------------------------------------

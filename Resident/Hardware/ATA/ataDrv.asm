@@ -6,6 +6,7 @@ ATA:
 ;rdi points to the buffer
 ;Carry set if failed.
     xchg bx, bx
+    push rax
     push rbx
     mov bl, al            ;save the master/slave bit temporarily
     add edx, 7            ;dx at base + 7
@@ -36,11 +37,21 @@ ATA:
     out dx, al
 
     jmp short $ + 2      ;IO cycle kill
-.l3:
+    mov bl, 10           ;10 retries ok
+.l2:
     in al, dx            ;get status byte
     test al, 00001000b   ;Check DRQ, to be set for data ready
-    jz .l3
-
+    jnz .l3 ;If set we good to go
+    ;Else timeout, wait for 1 ms before reading again
+    dec bl
+    jz .exitfail
+    push rcx
+    mov ecx, 1
+    mov ah, 86h
+    int 35h
+    pop rcx
+    jmp short .l2
+.l3:
     sub edx, 7            ;dx at base + 0
     mov ecx, 100h         ;100h words to be copied
     rep insw
@@ -52,4 +63,5 @@ ATA:
 .exit:
     sti
     pop rbx
+    pop rax
     ret

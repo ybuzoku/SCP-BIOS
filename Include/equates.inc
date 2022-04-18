@@ -135,8 +135,22 @@ sata_subclass   equ    06h
 ideTableEntrySize     equ 10h
 ;----------------------FDD equates---------------------------
 fdd_base        equ    3F0h
+;----------------------ATA equates---------------------------
+struc fdiskEntry
+    .signature  resq 1  ;Bit 0 set = LBA 48 supported
+    ;Obsolete and really shouldnt be used
+    .wHeads     resw 1  ;Number of CHS Heads
+    .wCylinder  resw 1  ;Number of CHS Cylinders
+    .wSecTrc    resw 1  ;Number of CHS Sectors per Track
+    .lbaMax     resd 1  ;Number of maximum sector accessible by LBA28
+    .lbaMax48   resq 1  ;Number of maximum sector accessible by LBA48
+endstruc
+    idCurrCyl   equ 2*54    ;54th word
+    idCurrHed   equ 2*55    ;55th word
+    idCurrSecTk equ 2*56    ;56th word
+    idLBASectrs equ 2*60    ;60th word
+    idLBA48Sec  equ 2*100   ;100th word
 ;----------------------Int 33h Equates-----------------------
-fdiskTableEntrySize   equ 10h
 int33TblEntrySize     equ 10h
 ;------------------------------------------------------------
 ;------------------------------------------------------------
