@@ -11,7 +11,7 @@ ideInitialisation:
     mov al, 0A0h
     mov dx, ata0_base
     mov rdi, sectorbuffer
-    call IDE.identifyDevice
+    call ATA.identifyDevice
     ;Now get information and build tables here
     jmp short .ideInitEnd
 
