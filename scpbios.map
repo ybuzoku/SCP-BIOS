@@ -231,6 +231,9 @@ Value     Name
 0000000E  fdiskEntry.lbaMax
 00000012  fdiskEntry.lbaMax48
 0000001A  fdiskEntry_size
+00000001  fdePresent
+00000002  fdeLBA28
+00000004  fdeLBA48
 0000006C  idCurrCyl
 0000006E  idCurrHed
 00000070  idCurrSecTk

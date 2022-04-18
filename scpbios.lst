@@ -148,23 +148,35 @@
    148 0000000E ????????            <1>     .lbaMax     resd 1  ;Number of maximum sector accessible by LBA28
    149 00000012 ????????????????    <1>     .lbaMax48   resq 1  ;Number of maximum sector accessible by LBA48
    150                              <1> endstruc
-   151                              <1>     idCurrCyl   equ 2*54    ;54th word
-   152                              <1>     idCurrHed   equ 2*55    ;55th word
-   153                              <1>     idCurrSecTk equ 2*56    ;56th word
-   154                              <1>     idLBASectrs equ 2*60    ;60th word
-   155                              <1>     idLBA48Sec  equ 2*100   ;100th word
-   156                              <1> ;----------------------Int 33h Equates-----------------------
-   157                              <1> int33TblEntrySize     equ 10h
-   158                              <1> ;------------------------------------------------------------
-   159                              <1> ;------------------------------------------------------------
-   160                              <1> ;------------------------Misc--------------------------------
-   161                              <1> port61h         equ 61h         ;I/O port 61h
-   162                              <1> EOI             equ 20h         ;End of interrupt signal
-   163                              <1> waitp           equ 80h         ;debug port used to wait for io cycles
-   164                              <1> bochsout        equ 0E9h        ;Emulator debug port
-   165                              <1> BREAKPOINT      equ 0CCh        ;Use to manually encode breakpoints in program
-   166                              <1> sizeOfMCPAlloc  equ 800h        ;2Kb allocated space
-   167                              <1> ;------------------------------------------------------------
+   151                              <1> ;.signature is as follows:
+   152                              <1> ;.signature[0] set = Device present and OK to use.
+   153                              <1> ;.signature[1] set = LBA 28 supported, detected by non-zero LBA28 field
+   154                              <1> ;.signature[2] set = LBA 48 supported, detected by bit set AND non-zero 
+   155                              <1> ;                       LBA 48 sectors field
+   156                              <1> ;.signature[7:3] = Reserved
+   157                              <1> ;Bitfield equates
+   158                              <1>     fdePresent  equ 1
+   159                              <1>     fdeLBA28    equ 2
+   160                              <1>     fdeLBA48    equ 4
+   161                              <1> 
+   162                              <1> ;Equates for the ATA identify command
+   163                              <1>     idCurrCyl   equ 2*54    ;54th word
+   164                              <1>     idCurrHed   equ 2*55    ;55th word
+   165                              <1>     idCurrSecTk equ 2*56    ;56th word
+   166                              <1>     idLBASectrs equ 2*60    ;60th word
+   167                              <1>     idLBA48Sec  equ 2*100   ;100th word
+   168                              <1> ;----------------------Int 33h Equates-----------------------
+   169                              <1> int33TblEntrySize     equ 10h
+   170                              <1> ;------------------------------------------------------------
+   171                              <1> ;------------------------------------------------------------
+   172                              <1> ;------------------------Misc--------------------------------
+   173                              <1> port61h         equ 61h         ;I/O port 61h
+   174                              <1> EOI             equ 20h         ;End of interrupt signal
+   175                              <1> waitp           equ 80h         ;debug port used to wait for io cycles
+   176                              <1> bochsout        equ 0E9h        ;Emulator debug port
+   177                              <1> BREAKPOINT      equ 0CCh        ;Use to manually encode breakpoints in program
+   178                              <1> sizeOfMCPAlloc  equ 800h        ;2Kb allocated space
+   179                              <1> ;------------------------------------------------------------
      4                                  ;----------------------------------------------------------------
      5                                  ;                 BIOS SYSTEM TABLE AREA                        :
      6                                  ;----------------------------------------------------------------
@@ -2429,8 +2441,8 @@
     84                              <1> 
     85 0000124C B0A0                <1>     mov al, 0A0h
     86 0000124E 66BAF001            <1>     mov dx, ata0_base
-    87 00001252 48BF00000700000000- <1>     mov rdi, 70000h
-    87 0000125B 00                  <1>
+    87 00001252 48BF-               <1>     mov rdi, sectorbuffer
+    87 00001254 [C003000000000000]  <1>
     88 0000125C E8(F5310000)        <1>     call ATA.identifyDevice
     89                              <1>     ;Now get information and build tables here
     90 00001261 6687DB              <1>     xchg bx, bx

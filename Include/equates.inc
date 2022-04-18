@@ -145,6 +145,18 @@ struc fdiskEntry
     .lbaMax     resd 1  ;Number of maximum sector accessible by LBA28
     .lbaMax48   resq 1  ;Number of maximum sector accessible by LBA48
 endstruc
+;.signature is as follows:
+;.signature[0] set = Device present and OK to use.
+;.signature[1] set = LBA 28 supported, detected by non-zero LBA28 field
+;.signature[2] set = LBA 48 supported, detected by bit set AND non-zero 
+;                       LBA 48 sectors field
+;.signature[7:3] = Reserved
+;Bitfield equates
+    fdePresent  equ 1
+    fdeLBA28    equ 2
+    fdeLBA48    equ 4
+
+;Equates for the ATA identify command
     idCurrCyl   equ 2*54    ;54th word
     idCurrHed   equ 2*55    ;55th word
     idCurrSecTk equ 2*56    ;56th word
