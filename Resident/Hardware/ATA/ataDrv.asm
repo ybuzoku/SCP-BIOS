@@ -5,7 +5,7 @@ ATA:
 ;al should contain either A0/B0 for master/slave
 ;rdi points to the buffer
 ;Carry set if failed.
-    xchg bx, bx
+
     push rax
     push rbx
     mov bl, al            ;save the master/slave bit temporarily

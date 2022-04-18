@@ -23,6 +23,7 @@ IDE:
     mov rdi, sectorbuffer
     call ATA.identifyDevice
     ;Now get information and build tables here
+    xchg bx, bx
     cmp dword [rdi + idLBASectrs], 0    ;Shouldn't be 0
 
     jmp short .ideInitEnd
