@@ -15,10 +15,12 @@ IDE:
     mov byte [ata0CmdByte], 1
     mov byte [ata1CmdByte], 1
 
+;Here, consider resetting drives on both channels
+
     lea rbx, fdiskTable
     mov al, 0A0h
     mov ah, al  ;Save in ah
-    mov dx, ata0_base
+    mov edx, ata0_base
     call ATA.selectDrive    ;Ignore status for master
     mov al, ah  ;Bring back
     call .identifyDrive ;Master ata0
@@ -34,7 +36,7 @@ IDE:
 
 .ii0:
     add rbx, fdiskEntry_size
-    mov dx, ata1_base
+    mov edx, ata1_base
     and al, 0EFh    ;Clear bit 4
     mov ah, al  ;Save in ah
     call ATA.selectDrive    ;Ignore status for master
@@ -50,6 +52,14 @@ IDE:
     jz .ii1 ;If al was zero, skip slave identification
     call .identifyDrive ;Slave ata1
 .ii1:
+;Now return the control of each host to the master drives
+    mov al, A0h
+    mov edx, ata0_base
+    call ATA.selectDrive
+
+    mov al, A0h
+    mov edx, ata1_base
+    call ATA.selectDrive
 
     jmp .ideInitEnd
 ;===========================

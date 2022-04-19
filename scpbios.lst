@@ -1247,7 +1247,7 @@
    411 000007B3 48B940000000000000- <1>     mov rcx, ((IDT_TABLE_Length >> 3))
    411 000007BC 00                  <1>
    412 000007BD 48BD-               <1>     mov rbp, IDT_TABLE
-   412 000007BF [D119000000000000]  <1>
+   412 000007BF [FC19000000000000]  <1>
    413                              <1> idtLoop:
    414 000007C7 488B44F500          <1>     mov rax, qword [rbp+(rsi*8)]
    415 000007CC E8(CB000000)        <1>     call idtWriteEntry
@@ -1290,10 +1290,10 @@
    448                              <1> ;Print Boot Message
    449 00000831 66B80413            <1>     mov ax, 1304h
    450 00000835 48BD-               <1>     mov rbp, startboot
-   450 00000837 [2617000000000000]  <1>
+   450 00000837 [4117000000000000]  <1>
    451 0000083F CD30                <1>     int 30h
    452                              <1> 
-   453 00000841 E8B90F0000          <1>     call memprint    ;Print Memory status
+   453 00000841 E8E40F0000          <1>     call memprint    ;Print Memory status
    454                              <1> 
    455                              <1> ;----------------------------------------------------------------
    456                              <1> ;                        End of Initialisation                  :
@@ -2822,312 +2822,322 @@
     75                              <1> end:
     76 00001656 66B80413            <1>     mov ax, 1304h
     77 0000165A 48BD-               <1>     mov rbp, dbgmsg
-    77 0000165C [CC17000000000000]  <1>
+    77 0000165C [E717000000000000]  <1>
     78 00001664 CD30                <1>     int 30h
     79 00001666 8A0425[4B020000]    <1>     mov al, byte [numMSD]
     80 0000166D B404                <1>     mov ah, 04h
     81 0000166F CD30                <1>     int 30h
     82                              <1> 
     83 00001671 66B80413            <1>     mov ax, 1304h
-    84 00001675 48BD-               <1>     mov rbp, dbgmsg2
-    84 00001677 [DD17000000000000]  <1>
+    84 00001675 48BD-               <1>     mov rbp, dbgmsg4
+    84 00001677 [1A18000000000000]  <1>
     85 0000167F CD30                <1>     int 30h
-    86 00001681 8A0425[A8010000]    <1>     mov al, byte [i33Devices]
+    86 00001681 8A0425[AA010000]    <1>     mov al, byte [fdiskNum]
     87 00001688 B404                <1>     mov ah, 04h
     88 0000168A CD30                <1>     int 30h
     89                              <1> 
     90 0000168C 66B80413            <1>     mov ax, 1304h
-    91 00001690 48BD-               <1>     mov rbp, dbgmsg3
-    91 00001692 [F117000000000000]  <1>
+    91 00001690 48BD-               <1>     mov rbp, dbgmsg2
+    91 00001692 [F817000000000000]  <1>
     92 0000169A CD30                <1>     int 30h
-    93 0000169C 8A0425[66000000]    <1>     mov al, byte [numCOM]
+    93 0000169C 8A0425[A8010000]    <1>     mov al, byte [i33Devices]
     94 000016A3 B404                <1>     mov ah, 04h
     95 000016A5 CD30                <1>     int 30h
     96                              <1> 
-    97 000016A7 803C25[A8010000]00  <1>     cmp byte [i33Devices], 0    ;If there are no i33 devices, skip bootstrap
-    98 000016AF 740C                <1>     jz endNoDevFound
-    99                              <1> 
-   100 000016B1 66C70425FE7D000000- <1>     mov word [7DFEh], 0 ;Clear out the old bootloader signature
-   100 000016BA 00                  <1>
-   101 000016BB CD39                <1>     int 39h             ;Bootstrap loader
-   102                              <1> endNoDevFound:
-   103 000016BD 48BD-               <1>     mov rbp, endboot
-   103 000016BF [3C17000000000000]  <1>
-   104 000016C7 66B80413            <1>     mov ax, 1304h
-   105 000016CB CD30                <1>     int 30h
-   106                              <1>     
-   107 000016CD 6631C0              <1>     xor ax, ax  ;Pause for any key
-   108 000016D0 CD36                <1>     int 36h
-   109                              <1> 
-   110 000016D2 66BB0700            <1>     mov bx, 0007h    ;cls attribs
-   111 000016D6 E8(F7000000)        <1>     call cls
-   112                              <1> 
-   113 000016DB 6631C9              <1>     xor cx, cx
-   114 000016DE 6631D2              <1>     xor dx, dx
-   115 000016E1 B402                <1>     mov ah, 2
-   116 000016E3 30FF                <1>     xor bh, bh
-   117 000016E5 CD30                <1>     int 30h 
-   118                              <1> 
-   119 000016E7 66B80413            <1>     mov ax, 1304h
-   120 000016EB 48BD-               <1>     mov rbp, endboot2
-   120 000016ED [AC17000000000000]  <1>
-   121 000016F5 CD30                <1>     int 30h
-   122                              <1> 
-   123 000016F7 4831C0              <1>     xor rax, rax
-   124 000016FA 4831DB              <1>     xor rbx, rbx
-   125 000016FD 4831C9              <1>     xor rcx, rcx
-   126 00001700 4831D2              <1>     xor rdx, rdx
-   127 00001703 4831F6              <1>     xor rsi, rsi
-   128 00001706 4831FF              <1>     xor rdi, rdi
-   129 00001709 4831ED              <1>     xor rbp, rbp
-   130 0000170C 4D31C0              <1>     xor r8, r8
-   131 0000170F 4D31C9              <1>     xor r9, r9
-   132 00001712 4D31D2              <1>     xor r10, r10
-   133 00001715 4D31DB              <1>     xor r11, r11
-   134 00001718 4D31E4              <1>     xor r12, r12
-   135 0000171B 4D31ED              <1>     xor r13, r13
-   136 0000171E 4D31F6              <1>     xor r14, r14
-   137 00001721 4D31FF              <1>     xor r15, r15
-   138                              <1> 
-   139 00001724 CD38                <1>     int 38h
-   140                              <1> 
-   141                              <1> 
-   142 00001726 4C6F6164696E672053- <1> startboot:  db "Loading SCP/BIOS...", 0Ah, 0Dh, 0
-   142 0000172F 43502F42494F532E2E- <1>
-   142 00001738 2E0A0D00            <1>
-   143 0000173C 0A0D5343502F42494F- <1> endboot:    db    0Ah,0Dh,"SCP/BIOS system initialisation complete", 0Ah, 0Dh 
-   143 00001745 532073797374656D20- <1>
-   143 0000174E 696E697469616C6973- <1>
-   143 00001757 6174696F6E20636F6D- <1>
-   143 00001760 706C6574650A0D      <1>
-   144 00001767 4E6F204F7065726174- <1>         db "No Operating System detected. Strike any key to launch SYSDEBUG."
-   144 00001770 696E67205379737465- <1>
-   144 00001779 6D2064657465637465- <1>
-   144 00001782 642E20537472696B65- <1>
-   144 0000178B 20616E79206B657920- <1>
-   144 00001794 746F206C61756E6368- <1>
-   144 0000179D 205359534445425547- <1>
-   144 000017A6 2E                  <1>
-   145 000017A7 2E2E0A0D00          <1>             db "..",0Ah, 0Dh,0
-   146 000017AC 5374617274696E6720- <1> endboot2:   db "Starting SCP/BIOS SYSDEBUG...",0Ah,0Dh,0
-   146 000017B5 5343502F42494F5320- <1>
-   146 000017BE 53595344454255472E- <1>
-   146 000017C7 2E2E0A0D00          <1>
-   147 000017CC 0A0A0D4D5344206465- <1> dbgmsg:     db 0Ah,0Ah,0Dh,"MSD devices: ",0
-   147 000017D5 76696365733A2000    <1>
-   148 000017DD 0A0D496E7420333368- <1> dbgmsg2:    db 0Ah,0Dh,"Int 33h devices: ",0
-   148 000017E6 20646576696365733A- <1>
-   148 000017EF 2000                <1>
-   149 000017F1 0A0D434F4D20706F72- <1> dbgmsg3:    db 0Ah,0Dh,"COM ports: ",0
-   149 000017FA 74733A2000          <1>
-   150                              <1> memprint:
-   151                              <1> ;Simple proc to print memory status
-   152 000017FF 6631DB              <1>     xor bx, bx 
-   153 00001802 48BD-               <1>     mov rbp, .convmemmsg
-   153 00001804 [5819000000000000]  <1>
-   154 0000180C 66B80413            <1>     mov ax, 1304h
-   155 00001810 CD30                <1>     int 30h
-   156 00001812 CD32                <1>     int 32h    ;Get conv Size
-   157 00001814 25FFFF0000          <1>     and eax, 0FFFFh ;Clear upper bits
-   158 00001819 E8F4000000          <1>     call .printdecimalword
-   159 0000181E 48BD-               <1>     mov rbp, .kb
-   159 00001820 [CF19000000000000]  <1>
-   160 00001828 66B80413            <1>     mov ax, 1304h
-   161 0000182C CD30                <1>     int 30h
-   162                              <1> 
-   163 0000182E 66B801E8            <1>     mov ax, 0E801h
-   164 00001832 CD35                <1>     int 35h
-   165 00001834 25FFFF0000          <1>     and eax, 0FFFFh
-   166 00001839 81E3FFFF0000        <1>     and ebx, 0FFFFh
-   167 0000183F 81E1FFFF0000        <1>     and ecx, 0FFFFh
-   168 00001845 81E2FFFF0000        <1>     and edx, 0FFFFh
-   169 0000184B 53                  <1>     push rbx
-   170 0000184C 52                  <1>     push rdx
-   171 0000184D 4839C8              <1>     cmp rax, rcx
-   172 00001850 740C                <1>     je .sense1    ;Sensible
-   173 00001852 4885C0              <1>     test rax, rax
-   174 00001855 480F44C1            <1>     cmovz rax, rcx
-   175 00001859 4885C0              <1>     test rax, rax
-   176 0000185C 7427                <1>     jz .pt2
-   177                              <1> .sense1:
-   178 0000185E 50                  <1>     push rax
-   179 0000185F 48BD-               <1>     mov rbp, .extmemmsg
-   179 00001861 [7519000000000000]  <1>
-   180 00001869 66B80413            <1>     mov ax, 1304h
-   181 0000186D CD30                <1>     int 30h
-   182 0000186F 58                  <1>     pop rax
-   183 00001870 E89D000000          <1>     call .printdecimalword
-   184 00001875 48BD-               <1>     mov rbp, .kb
-   184 00001877 [CF19000000000000]  <1>
-   185 0000187F 66B80413            <1>     mov ax, 1304h
-   186 00001883 CD30                <1>     int 30h
-   187                              <1> .pt2:
-   188 00001885 58                  <1>     pop rax
-   189 00001886 59                  <1>     pop rcx
-   190 00001887 4839C8              <1>     cmp rax, rcx
-   191 0000188A 740C                <1>     je .sense2    ;Sensible
-   192 0000188C 4885C0              <1>     test rax, rax
-   193 0000188F 480F44C1            <1>     cmovz rax, rcx
-   194 00001893 4885C0              <1>     test rax, rax
-   195 00001896 742B                <1>     jz .pt3
-   196                              <1> .sense2:
-   197 00001898 50                  <1>     push rax
-   198 00001899 48BD-               <1>     mov rbp, .extmemmsg2
-   198 0000189B [9319000000000000]  <1>
-   199 000018A3 66B80413            <1>     mov ax, 1304h
-   200 000018A7 CD30                <1>     int 30h
-   201 000018A9 58                  <1>     pop rax
-   202                              <1> 
-   203 000018AA 48C1E006            <1>     shl rax, 6    ;Turn 64Kb into Kb
-   204 000018AE E85F000000          <1>     call .printdecimalword
-   205 000018B3 48BD-               <1>     mov rbp, .kb
-   205 000018B5 [CF19000000000000]  <1>
-   206 000018BD 66B80413            <1>     mov ax, 1304h
-   207 000018C1 CD30                <1>     int 30h
-   208                              <1> .pt3:   ;Read total free size from big map
-   209 000018C3 50                  <1>     push rax
-   210 000018C4 48BD-               <1>     mov rbp, .totalmem
-   210 000018C6 [B219000000000000]  <1>
-   211 000018CE B804130000          <1>     mov eax, 1304h
-   212 000018D3 CD30                <1>     int 30h
-   213 000018D5 58                  <1>     pop rax
-   214 000018D6 488B0425[E0010000]  <1>     mov rax, qword [sysMem]
-   215 000018DE 31DB                <1>     xor ebx, ebx
-   216 000018E0 8B1C25[E8010000]    <1>     mov ebx, dword [scpSize]
-   217 000018E7 4829D8              <1>     sub rax, rbx
-   218 000018EA 48C1E80A            <1>     shr rax, 0Ah                ;Get number of Kb's free
-   219 000018EE E81F000000          <1>     call .printdecimalword  
-   220 000018F3 48BD-               <1>     mov rbp, .kb
-   220 000018F5 [CF19000000000000]  <1>
-   221 000018FD 66B80413            <1>     mov ax, 1304h
-   222 00001901 CD30                <1>     int 30h
-   223                              <1> 
-   224 00001903 B80A0E0000          <1>     mov eax, 0E0Ah
-   225 00001908 CD30                <1>     int 30h
-   226 0000190A B80D0E0000          <1>     mov eax, 0E0Dh   ;CR/LF
-   227 0000190F CD30                <1>     int 30h
-   228                              <1> 
-   229 00001911 C3                  <1>     ret
-   230                              <1> 
-   231                              <1> .printdecimalword:
-   232                              <1> ;Takes the qword in rax and prints its decimal representation
-   233 00001912 52                  <1>     push rdx
-   234 00001913 51                  <1>     push rcx
-   235 00001914 53                  <1>     push rbx
-   236 00001915 50                  <1>     push rax
-   237 00001916 55                  <1>     push rbp
-   238 00001917 4831C9              <1>     xor rcx, rcx
-   239 0000191A 6631ED              <1>     xor bp, bp    ;Use bp as #of digits counter
-   240 0000191D 48BB0A000000000000- <1>     mov rbx, 0Ah  ;Divide by 10
-   240 00001926 00                  <1>
-   241                              <1> .pdw0:
-   242 00001927 FFC5                <1>     inc ebp
-   243 00001929 48C1E108            <1>     shl rcx, 8    ;Space for next nybble
-   244 0000192D 31D2                <1>     xor edx, edx
-   245 0000192F 48F7F3              <1>     div rbx
-   246 00001932 80C230              <1>     add dl, '0'
-   247 00001935 80FA39              <1>     cmp dl, '9'
-   248 00001938 7603                <1>     jbe .pdw1
-   249 0000193A 80C207              <1>     add dl, 'A'-'0'-10
-   250                              <1> .pdw1:
-   251 0000193D 88D1                <1>     mov cl, dl    ;Save remainder byte
-   252 0000193F 4885C0              <1>     test rax, rax
-   253 00001942 75E3                <1>     jnz .pdw0
-   254                              <1> .pdw2:
-   255 00001944 88C8                <1>     mov al, cl    ;Get most sig digit into al
-   256 00001946 48C1E908            <1>     shr rcx, 8    ;Get next digit down
-   257 0000194A B40E                <1>     mov ah, 0Eh
-   258 0000194C CD30                <1>     int 30h
-   259 0000194E FFCD                <1>     dec ebp
-   260 00001950 75F2                <1>     jnz .pdw2
-   261                              <1> 
-   262 00001952 5D                  <1>     pop rbp
-   263 00001953 58                  <1>     pop rax
-   264 00001954 5B                  <1>     pop rbx
-   265 00001955 59                  <1>     pop rcx
-   266 00001956 5A                  <1>     pop rdx
-   267 00001957 C3                  <1>     ret
-   268 00001958 0A0D4672656520436F- <1> .convmemmsg:        db 0Ah,0Dh,"Free Conventional Memory: ",0
-   268 00001961 6E76656E74696F6E61- <1>
-   268 0000196A 6C204D656D6F72793A- <1>
-   268 00001973 2000                <1>
-   269 00001975 0A0D546F74616C204C- <1> .extmemmsg:         db 0Ah,0Dh,"Total Low Extended Memory: ",0    
-   269 0000197E 6F7720457874656E64- <1>
-   269 00001987 6564204D656D6F7279- <1>
-   269 00001990 3A2000              <1>
-   270 00001993 0A0D546F74616C2048- <1> .extmemmsg2:        db 0Ah,0Dh,"Total High Extended Memory: ",0
-   270 0000199C 69676820457874656E- <1>
-   270 000019A5 646564204D656D6F72- <1>
-   270 000019AE 793A2000            <1>
-   271 000019B2 0A0D546F74616C2046- <1> .totalmem:          db 0Ah,0Dh,"Total Free System Memory: ",0
-   271 000019BB 726565205379737465- <1>
-   271 000019C4 6D204D656D6F72793A- <1>
-   271 000019CD 2000                <1>
-   272 000019CF 4B00                <1> .kb:                db "K",0
+    97 000016A7 66B80413            <1>     mov ax, 1304h
+    98 000016AB 48BD-               <1>     mov rbp, dbgmsg3
+    98 000016AD [0C18000000000000]  <1>
+    99 000016B5 CD30                <1>     int 30h
+   100 000016B7 8A0425[66000000]    <1>     mov al, byte [numCOM]
+   101 000016BE B404                <1>     mov ah, 04h
+   102 000016C0 CD30                <1>     int 30h
+   103                              <1> 
+   104 000016C2 803C25[A8010000]00  <1>     cmp byte [i33Devices], 0    ;If there are no i33 devices, skip bootstrap
+   105 000016CA 740C                <1>     jz endNoDevFound
+   106                              <1> 
+   107 000016CC 66C70425FE7D000000- <1>     mov word [7DFEh], 0 ;Clear out the old bootloader signature
+   107 000016D5 00                  <1>
+   108 000016D6 CD39                <1>     int 39h             ;Bootstrap loader
+   109                              <1> endNoDevFound:
+   110 000016D8 48BD-               <1>     mov rbp, endboot
+   110 000016DA [5717000000000000]  <1>
+   111 000016E2 66B80413            <1>     mov ax, 1304h
+   112 000016E6 CD30                <1>     int 30h
+   113                              <1>     
+   114 000016E8 6631C0              <1>     xor ax, ax  ;Pause for any key
+   115 000016EB CD36                <1>     int 36h
+   116                              <1> 
+   117 000016ED 66BB0700            <1>     mov bx, 0007h    ;cls attribs
+   118 000016F1 E8(F7000000)        <1>     call cls
+   119                              <1> 
+   120 000016F6 6631C9              <1>     xor cx, cx
+   121 000016F9 6631D2              <1>     xor dx, dx
+   122 000016FC B402                <1>     mov ah, 2
+   123 000016FE 30FF                <1>     xor bh, bh
+   124 00001700 CD30                <1>     int 30h 
+   125                              <1> 
+   126 00001702 66B80413            <1>     mov ax, 1304h
+   127 00001706 48BD-               <1>     mov rbp, endboot2
+   127 00001708 [C717000000000000]  <1>
+   128 00001710 CD30                <1>     int 30h
+   129                              <1> 
+   130 00001712 4831C0              <1>     xor rax, rax
+   131 00001715 4831DB              <1>     xor rbx, rbx
+   132 00001718 4831C9              <1>     xor rcx, rcx
+   133 0000171B 4831D2              <1>     xor rdx, rdx
+   134 0000171E 4831F6              <1>     xor rsi, rsi
+   135 00001721 4831FF              <1>     xor rdi, rdi
+   136 00001724 4831ED              <1>     xor rbp, rbp
+   137 00001727 4D31C0              <1>     xor r8, r8
+   138 0000172A 4D31C9              <1>     xor r9, r9
+   139 0000172D 4D31D2              <1>     xor r10, r10
+   140 00001730 4D31DB              <1>     xor r11, r11
+   141 00001733 4D31E4              <1>     xor r12, r12
+   142 00001736 4D31ED              <1>     xor r13, r13
+   143 00001739 4D31F6              <1>     xor r14, r14
+   144 0000173C 4D31FF              <1>     xor r15, r15
+   145                              <1> 
+   146 0000173F CD38                <1>     int 38h
+   147                              <1> 
+   148                              <1> 
+   149 00001741 4C6F6164696E672053- <1> startboot:  db "Loading SCP/BIOS...", 0Ah, 0Dh, 0
+   149 0000174A 43502F42494F532E2E- <1>
+   149 00001753 2E0A0D00            <1>
+   150 00001757 0A0D5343502F42494F- <1> endboot:    db    0Ah,0Dh,"SCP/BIOS system initialisation complete", 0Ah, 0Dh 
+   150 00001760 532073797374656D20- <1>
+   150 00001769 696E697469616C6973- <1>
+   150 00001772 6174696F6E20636F6D- <1>
+   150 0000177B 706C6574650A0D      <1>
+   151 00001782 4E6F204F7065726174- <1>         db "No Operating System detected. Strike any key to launch SYSDEBUG."
+   151 0000178B 696E67205379737465- <1>
+   151 00001794 6D2064657465637465- <1>
+   151 0000179D 642E20537472696B65- <1>
+   151 000017A6 20616E79206B657920- <1>
+   151 000017AF 746F206C61756E6368- <1>
+   151 000017B8 205359534445425547- <1>
+   151 000017C1 2E                  <1>
+   152 000017C2 2E2E0A0D00          <1>             db "..",0Ah, 0Dh,0
+   153 000017C7 5374617274696E6720- <1> endboot2:   db "Starting SCP/BIOS SYSDEBUG...",0Ah,0Dh,0
+   153 000017D0 5343502F42494F5320- <1>
+   153 000017D9 53595344454255472E- <1>
+   153 000017E2 2E2E0A0D00          <1>
+   154 000017E7 0A0A0D4D5344206465- <1> dbgmsg:     db 0Ah,0Ah,0Dh,"MSD devices: ",0
+   154 000017F0 76696365733A2000    <1>
+   155 000017F8 0A0D496E7420333368- <1> dbgmsg2:    db 0Ah,0Dh,"Int 33h devices: ",0
+   155 00001801 20646576696365733A- <1>
+   155 0000180A 2000                <1>
+   156 0000180C 0A0D434F4D20706F72- <1> dbgmsg3:    db 0Ah,0Dh,"COM ports: ",0
+   156 00001815 74733A2000          <1>
+   157 0000181A 0A0D41544120646576- <1> dbgmsg4:    db 0Ah,0Dh,"ATA devices: ", 0
+   157 00001823 696365733A2000      <1>
+   158                              <1> memprint:
+   159                              <1> ;Simple proc to print memory status
+   160 0000182A 6631DB              <1>     xor bx, bx 
+   161 0000182D 48BD-               <1>     mov rbp, .convmemmsg
+   161 0000182F [8319000000000000]  <1>
+   162 00001837 66B80413            <1>     mov ax, 1304h
+   163 0000183B CD30                <1>     int 30h
+   164 0000183D CD32                <1>     int 32h    ;Get conv Size
+   165 0000183F 25FFFF0000          <1>     and eax, 0FFFFh ;Clear upper bits
+   166 00001844 E8F4000000          <1>     call .printdecimalword
+   167 00001849 48BD-               <1>     mov rbp, .kb
+   167 0000184B [FA19000000000000]  <1>
+   168 00001853 66B80413            <1>     mov ax, 1304h
+   169 00001857 CD30                <1>     int 30h
+   170                              <1> 
+   171 00001859 66B801E8            <1>     mov ax, 0E801h
+   172 0000185D CD35                <1>     int 35h
+   173 0000185F 25FFFF0000          <1>     and eax, 0FFFFh
+   174 00001864 81E3FFFF0000        <1>     and ebx, 0FFFFh
+   175 0000186A 81E1FFFF0000        <1>     and ecx, 0FFFFh
+   176 00001870 81E2FFFF0000        <1>     and edx, 0FFFFh
+   177 00001876 53                  <1>     push rbx
+   178 00001877 52                  <1>     push rdx
+   179 00001878 4839C8              <1>     cmp rax, rcx
+   180 0000187B 740C                <1>     je .sense1    ;Sensible
+   181 0000187D 4885C0              <1>     test rax, rax
+   182 00001880 480F44C1            <1>     cmovz rax, rcx
+   183 00001884 4885C0              <1>     test rax, rax
+   184 00001887 7427                <1>     jz .pt2
+   185                              <1> .sense1:
+   186 00001889 50                  <1>     push rax
+   187 0000188A 48BD-               <1>     mov rbp, .extmemmsg
+   187 0000188C [A019000000000000]  <1>
+   188 00001894 66B80413            <1>     mov ax, 1304h
+   189 00001898 CD30                <1>     int 30h
+   190 0000189A 58                  <1>     pop rax
+   191 0000189B E89D000000          <1>     call .printdecimalword
+   192 000018A0 48BD-               <1>     mov rbp, .kb
+   192 000018A2 [FA19000000000000]  <1>
+   193 000018AA 66B80413            <1>     mov ax, 1304h
+   194 000018AE CD30                <1>     int 30h
+   195                              <1> .pt2:
+   196 000018B0 58                  <1>     pop rax
+   197 000018B1 59                  <1>     pop rcx
+   198 000018B2 4839C8              <1>     cmp rax, rcx
+   199 000018B5 740C                <1>     je .sense2    ;Sensible
+   200 000018B7 4885C0              <1>     test rax, rax
+   201 000018BA 480F44C1            <1>     cmovz rax, rcx
+   202 000018BE 4885C0              <1>     test rax, rax
+   203 000018C1 742B                <1>     jz .pt3
+   204                              <1> .sense2:
+   205 000018C3 50                  <1>     push rax
+   206 000018C4 48BD-               <1>     mov rbp, .extmemmsg2
+   206 000018C6 [BE19000000000000]  <1>
+   207 000018CE 66B80413            <1>     mov ax, 1304h
+   208 000018D2 CD30                <1>     int 30h
+   209 000018D4 58                  <1>     pop rax
+   210                              <1> 
+   211 000018D5 48C1E006            <1>     shl rax, 6    ;Turn 64Kb into Kb
+   212 000018D9 E85F000000          <1>     call .printdecimalword
+   213 000018DE 48BD-               <1>     mov rbp, .kb
+   213 000018E0 [FA19000000000000]  <1>
+   214 000018E8 66B80413            <1>     mov ax, 1304h
+   215 000018EC CD30                <1>     int 30h
+   216                              <1> .pt3:   ;Read total free size from big map
+   217 000018EE 50                  <1>     push rax
+   218 000018EF 48BD-               <1>     mov rbp, .totalmem
+   218 000018F1 [DD19000000000000]  <1>
+   219 000018F9 B804130000          <1>     mov eax, 1304h
+   220 000018FE CD30                <1>     int 30h
+   221 00001900 58                  <1>     pop rax
+   222 00001901 488B0425[E0010000]  <1>     mov rax, qword [sysMem]
+   223 00001909 31DB                <1>     xor ebx, ebx
+   224 0000190B 8B1C25[E8010000]    <1>     mov ebx, dword [scpSize]
+   225 00001912 4829D8              <1>     sub rax, rbx
+   226 00001915 48C1E80A            <1>     shr rax, 0Ah                ;Get number of Kb's free
+   227 00001919 E81F000000          <1>     call .printdecimalword  
+   228 0000191E 48BD-               <1>     mov rbp, .kb
+   228 00001920 [FA19000000000000]  <1>
+   229 00001928 66B80413            <1>     mov ax, 1304h
+   230 0000192C CD30                <1>     int 30h
+   231                              <1> 
+   232 0000192E B80A0E0000          <1>     mov eax, 0E0Ah
+   233 00001933 CD30                <1>     int 30h
+   234 00001935 B80D0E0000          <1>     mov eax, 0E0Dh   ;CR/LF
+   235 0000193A CD30                <1>     int 30h
+   236                              <1> 
+   237 0000193C C3                  <1>     ret
+   238                              <1> 
+   239                              <1> .printdecimalword:
+   240                              <1> ;Takes the qword in rax and prints its decimal representation
+   241 0000193D 52                  <1>     push rdx
+   242 0000193E 51                  <1>     push rcx
+   243 0000193F 53                  <1>     push rbx
+   244 00001940 50                  <1>     push rax
+   245 00001941 55                  <1>     push rbp
+   246 00001942 4831C9              <1>     xor rcx, rcx
+   247 00001945 6631ED              <1>     xor bp, bp    ;Use bp as #of digits counter
+   248 00001948 48BB0A000000000000- <1>     mov rbx, 0Ah  ;Divide by 10
+   248 00001951 00                  <1>
+   249                              <1> .pdw0:
+   250 00001952 FFC5                <1>     inc ebp
+   251 00001954 48C1E108            <1>     shl rcx, 8    ;Space for next nybble
+   252 00001958 31D2                <1>     xor edx, edx
+   253 0000195A 48F7F3              <1>     div rbx
+   254 0000195D 80C230              <1>     add dl, '0'
+   255 00001960 80FA39              <1>     cmp dl, '9'
+   256 00001963 7603                <1>     jbe .pdw1
+   257 00001965 80C207              <1>     add dl, 'A'-'0'-10
+   258                              <1> .pdw1:
+   259 00001968 88D1                <1>     mov cl, dl    ;Save remainder byte
+   260 0000196A 4885C0              <1>     test rax, rax
+   261 0000196D 75E3                <1>     jnz .pdw0
+   262                              <1> .pdw2:
+   263 0000196F 88C8                <1>     mov al, cl    ;Get most sig digit into al
+   264 00001971 48C1E908            <1>     shr rcx, 8    ;Get next digit down
+   265 00001975 B40E                <1>     mov ah, 0Eh
+   266 00001977 CD30                <1>     int 30h
+   267 00001979 FFCD                <1>     dec ebp
+   268 0000197B 75F2                <1>     jnz .pdw2
+   269                              <1> 
+   270 0000197D 5D                  <1>     pop rbp
+   271 0000197E 58                  <1>     pop rax
+   272 0000197F 5B                  <1>     pop rbx
+   273 00001980 59                  <1>     pop rcx
+   274 00001981 5A                  <1>     pop rdx
+   275 00001982 C3                  <1>     ret
+   276 00001983 0A0D4672656520436F- <1> .convmemmsg:        db 0Ah,0Dh,"Free Conventional Memory: ",0
+   276 0000198C 6E76656E74696F6E61- <1>
+   276 00001995 6C204D656D6F72793A- <1>
+   276 0000199E 2000                <1>
+   277 000019A0 0A0D546F74616C204C- <1> .extmemmsg:         db 0Ah,0Dh,"Total Low Extended Memory: ",0    
+   277 000019A9 6F7720457874656E64- <1>
+   277 000019B2 6564204D656D6F7279- <1>
+   277 000019BB 3A2000              <1>
+   278 000019BE 0A0D546F74616C2048- <1> .extmemmsg2:        db 0Ah,0Dh,"Total High Extended Memory: ",0
+   278 000019C7 69676820457874656E- <1>
+   278 000019D0 646564204D656D6F72- <1>
+   278 000019D9 793A2000            <1>
+   279 000019DD 0A0D546F74616C2046- <1> .totalmem:          db 0Ah,0Dh,"Total Free System Memory: ",0
+   279 000019E6 726565205379737465- <1>
+   279 000019EF 6D204D656D6F72793A- <1>
+   279 000019F8 2000                <1>
+   280 000019FA 4B00                <1> .kb:                db "K",0
     72                                  %include "./Init/IntTable.asm"
     73                              <1> ;----------------------Interrupt Tables--------------------------
     74                              <1> IDT_TABLE:
     75                              <1> CPU_IDT:
-    76 000019D1 [114C000000000000]  <1>     dq i0
-    77 000019D9 [194C000000000000]  <1>     dq i1
-    78 000019E1 [284C000000000000]  <1>     dq i2
-    79 000019E9 [374C000000000000]  <1>     dq i3
-    80 000019F1 [464C000000000000]  <1>     dq i4
-    81 000019F9 [554C000000000000]  <1>     dq i5
-    82 00001A01 [644C000000000000]  <1>     dq i6
-    83 00001A09 [734C000000000000]  <1>     dq i7
-    84 00001A11 [824C000000000000]  <1>     dq i8
-    85 00001A19 [914C000000000000]  <1>     dq i9
-    86 00001A21 [A04C000000000000]  <1>     dq i10
-    87 00001A29 [AF4C000000000000]  <1>     dq i11
-    88 00001A31 [BE4C000000000000]  <1>     dq i12
-    89 00001A39 [CD4C000000000000]  <1>     dq i13
-    90 00001A41 [D94C000000000000]  <1>     dq i14
-    91 00001A49 [E54C000000000000]  <1>     dq i15
-    92 00001A51 [F14C000000000000]  <1>     dq i16
-    93 00001A59 [FD4C000000000000]  <1>     dq i17
-    94 00001A61 [094D000000000000]  <1>     dq i18
-    95 00001A69 [154D000000000000]  <1>     dq i19
-    96 00001A71 [214D000000000000]  <1>     dq i20
-    97 00001A79 [2D4D000000000000]  <1>     dq i21
-    98 00001A81 [3050000000000000]- <1>     times 0Ah dq dummy_return_64    ;just return, reserved interrupts!
-    98 00001A81 <rep Ah>            <1>
+    76 000019FC [114C000000000000]  <1>     dq i0
+    77 00001A04 [194C000000000000]  <1>     dq i1
+    78 00001A0C [284C000000000000]  <1>     dq i2
+    79 00001A14 [374C000000000000]  <1>     dq i3
+    80 00001A1C [464C000000000000]  <1>     dq i4
+    81 00001A24 [554C000000000000]  <1>     dq i5
+    82 00001A2C [644C000000000000]  <1>     dq i6
+    83 00001A34 [734C000000000000]  <1>     dq i7
+    84 00001A3C [824C000000000000]  <1>     dq i8
+    85 00001A44 [914C000000000000]  <1>     dq i9
+    86 00001A4C [A04C000000000000]  <1>     dq i10
+    87 00001A54 [AF4C000000000000]  <1>     dq i11
+    88 00001A5C [BE4C000000000000]  <1>     dq i12
+    89 00001A64 [CD4C000000000000]  <1>     dq i13
+    90 00001A6C [D94C000000000000]  <1>     dq i14
+    91 00001A74 [E54C000000000000]  <1>     dq i15
+    92 00001A7C [F14C000000000000]  <1>     dq i16
+    93 00001A84 [FD4C000000000000]  <1>     dq i17
+    94 00001A8C [094D000000000000]  <1>     dq i18
+    95 00001A94 [154D000000000000]  <1>     dq i19
+    96 00001A9C [214D000000000000]  <1>     dq i20
+    97 00001AA4 [2D4D000000000000]  <1>     dq i21
+    98 00001AAC [3050000000000000]- <1>     times 0Ah dq dummy_return_64    ;just return, reserved interrupts!
+    98 00001AAC <rep Ah>            <1>
     99                              <1> HW_IDT:
    100                              <1> ;--------PIC1--------:    ;Int 20h-27h
-   101 00001AD1 [0F01000000000000]  <1>     dq timer_IRQ0
-   102 00001AD9 [4F01000000000000]  <1>     dq kb_IRQ1
-   103 00001AE1 [2A50000000000000]  <1>     dq dummy_interrupt.pic1
-   104 00001AE9 [CF09000000000000]  <1>     dq ser_IRQ3
-   105 00001AF1 [E109000000000000]  <1>     dq ser_IRQ4
-   106 00001AF9 [2A50000000000000]  <1>     dq dummy_interrupt.pic1
-   107 00001B01 [AA0A000000000000]  <1>     dq fdd_IRQ6
-   108 00001B09 [770B000000000000]  <1>     dq default_IRQ7
+   101 00001AFC [0F01000000000000]  <1>     dq timer_IRQ0
+   102 00001B04 [4F01000000000000]  <1>     dq kb_IRQ1
+   103 00001B0C [2A50000000000000]  <1>     dq dummy_interrupt.pic1
+   104 00001B14 [CF09000000000000]  <1>     dq ser_IRQ3
+   105 00001B1C [E109000000000000]  <1>     dq ser_IRQ4
+   106 00001B24 [2A50000000000000]  <1>     dq dummy_interrupt.pic1
+   107 00001B2C [AA0A000000000000]  <1>     dq fdd_IRQ6
+   108 00001B34 [770B000000000000]  <1>     dq default_IRQ7
    109                              <1> ;--------PIC2--------:    ;Int 28h-2Fh
-   110 00001B11 [B20A000000000000]  <1>     dq rtc_IRQ8
-   111 00001B19 [2350000000000000]  <1>     dq dummy_interrupt.pic2
-   112 00001B21 [2350000000000000]  <1>     dq dummy_interrupt.pic2
-   113 00001B29 [2350000000000000]  <1>     dq dummy_interrupt.pic2
-   114 00001B31 [2350000000000000]  <1>     dq dummy_interrupt.pic2
-   115 00001B39 [2350000000000000]  <1>     dq dummy_interrupt.pic2
-   116 00001B41 [E50A000000000000]  <1>     dq hdd_IRQ14
-   117 00001B49 [960B000000000000]  <1>     dq default_IRQ15
+   110 00001B3C [B20A000000000000]  <1>     dq rtc_IRQ8
+   111 00001B44 [2350000000000000]  <1>     dq dummy_interrupt.pic2
+   112 00001B4C [2350000000000000]  <1>     dq dummy_interrupt.pic2
+   113 00001B54 [2350000000000000]  <1>     dq dummy_interrupt.pic2
+   114 00001B5C [2350000000000000]  <1>     dq dummy_interrupt.pic2
+   115 00001B64 [2350000000000000]  <1>     dq dummy_interrupt.pic2
+   116 00001B6C [E50A000000000000]  <1>     dq hdd_IRQ14
+   117 00001B74 [960B000000000000]  <1>     dq default_IRQ15
    118                              <1> SW_IDT:    ;Int 30h onwards!
-   119 00001B51 [690C000000000000]  <1>     dq scr_io            ;Int 30h, VGA Screen drawing/TTY functions
-   120 00001B59 [F312000000000000]  <1>     dq machineWord_io    ;Int 31h, Give the BIOS hardware bitfield
-   121 00001B61 [2A13000000000000]  <1>     dq convRAM_io        ;Int 32h, Give conv memory available
-   122 00001B69 [4D13000000000000]  <1>     dq disk_io           ;Int 33h, Storage device Functions
-   123 00001B71 [AA1A000000000000]  <1>     dq serial_io         ;Int 34h, Serial Port Functions
-   124 00001B79 [181C000000000000]  <1>     dq misc_io           ;Int 35h, Misc functions
-   125 00001B81 [BA1F000000000000]  <1>     dq kb_io             ;Int 36h, Keyboard functions
-   126 00001B89 [3C20000000000000]  <1>     dq printer_io        ;Int 37h, Reserved [Who uses parallel anymore?]
-   127 00001B91 [DD20000000000000]  <1>     dq MCP_int           ;Int 38h, launch MCP, and install its "API" handle
-   128 00001B99 [D52E000000000000]  <1>     dq bootstrapInt      ;Int 39h, restart the PC using an interrupt
-   129 00001BA1 [522F000000000000]  <1>     dq timerInt          ;Int 3Ah, Time of day
-   130 00001BA9 [BD31000000000000]  <1>     dq ctrlbreak_io      ;Int 3Bh, user Break
-   131 00001BB1 [3050000000000000]  <1>     dq dummy_return_64   ;Int 3Ch, user IRQ0 hook
-   132 00001BB9 [BF31000000000000]  <1>     dq scr_params_io     ;Int 3Dh, Screen Mode parameters return function
-   133 00001BC1 [CB31000000000000]  <1>     dq disk_params_io    ;Int 3Eh, disk parameters return function
-   134 00001BC9 [DD31000000000000]  <1>     dq cga_ret_io        ;Int 3Fh, video extention return function
+   119 00001B7C [690C000000000000]  <1>     dq scr_io            ;Int 30h, VGA Screen drawing/TTY functions
+   120 00001B84 [F312000000000000]  <1>     dq machineWord_io    ;Int 31h, Give the BIOS hardware bitfield
+   121 00001B8C [2A13000000000000]  <1>     dq convRAM_io        ;Int 32h, Give conv memory available
+   122 00001B94 [4D13000000000000]  <1>     dq disk_io           ;Int 33h, Storage device Functions
+   123 00001B9C [AA1A000000000000]  <1>     dq serial_io         ;Int 34h, Serial Port Functions
+   124 00001BA4 [181C000000000000]  <1>     dq misc_io           ;Int 35h, Misc functions
+   125 00001BAC [BA1F000000000000]  <1>     dq kb_io             ;Int 36h, Keyboard functions
+   126 00001BB4 [3C20000000000000]  <1>     dq printer_io        ;Int 37h, Reserved [Who uses parallel anymore?]
+   127 00001BBC [DD20000000000000]  <1>     dq MCP_int           ;Int 38h, launch MCP, and install its "API" handle
+   128 00001BC4 [D52E000000000000]  <1>     dq bootstrapInt      ;Int 39h, restart the PC using an interrupt
+   129 00001BCC [522F000000000000]  <1>     dq timerInt          ;Int 3Ah, Time of day
+   130 00001BD4 [BD31000000000000]  <1>     dq ctrlbreak_io      ;Int 3Bh, user Break
+   131 00001BDC [3050000000000000]  <1>     dq dummy_return_64   ;Int 3Ch, user IRQ0 hook
+   132 00001BE4 [BF31000000000000]  <1>     dq scr_params_io     ;Int 3Dh, Screen Mode parameters return function
+   133 00001BEC [CB31000000000000]  <1>     dq disk_params_io    ;Int 3Eh, disk parameters return function
+   134 00001BF4 [DD31000000000000]  <1>     dq cga_ret_io        ;Int 3Fh, video extention return function
    135                              <1> IDT_TABLE_Length equ $ - IDT_TABLE
     73                                  seg0len equ ($ - $$)
     74                                  

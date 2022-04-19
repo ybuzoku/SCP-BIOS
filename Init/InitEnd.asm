@@ -10,6 +10,13 @@ end:
     int 30h
 
     mov ax, 1304h
+    mov rbp, dbgmsg4
+    int 30h
+    mov al, byte [fdiskNum]
+    mov ah, 04h
+    int 30h
+
+    mov ax, 1304h
     mov rbp, dbgmsg2
     int 30h
     mov al, byte [i33Devices]
@@ -76,6 +83,7 @@ endboot2:   db "Starting SCP/BIOS SYSDEBUG...",0Ah,0Dh,0
 dbgmsg:     db 0Ah,0Ah,0Dh,"MSD devices: ",0
 dbgmsg2:    db 0Ah,0Dh,"Int 33h devices: ",0
 dbgmsg3:    db 0Ah,0Dh,"COM ports: ",0
+dbgmsg4:    db 0Ah,0Dh,"ATA devices: ", 0
 memprint:
 ;Simple proc to print memory status
     xor bx, bx 
