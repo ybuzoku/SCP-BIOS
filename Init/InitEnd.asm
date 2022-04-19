@@ -80,10 +80,10 @@ endboot:    db    0Ah,0Dh,"SCP/BIOS system initialisation complete", 0Ah, 0Dh
         db "No Operating System detected. Strike any key to launch SYSDEBUG."
             db "..",0Ah, 0Dh,0
 endboot2:   db "Starting SCP/BIOS SYSDEBUG...",0Ah,0Dh,0
-dbgmsg:     db 0Ah,0Ah,0Dh,"MSD devices: ",0
-dbgmsg2:    db 0Ah,0Dh,"Int 33h devices: ",0
-dbgmsg3:    db 0Ah,0Dh,"COM ports: ",0
-dbgmsg4:    db 0Ah,0Dh,"ATA devices: ", 0
+dbgmsg:     db 0Ah,0Ah,0Dh,"USB Rem. Devices: ",0
+dbgmsg2:    db 0Ah,0Dh,"Int 33h Devices: ",0
+dbgmsg3:    db 0Ah,0Dh,"COM Ports: ",0
+dbgmsg4:    db 0Ah,0Dh,"ATA Fixed Devices: ", 0
 memprint:
 ;Simple proc to print memory status
     xor bx, bx 

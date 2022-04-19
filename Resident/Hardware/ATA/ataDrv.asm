@@ -102,3 +102,13 @@ ATA:
     sub edx, 206h   ;Return to ataXbase
     pop rcx
     ret
+
+.readCHS:
+.readLBA:
+.readLBA48:
+.writeCHS:
+.writeLBA:
+.writeLBA48:
+.verifyCHS:
+.verifyLBA:
+.verifyLBA48:
