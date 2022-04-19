@@ -16,42 +16,53 @@ IDE:
     mov byte [ata1CmdByte], 1
 
 ;Here, consider resetting drives on both channels
-
+    ;ATA Channel 0 Master
     lea rbx, fdiskTable
     mov al, 0A0h
     mov ah, al  ;Save in ah
     mov edx, ata0_base
     call ATA.selectDrive    ;Ignore status for master
     mov al, ah  ;Bring back
+    jc .ii0    ;If Master failed to select, ignore trying to identify it
     call .identifyDrive ;Master ata0
-
+.ii0:
+    ;ATA Channel 0 Slave
     add rbx, fdiskEntry_size
     or al, 10h ;Change from A0h to B0h
     mov ah, al
     call ATA.selectDrive ;Master should set slave status to 0 if non-existent
+    jnc .ii1   ;If slave successfully was selected, skip the next line
+    xor al, al  ;Mock the "00" response that would be placed on the bus by the master
+.ii1:
     test al, al
     mov al, ah  ;Bring back
-    jz .ii0 ;If al was zero, skip slave identification
+    jz .ii2 ;If al was zero, skip slave identification
     call .identifyDrive  ;Slave ata0
 
-.ii0:
+.ii2:
+    ;ATA Channel 1 Master
     add rbx, fdiskEntry_size
     mov edx, ata1_base
     and al, 0EFh    ;Clear bit 4
     mov ah, al  ;Save in ah
     call ATA.selectDrive    ;Ignore status for master
     mov al, ah  ;Bring back
+    jc .ii3     ;If Master failed to select, ignore trying to identify it
     call .identifyDrive ;Master ata1
-
+.ii3:
+    ;ATA Channel 1 Slave
     add rbx, fdiskEntry_size
     or al, 10h ;Change from A0h to B0h
     mov ah, al
     call ATA.selectDrive ;Master should set slave status to 0 if non-existent
+    jnc .ii4   ;If slave successfully was selected, skip the next line
+    xor al, al  ;Mock the "00" response that would be placed on the bus by the master
+.ii4:
     test al, al
     mov al, ah  ;Bring back
-    jz .ii1 ;If al was zero, skip slave identification
+    jz .ii5 ;If al was zero, skip slave identification
     call .identifyDrive ;Slave ata1
-.ii1:
+.ii5:
 ;Now return the control of each host to the master drives
     mov al, 0A0h
     mov edx, ata0_base

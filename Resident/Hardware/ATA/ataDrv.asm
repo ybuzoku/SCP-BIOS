@@ -55,8 +55,9 @@ ATA:
 ;Selects either master or slave drive
 ;Sets/clears bit 7 of ataXCmdByte 
 ;Bit 7 ataX Clear => Master
-;Called with dx = ataXbase, al = A0h/B0h for master/slave
-;Returns the status of the selected drive after selection
+;Called with dx = ataXbase, ah = al = A0h/B0h for master/slave
+;Returns the status of the selected drive after selection in al
+; or with Carry set to indicate drive not set
 ;First check if this is the presently active device
     push rbx
     push rcx
@@ -69,25 +70,42 @@ ATA:
     mov bl, al  ;Save master/slave byte in bl
     shr bl, 4   ;Bring nybble low
     and bl, 1   ;Save only bottom bit, if set it is slave
-    ;Now check if the bits are the same
-    mov bh, byte [rcx]
+    mov bh, byte [rcx]  ;Now get ataXCmdByte
     and bh, 1   ;Only care for the bottom bit
     ;bh has in memory bit, bl has device bit
     cmp bh, bl
     je .skipSelection   ;If bh and bl are equal, the drive we want is selected
-    and byte [rcx], 0FEh    ;Clear the bottom bit
-    or byte [rcx], bl       ;Set the bit if bl[0] is set
     ;Now set master/slave on host
-    add edx, 6            ;dx at base + 6, drive select
-    out dx, al  ;Select here
-    sub edx, 6            ;dx back at base + 0
+    mov bh, 11     ;Up to 10 tries to set a device
+.sd0:      
+    dec bh
+    jz .driveNotSelected
+    mov al, ah     ;Return A0h/B0h to al from ah
+    mov bl, al     ;Save shifted-up drive select bit in bl
+    add edx, 6     ;dx at base + 6, drive select register
+    out dx, al     ;Select here
+    sub edx, 6     ;dx back at base + 0
     ;Now wait 400ns for value to settle
     call .driveSelectWait
+    add edx, 7     ;Go to Status Register
+    in al, dx      ;Get status
+    sub edx, 7     ;Go back to ataXbase
+    test al, 88h   ;Test if either BSY and DRQ bits set.
+    jnz .sd0       ;If either is set, drive setting failed, try set again!
+    ;Here set the bit in ataXCmdByte to confirm drive as selected
+    ;ecx still has the value of the ataXCmdbyte
+    and byte [rcx], 0FEh    ;Clear the bottom bit
+    mov bl, ah              ;Bring A0h/B0h to bl
+    shr bl, 4               ;Shift it down to bl[0]
+    and bl, 1   ;Save only bottom bit, if set it is slave
+    or byte [rcx], bl       ;Set the bit if bl[0] is set
 .skipSelection:
     pop rcx
     pop rbx
     ret
-
+.driveNotSelected:
+    stc
+    jmp short .skipSelection
 .driveSelectWait:
 ; Called with dx = ataXbase
 ; Reads the alternate status register 14 times
@@ -98,8 +116,9 @@ ATA:
 .dsw0:
     in al, dx
     loop .dsw0
-    in al, dx
-    sub edx, 206h   ;Return to ataXbase
+    sub edx, 200h   ;Return to ataXbase + 6
+    in al, dx       ;Get status and clear pending Interrupt
+    sub edx, 6      ;Return to ataXbase
     pop rcx
     ret
 
