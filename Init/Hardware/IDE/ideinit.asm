@@ -53,11 +53,11 @@ IDE:
     call .identifyDrive ;Slave ata1
 .ii1:
 ;Now return the control of each host to the master drives
-    mov al, A0h
+    mov al, 0A0h
     mov edx, ata0_base
     call ATA.selectDrive
 
-    mov al, A0h
+    mov al, 0A0h
     mov edx, ata1_base
     call ATA.selectDrive
 
@@ -88,8 +88,8 @@ IDE:
     push rdi
     call ATA.identifyDevice
     pop rdi
+    jc .idExit  ;If the carry flag set, the device timed out
     ;Now get information and build tables here
-    xchg bx, bx
     mov byte [rbx + fdiskEntry.signature], 0    ;Clear signature byte in table
 ;CHS, none of CHS is allowed to be 0 but may be because obsolete on new drives
     mov ax, word [rdi + idCurrCyl]
