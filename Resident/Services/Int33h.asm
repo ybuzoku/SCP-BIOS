@@ -10,10 +10,10 @@
 disk_io:
     cld ;Ensure all string reads/writes are in the right way
     test dl, 80h
-    jnz .baddev    ;If bit 7 set, exit (temp for v0.9)
+    jnz fdisk_io    ;If bit 7 set, goto Fixed disk routines
     push rdx
     inc dl          ;Inc device number count to absolute value
-    cmp dl, byte [i33Devices]
+    cmp dl, byte [numMSD]   ;For now, numMSD, eventually, numRemDrv
     pop rdx
     ja .baddev
     cmp ah, 16h
@@ -730,4 +730,16 @@ fdiskdpt: ;Fixed drive table, only cyl, nhd and spt are valid.
 .clz:   dw  1023    ;Cylinder for landing zone
 .spt:   db  63      ;Sectors per track
 .res:   db  0       ;Reserved byte
+
+;---------------------Storage Interrupt Int 33h------------------
+;Input : dl = Drive number, rbx = Address of buffer, 
+;        al = number of sectors, ch = Track number, 
+;        cl = Sector number, dh = Head number
+;Input LBA: dl = Drive Number, rbx = Address of Buffer, 
+;           al = number of sectors, rcx = LBA number
+;
+;All registers not mentioned above, preserved
+;----------------------------------------------------------------
+fdisk_io:
+    iretq
 ;------------------------End of Interrupt------------------------

@@ -34,3 +34,5 @@ int33hinit:
 .i33iend:
     mov al, byte [numMSD]
     add byte [i33Devices], al   ;Add the number of MSD devices to Int 33h total
+    mov al, byte [fdiskNum]
+    add byte [i33Devices], al   ;Add the number of Fixed Disks to Int 33h total
