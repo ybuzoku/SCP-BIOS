@@ -116,9 +116,9 @@ ATA:
 .dsw0:
     in al, dx
     loop .dsw0
-    sub edx, 200h   ;Return to ataXbase + 6
+    sub edx, 1FFh   ;Return to ataXbase + 7
     in al, dx       ;Get status and clear pending Interrupt
-    sub edx, 6      ;Return to ataXbase
+    sub edx, 7      ;Return to ataXbase
     pop rcx
     ret
 
