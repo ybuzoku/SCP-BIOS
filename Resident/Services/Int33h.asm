@@ -731,15 +731,73 @@ fdiskdpt: ;Fixed drive table, only cyl, nhd and spt are valid.
 .spt:   db  63      ;Sectors per track
 .res:   db  0       ;Reserved byte
 
-;---------------------Storage Interrupt Int 33h------------------
-;Input : dl = Drive number, rbx = Address of buffer, 
-;        al = number of sectors, ch = Track number, 
-;        cl = Sector number, dh = Head number
+;----------------------Fixed Disk Int 33h Ext-------------------
+; Subfunctions in ah
+;Input:  dl = Drive number, 
+;        dh = Head number,
+;        rbx = Address of buffer, 
+;        al = number of sectors, 
+;        ch = Cylinder number (low 8 bits), 
+;        cl[7:6] = Cylinder number (upper 2 bits), 
+;        cl[5:0] = Sector number
 ;Input LBA: dl = Drive Number, rbx = Address of Buffer, 
 ;           al = number of sectors, rcx = LBA number
 ;
-;All registers not mentioned above, preserved
+;All registers not mentioned above, preserved.
+;Still use msdStatus as the error byte dumping ground. For now, 
+; do not use the ata specific status bytes. 
 ;----------------------------------------------------------------
 fdisk_io:
+    test ah, ah
+    jz .fdiskReset
+    cmp ah, 01h
+    je .fdiskStatus
+    cmp ah, 02h
+    je .fdiskReadCHS
+    cmp ah, 03h
+    je .fdiskWriteCHS
+    cmp ah, 04h
+    je .fdiskVerifyCHS
+    cmp ah, 05h
+    je .fdiskFormat
+    cmp ah, 82h
+    je .fdiskReadLBA
+    cmp ah, 83h
+    je .fdiskWriteLBA
+    cmp ah, 84h
+    je .fdiskVerifyLBA
+    cmp ah, 85h
+    je .fdiskFormatSector
+
+    mov ah, 01h
+    mov byte [msdStatus], ah   ;Invalid function requested signature
+.bad:
+    or byte [rsp + 2*8h], 1    ;Set Carry flag on for invalid function
+    iretq 
+.fdiskReset:
+    call ATA.getChannelBase ;Get the base in dx
+    and edx, 0FFFh  ;Save low 12 bits
+    call ATA.resetChannel
+
+.fdiskStatus:
+    mov ah, byte [msdStatus]    ;Save old status
+    mov byte [msdStatus], 0     ;Clear the status
+    test ah, ah
+    jnz .bad    ;Set carry flag if status is non-zero
+    iretq
+;CHS functions
+.fdiskReadCHS:
+.fdiskWriteCHS:
+.fdiskVerifyCHS:
+;Format a whole "track" (for now just overwrite)
+.fdiskFormat:
+
+;LBA functions
+.fdiskReadLBA:
+.fdiskWriteLBA:
+.fdiskVerifyLBA:
+.fdiskFormatSector:
+;Format a series of sectors (for now just overwrite)
+
     iretq
 ;------------------------End of Interrupt------------------------

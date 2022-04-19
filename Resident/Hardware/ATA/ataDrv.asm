@@ -55,9 +55,14 @@ ATA:
 ;Selects either master or slave drive
 ;Sets/clears bit 7 of ataXCmdByte 
 ;Bit 7 ataX Clear => Master
-;Called with dx = ataXbase, ah = al = A0h/B0h for master/slave
+;Called with dx = ataXbase, 
+; ah = al = A0h/B0h (or E0h/F0h for LBA) for master/slave
+; Bits ah=al[3:0] may optionally store information (i.e.head bits or LBA bits)
+; This function should NOT be used to set the head bits of a CHS or the high LBA bits 
+; That should be done only after the drive has been successfully selected.
 ;Returns the status of the selected drive after selection in al
 ; or with Carry set to indicate drive not set
+;ah is preserved
 ;First check if this is the presently active device
     push rbx
     push rcx
@@ -122,12 +127,110 @@ ATA:
     pop rcx
     ret
 
+.wait400ns:
+;Called with dx pointing to a port to read 14 times
+    push rcx
+    mov ecx, 14     ;14 iterations for 420ns wait
+.wns:
+    in al, dx
+    loop .wns
+    pop rcx
+    ret
+
+.getChannelBase:
+;Given a BIOS drive number in dl, 
+; returns wheather it is a master or 
+; slave in bit 12 of dx and in 
+; bits [11:0] the IO address of the 
+; base of the controller for the drive.
+    push rbx
+    push rcx
+    and dl, 3       ;Save only the bottom 2 bits
+    mov dh, dl      ;Save in dh
+    and dh, 1       ;Save only master/slave bit in dh
+    mov ebx, ata0_base
+    mov ecx, ata1_base
+    test dl, 2      ;If bit 1 is set, it is ata1
+    cmovnz ebx, ecx ;Move ata1base into bx
+    xor dl, dl      ;Clear bottom byte
+    or dx, bx       ;Add the ataXbase into dx
+    pop rcx
+    pop rdx
+    ret 
+;==============================:
+;    ATA primitive functions
+;==============================:
+.resetChannel:
+    ;Resets a selected ATA channel
+    ;Input: edx = ataXbase register for the ata channel to reset
+    ;Output: CF=CY -> Channel did not reset.
+    ;        CF=NC -> Channel reset
+    ;If the channel doesnt reset, the caller will establish an error code
+    ;
+    push rax
+    add edx, 206h   ;Go to alternate base
+    mov al, 4h      ;Set the SoftwareReSeT (SRST) bit
+    out dx, al      ;Set the bit
+    call .wait400ns
+    in al, dx       ;Get one more read
+    sub edx, 206h   ;Return to base
+	and al, 0xc0    ;Get only BSY and DRDY
+	cmp al, 0x40	;Check that BSY is clear and that DRDY is set
+    jne .rcBad
+    ;Here clear the bit in ataXCmdByte
+    push rbx
+    push rcx
+    lea rbx, ata0CmdByte
+    lea rcx, ata1CmdByte
+    cmp edx, ata0_base
+    cmovne rbx, rcx
+    and byte [rbx], 0FEh    ;Clear low bit
+    pop rcx
+    pop rbx
+    clc             ;Clear carry
+.rcExit:
+    pop rax
+    ret
+.rcBad:
+    stc             ;Set carry
+    jmp short .rcExit
+
+;CHS functions
 .readCHS:
-.readLBA:
-.readLBA48:
+    call .setupCHS
+    ret
 .writeCHS:
-.writeLBA:
-.writeLBA48:
+    call .setupCHS
+    ret
 .verifyCHS:
+    call .setupCHS
+    ret
+.setupCHS:
+    ;Select the drive, set up the CHS registers
+    ; and return to the caller to enact the transaction
+    
+    ret
+;LBA functions
+.readLBA:
+    call .setupLBA
+    ret
+.writeLBA:
+    call .setupLBA
+    ret
 .verifyLBA:
+    call .setupLBA
+    ret
+.setupLBA:
+    ret
+;LBA48 functions
+.readLBA48:
+    call .setupLBA48
+    ret
+.writeLBA48:
+    call .setupLBA48
+    ret
 .verifyLBA48:
+    call .setupLBA48
+    ret
+.setupLBA48:
+    ret
