@@ -1,27 +1,16 @@
 ;ATA driver!
 ATA:
 .identifyDevice:
+;Drive to be identified should be selected already
 ;dx should contain the base register
-;al should contain either A0/B0 for master/slave
 ;rdi points to the buffer
 ;Carry set if failed.
 
     push rax
     push rbx
-    mov bl, al            ;save the master/slave bit temporarily
-    add edx, 7            ;dx at base + 7
-.l1:
-    in al, dx             ;Check for float
-    cmp al, 0FFh
-    je .exitfail
-    test al, 10000000b
-    jnz .l1
 
-    jmp short $ + 2            ;IO cycle kill
-    cli
-    
     xor al, al
-    sub edx, 5            ;dx at base + 2
+    add edx, 2            ;dx at base + 2
     out dx, al
     inc edx               ;dx at base + 3
     out dx, al
@@ -29,10 +18,7 @@ ATA:
     out dx, al
     inc edx               ;dx at base + 5
     out dx, al
-    inc edx               ;dx at base + 6
-    mov al, bl            ;Get the master/slave bit back
-    out dx, al            
-    inc dx               ;dx at base + 7
+    add edx, 2           ;dx at base + 7
     mov al, 0ECh         ;ECh = Identify drive command
     out dx, al
 
@@ -61,13 +47,58 @@ ATA:
 .exitfail:
     stc
 .exit:
-    sti
     pop rbx
     pop rax
     ret
 
-.switchDrive:
-;Switches drive from master/slave to slave/master
+.selectDrive:
+;Selects either master or slave drive
 ;Sets/clears bit 7 of ataXCmdByte 
 ;Bit 7 ataX Clear => Master
-;Called with dx = ataXbase
+;Called with dx = ataXbase, al = A0h/B0h for master/slave
+;Returns the status of the selected drive after selection
+;First check if this is the presently active device
+    push rbx
+    push rcx
+    ;First find if ata0CmdByte or ata1CmdByte
+    lea ecx, ata0CmdByte
+    lea ebx, ata1CmdByte
+    cmp edx, ata0_base
+    cmovne ecx, ebx    ;Move ata1CmdByte to ecx
+    ;Now isolate master/slave bit
+    mov bl, al  ;Save master/slave byte in bl
+    shr bl, 4   ;Bring nybble low
+    and bl, 1   ;Save only bottom bit, if set it is slave
+    ;Now check if the bits are the same
+    mov bh, byte [rcx]
+    and bh, 1   ;Only care for the bottom bit
+    ;bh has in memory bit, bl has device bit
+    cmp bh, bl
+    je .skipSelection   ;If bh and bl are equal, the drive we want is selected
+    and byte [rcx], 0FEh    ;Clear the bottom bit
+    or byte [rcx], bl       ;Set the bit if bl[0] is set
+    ;Now set master/slave on host
+    add edx, 6            ;dx at base + 6, drive select
+    out dx, al  ;Select here
+    sub edx, 6            ;dx back at base + 0
+    ;Now wait 400ns for value to settle
+    call .driveSelectWait
+.skipSelection:
+    pop rcx
+    pop rbx
+    ret
+
+.driveSelectWait:
+; Called with dx = ataXbase
+; Reads the alternate status register 14 times
+; Returns the alternate status after a 15th read
+    push rcx
+    add edx, 206h   ;Move to alt base
+    mov ecx, 14     ;14 iterations for 420ns wait
+.dsw0:
+    in al, dx
+    loop .dsw0
+    in al, dx
+    sub edx, 206h   ;Return to ataXbase
+    pop rcx
+    ret

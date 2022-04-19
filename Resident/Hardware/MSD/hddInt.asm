@@ -1,7 +1,7 @@
 ;---------------HDD Interrupt IRQ 14/Int 2Eh---------------------
 hdd_IRQ14:
     push rax
-    mov byte [ata0CmdByte], 0
+    and byte [ata0CmdByte], 0FDh    ;Clear bit 1
     mov al, EOI
     out pic1command, al
     pop rax
