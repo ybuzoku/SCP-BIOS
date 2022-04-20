@@ -7,51 +7,6 @@ end:
     out pic2data, al
     out pic1data, al
 
-    mov ah, 00h
-    mov dl, 80h
-    int 33h
-    mov al, ah
-    mov ah, 04h
-    int 30h
-
-    mov ah, 02h ;Read
-    mov al, 20  ;20 sectors
-    mov ch, 0   ;Cylinder 0
-    mov cl, 1   ;Sector 1, cylinder 0
-    mov dh, 0   ;Head 0
-    mov dl, 80h
-    mov rbx, 20000h
-    int 33h
-    mov al, ah
-    mov ah, 04h
-    int 30h
-
-    mov word [rbx], "TR"
-    
-    mov ah, 03h ;Write back
-    mov al, 20  ;20 sectors
-    mov ch, 0   ;Cylinder 0
-    mov cl, 1   ;Sector 1, cylinder 0
-    mov dh, 0   ;Head 0
-    mov dl, 80h
-    mov rbx, 20000h
-    int 33h
-    mov al, ah
-    mov ah, 04h
-    int 30h
-
-    mov ah, 04h ;Read
-    mov al, 20  ;20 sectors
-    mov ch, 0   ;Cylinder 0
-    mov cl, 1   ;Sector 1, cylinder 0
-    mov dh, 0   ;Head 0
-    mov dl, 80h
-    int 33h
-
-    mov al, ah
-    mov ah, 04h
-    int 30h
-
     mov ax, 1304h
     mov rbp, dbgmsg
     int 30h
