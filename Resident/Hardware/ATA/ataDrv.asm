@@ -428,7 +428,6 @@ ATA:
     jmp .read
 
 .writeLBA:
-    xchg bx, bx
     call .setupLBA
     jc .errorExit
     ;Send command
@@ -489,12 +488,84 @@ ATA:
 ;LBA48 functions
 .readLBA48:
     call .setupLBA48
-    ret
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 24h ;ATA READ EXT COMMAND!
+    jmp .read
+
 .writeLBA48:
     call .setupLBA48
-    ret
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 34h ;ATA WRITE EXT COMMAND!
+    jmp .write
 .verifyLBA48:
     call .setupLBA48
-    ret
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 42h ;ATA VERIFY EXT COMMAND!
+    jmp .verify
+
 .setupLBA48:
+;First sets the chosen device, then sets all the registers
+    ; except for the command and then returns
+    call .selectDriveFromTable
+    jc .sLBAFailed
+    mov dh, al  ;Save sector count in dh
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 2      ;Goto base + 2, Sector count
+    ror rcx, 24     ;Move the upper three bytes low
+    xor al, al      ;High byte of sector count is always 0
+    out dx, al
+
+    inc edx         ;Goto base + 3, Write LBA byte 4
+    mov al, cl      ;Get LBA byte 4 into al
+    out dx, al
+    shr rcx, 8      ;Shift bytes down by 1
+
+    inc edx         ;Goto base + 4, Write LBA byte 5
+    mov al, cl      ;Get LBA byte 5 into al
+    out dx, al
+    shr rcx, 8      ;Shift bytes down by 1
+
+    inc edx         ;Goto base + 5, Write LBA byte 6
+    mov al, cl      ;Get LBA byte 6 into al
+    out dx, al
+
+    shr rcx, 16     ;Shift down by two to eliminate two dummy bytes
+;cl now has LBA byte 1 again
+    sub edx, 3      ;Goto base + 2, Write low byte of sector count
+    mov al, dh      ;Get back sector count from dh
+    out dx, al
+
+    inc edx         ;Goto base + 3, Write LBA byte 1
+    mov al, cl      ;Get LBA byte 1 into al
+    out dx, al
+    shr rcx, 8      ;Shift bytes down by 1
+
+    inc edx         ;Goto base + 4, Write LBA byte 2
+    mov al, cl      ;Get LBA byte 2 into al
+    out dx, al
+    shr rcx, 8
+
+    inc edx         ;Goto base + 5, Write LBA byte 3
+    mov al, cl      ;Get LBA byte 3 into al
+    out dx, al
+
+    inc edx         ;Goto base + 6, write drive select
+    mov al, byte [rbp + fdiskEntry.msBit]    ;Add the master/slave bit and fixed bits
+    or al, 40h      ;Set LBA bit
+    out dx, al
+
+    mov al, dh  ;Return sector count into al
+    clc
     ret

@@ -844,23 +844,44 @@ fdisk_io:
 
 ;LBA functions
 .fdiskReadLBA:
+    xchg bx, bx
     push rdi
-    call ATA.readLBA
+    push rsi
+    lea rsi, ATA.readLBA
+    lea rdi, ATA.readLBA48
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+    call rdi    ;rdi is a free parameter anyway
+    pop rsi
     pop rdi
     jc .fdiskError
     jmp .okExit
 .fdiskWriteLBA:
+    push rdi
     push rsi
-    call ATA.writeLBA
+    lea rsi, ATA.writeLBA
+    lea rdi, ATA.writeLBA48
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+    call rdi    ;rdi is a free parameter anyway
     pop rsi
+    pop rdi
     jc .fdiskError
     jmp .okExit
 .fdiskVerifyLBA:
-    call ATA.verifyLBA
+    push rdi
+    push rsi
+    lea rsi, ATA.verifyLBA
+    lea rdi, ATA.verifyLBA48
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+    call rdi    ;rdi is a free parameter anyway
+    pop rsi
+    pop rdi
     jc .fdiskError
     jmp .okExit
 .fdiskFormatSector:
-;Format a series of sectors (for now just overwrite)
+;Format a series of sectors (for now just overwrite with fillbyte)
 
     iretq
 .fdiskError:
