@@ -27,6 +27,10 @@ default_IRQ15:
     test byte [ata1CmdByte], 1   ;Check if mutex bit set
     jz .spurcheck                ;If not set, then just check spur
     and byte [ata1CmdByte], 0FDh ;Clear bit 
+    push rdx
+    mov dx, ata1_base + 7   ;Goto ata1 status reg
+    in al, dx   ;Stop ctrlr from firing interrupts again!
+    pop rdx
 .spurcheck:
     mov al, 0Bh    ;Read ISR 
     out pic2command, al

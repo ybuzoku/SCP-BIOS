@@ -50,18 +50,28 @@ ATA:
     pop rbx
     pop rax
     ret
-
+.selectDriveFromTable:
+;Selects the drive pointed to by the table entry in rbp
+;Input: rbp = Pointer to drive table entry
+;Output: CF=NC -> All ok, can proceed with writing data
+;        CF=CY -> drive not set
+    push rdx
+    push rax
+    mov al, byte [rbp + fdiskEntry.msBit]
+    mov dx, word [rbp + fdiskEntry.ioBase]
+    call .selectDrive
+    pop rax
+    pop rdx
+    ret
 .selectDrive:
 ;Selects either master or slave drive
 ;Sets/clears bit 7 of ataXCmdByte 
 ;Bit 7 ataX Clear => Master
-;Called with dx = ataXbase, 
-; ah = al = A0h/B0h (or E0h/F0h for LBA) for master/slave
-; Bits ah=al[3:0] may optionally store information (i.e.head bits or LBA bits)
-; This function should NOT be used to set the head bits of a CHS or the high LBA bits 
-; That should be done only after the drive has been successfully selected.
-;Returns the status of the selected drive after selection in al
-; or with Carry set to indicate drive not set
+;Input: dx = ataXbase, 
+;       ah = al = A0h/B0h (or E0h/F0h for LBA) for master/slave
+;
+;Return: If CF=NC, al = the status of the selected drive after selection
+;        If CF=CY drive not set
 ;ah is preserved
 ;First check if this is the presently active device
     push rbx
@@ -138,132 +148,260 @@ ATA:
     pop rcx
     ret
 
-.getChannelBase:
-;Given a BIOS drive number in dl, 
-; returns wheather it is a master or 
-; slave in bit 12 of dx and in 
-; bits [11:0] the IO address of the 
-; base of the controller for the drive.
-    push rbx
-    push rcx
-    and dl, 3       ;Save only the bottom 2 bits
-    mov dh, dl      ;Save in dh
-    and dh, 1       ;Save only master/slave bit in dh
-    mov ebx, ata0_base
-    mov ecx, ata1_base
-    test dl, 2      ;If bit 1 is set, it is ata1
-    cmovnz ebx, ecx ;Move ata1base into bx
-    xor dl, dl      ;Clear bottom byte
-    or dx, bx       ;Add the ataXbase into dx
-    pop rcx
+.getTablePointer:
+;Given a drive number in dl, put the table pointer in rbp
+;If entry not valid OR greater than 4, fail with CF=CY
+    push rdx
+    and dl, 7Fh ;Clear top bit
+    cmp dl, 3   ;Only 4 fixed disks allowed!
+    ja .gtpBad
+    lea rbp, fdiskTable ;Point to the fdisktable
+.gtpSearch:
+    test dl, dl
+    jz .gtpVerifyOk
+    dec dl
+    add rbp, fdiskEntry_size    ;Goto next entry
+    jmp short .gtpSearch
+.gtpVerifyOk:
+    cmp byte [rbp + fdiskEntry.signature], 1    ;Configured bit must be set
+    jz .gtpBad 
     pop rdx
-    ret 
+    clc
+    ret
+.gtpBad:
+    stc 
+    pop rdx
+    ret
 ;==============================:
 ;    ATA primitive functions
 ;==============================:
 .resetChannel:
     ;Resets a selected ATA channel
-    ;Input: edx = ataXbase register for the ata channel to reset
+    ;Input: rbp = Fixed Disk Table entry pointer for chosen device
     ;Output: CF=CY -> Channel did not reset.
     ;        CF=NC -> Channel reset
     ;If the channel doesnt reset, the caller will establish an error code
     ;
-    push rax
+    movzx edx, word [rbp + fdiskEntry.ioBase]
     add edx, 206h   ;Go to alternate base
     mov al, 4h      ;Set the SoftwareReSeT (SRST) bit
     out dx, al      ;Set the bit
-    call .wait400ns
+    mov ecx, 10     ;Wait 10 milliseconds
+    mov ah, 86h
+    int 35h
+    xor al, al
+    out dx, al      ;Clear the SRST bit
+    mov ecx, 10     ;Wait 10 milliseconds
+    mov ah, 86h
+    int 35h
     in al, dx       ;Get one more read
     sub edx, 206h   ;Return to base
 	and al, 0xc0    ;Get only BSY and DRDY
 	cmp al, 0x40	;Check that BSY is clear and that DRDY is set
     jne .rcBad
-    ;Here clear the bit in ataXCmdByte
-    push rbx
-    push rcx
+    ;Here clear the master/slave bit in ataXCmdByte
     lea rbx, ata0CmdByte
     lea rcx, ata1CmdByte
-    cmp edx, ata0_base
+    cmp word [rbp + fdiskEntry.ioBase], ata0_base
     cmovne rbx, rcx
     and byte [rbx], 0FEh    ;Clear low bit
-    pop rcx
-    pop rbx
+
     clc             ;Clear carry
-.rcExit:
-    pop rax
     ret
 .rcBad:
     stc             ;Set carry
-    jmp short .rcExit
+    ret
 
 ;CHS functions
 .readCHS:
+;Called with rdi as a free register to use
+;All other registers have parameters as in Int 33h function ah=02h
     call .setupCHS
-    jc .rCHSend
-    ;Send command!
-.rCHSend:
+    jc .rCHSexit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 20h ;ATA READ COMMAND!
+    out dx, al  ;Output the command byte!
+    mov al, cl  ;Return sector count into al
+
+    ;Now we wait for the DRQ bit in the status register to set
+    mov cx, -1  ;Data should be ready within ~67 miliseconds
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 206h  ;Dummy read on Alt status register
+    mov rdi, rbx    ;Move the read buffer pointer to rdi
+    mov bl, al      ;Save sector count in bl
+.rCHSwait:
+    call .wait400ns
+    dec cx
+    jz .rCHSTimeout
+    test al, 8      ;If DRQ set?  
+    jz .rCHSwait    ;If not, keep waiting
+;Now we can read the data
+    movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
+    movzx eax, bl   ;Zero extend the sector count
+.readCHSLoop:
+    mov ecx, 256    ;Number of words in a sector
+    rep insw    ;Read that many words!
+    dec al      ;Reduce the number of sectors read by 1
+    jnz .readCHSLoop
+    ;Here check status register to ensure error isnt set
+    add edx, 7
+    mov ecx, -1
+.readExitloop:
+    dec ecx
+    jz .chsError
+    in al, dx
+    test al, 80h        ;Check if BSY bit still set (i.e not ready yet)
+    jnz .readExitloop   ;If BSY still set keep looping
+    test al, 61h        ;Check if DSDY bit or Error bits are set
+    jz .readExitloop    ;If DSDY not set, wait
+    test al, 21h    ;Check status bits 0 and 5 (error and drive fault)
+    jnz .chsError
+.rCHSexit:
+    clc
+    ret
+.rCHSTimeout:
+    mov byte [msdStatus], 80h   ;Timeout occured
+.chsError:
+    stc
     ret
 
 .writeCHS:
+;Called with rsi as a free register to use
+;All other registers have parameters as in Int 33h function ah=02h
     call .setupCHS
-    jc .wCHSend
+    jc .rCHSexit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 30h ;ATA WRITE COMMAND!
+    out dx, al  ;Output the command byte!
+    mov al, cl  ;Return sector count into al
 
-.wCHSend:
+    ;Now we wait for the DRQ bit in the status register to set
+    mov cx, -1  ;Data should be ready within ~67 miliseconds
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 206h  ;Dummy read on Alt status register
+    mov rdi, rbx    ;Move the write buffer pointer to rdi
+    mov bl, al      ;Save sector count in bl
+.wCHSwait:
+    call .wait400ns
+    dec cx
+    jz .rCHSTimeout
+    test al, 8      ;If DRQ set?  
+    jz .wCHSwait    ;If not, keep waiting
+;Now we can write the data
+    movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
+    movzx eax, bl   ;Zero extend the sector count
+.wCHS0:
+    mov ecx, 256    ;Number of words in a sector
+.wCHS1:
+    outsw    ;Read that many words!
+    jmp short $ + 2
+    loop .wCHS1 ;Read one sector, one word at a time
+    dec al
+    jnz .wCHS0  ;Keep going up by a sector
+    ;Here wait for device to stop being busy. 
+    ;If it doesnt after ~4 seconds, declare an error
+    mov ecx, -1 ;About 4 seconds
+    add edx, 7  ;Goto status register
+.wchsBSYcheck:
+    dec ecx
+    jz .chsError   ;If after 4 seconds the device is still BSY, consider it failing
+    in al, dx   ;Read status reg
+    test al, 80h    ;Check BSY
+    jnz .wchsBSYcheck    ;If it is no longer BSY, check error status
+    test al, 61h        ;Check if DSDY bit or Error bits are set
+    jz .wchsBSYcheck    ;If not set, do not send next command
+.wchsFlushBuffers:
+    ;Here check status register to ensure error isnt set
+    test al, 21h    ;Test bits 0 and 5 (error and drive fault)
+    jnz .chsError
+    ;Now we must flush cache on the device
+    mov al, 0E7h    ;FLUSH CACHE COMMAND
+    out dx, al
+    ;This command can take 30 seconds to complete so we check status 
+    ; every ms to see if BSY is clear yet.
+    mov ebx, 30000   ;30,000 miliseconds in 30 seconds
+.flushCheck:
+    dec ebx
+    jz .chsError
+    mov ecx, 1
+    mov ah, 86h
+    int 35h
+    in al, dx   ;Read the status byte
+    test al, 80h    ;Are we still busy?
+    jnz .flushCheck ;IF yes, loop again
+    test al, 61h    ;Check if DSDY bit or Error bits are set
+    jz .flushCheck  ;Whilst it is not set, keep looping
+    test al, 21h    ;Test bits 0 and 5 (error and drive fault)
+    jnz .chsError   ;If either are set, return fail
+    clc
     ret
 
 .verifyCHS:
     call .setupCHS
-    jc .vCHSend
-
-.vCHSend:
+    jc .rCHSexit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov al, 40h ;ATA VERIFY COMMAND!
+    out dx, al  ;Output the command byte!
+    ;Now we wait for BSY to go low and DRDY to go high
+    mov cx, -1  ;Data should be ready within ~67 miliseconds
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto status register
+.vCHSloop:
+    dec cx
+    jz .chsError
+    in al, dx   ;Get status
+    test al, 80h    ;BSY bit set
+    jnz .vCHSloop
+    ;Once it clears come here
+    test al, 61h    ;Check if DSDY bit or Error bits are set
+    jz .vCHSloop    ;Whilst it is not set, keep looping
+    test al, 21h    ;Test bits 0 and 5 (error and drive fault)
+    jnz .chsError   ;If either are set, return fail
+    clc
     ret
 
 .setupCHS:
-    ;Select the drive, then set up the CHS registers
-    ; and return to the caller to enact the transaction
-    xchg dl, dh
-    mov ebp, edx    ;Have Drive number in bph and Head number in bpl
-    xchg dl, dh
-    call .getChannelBase    ;Return in bit 12 master/slave bit and in dx[11:0] io addr
-    push rax
-    mov al, dh  ;Get dx[15:8] in al. Bit 12 of dx becomes bit 4 of al
-    and al, 10h ;Save master slave bit
-    or al, 0A0h ;Add bit pattern to al
-    mov ah, al
-    and edx, 0FFFh   ;Clear the upper nybble of data
-    call .selectDrive
-    pop rax    
-    jc .setupCHSFail0
-;Drive now selected on channel. channel base in dx[11:0]
-    add edx, 2  ;Goto ataXbase + 2, Sector Count
-    out dx, al  ;Put out the sector count 
-    inc edx     ;Goto ataXbase + 3, Sector Number
-    push rax    ;Save sector count
-    mov al, cl  ;Upper two bits of cl have a cylinder number. Clear them
-    and al, 03Fh
-    out dx, al  ;Out the sector to start at
-    inc edx     ;Goto ataXbase + 4, Cylinder Low
-    mov al, ch
-    out dx, al  ;Out the low 8 bits of the cylinder address to start at
-    inc edx     ;Goto ataXbase + 5, Cylinder High
-    mov al, cl  ;Lower five bits of cl have the sector number. Shift down
-    shr al, 6
-    out dx, al  ;Out the hight 2 bits of the cylinder address to start at
-    inc edx     ;Goto ataXbase + 6, Drive/Head Register
-    mov eax, ebp    ;Get back from ebp the value of dx switched into eax
-    ;ah has drive number, al has head number
-    and al, 0Fh ;Ensure only bottom nybble is alive
-    and ah, 1   ;Save only bottom bit (must be 0 for master, 1 for slave)
-    or ah, 0Ah  ;Set magic bits for CHS
-    shl ah, 4   ;Move low nybble high
-    or al, ah   ;Add the nybble to the head number that is low
+    ;First sets the chosen device, then sets all the registers
+    ; except for the command and then returns
+    call .selectDriveFromTable
+    jc .sCHSFailed
+    ;Now the drive has been selected, we can write to it
+    push rax    ;Only sector count needs to be preserved
+    push rdx    ;Temporarily save drive head bits to use later
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 2  ;Goto base + 2, Sector count
     out dx, al
-    sub edx, 6  ;Goto ataXbase + 0, Data Register
-    pop rax     ;Return sector count
+    inc edx     ;Goto base + 3, Starting sector number
+    mov al, cl  ;Bits [5:0] have starting sector number
+    and al, 3Fh ;Clear upper two bits
+    out dx, al
+    inc edx     ;Goto base + 4, Cylinder low bits
+    mov al, ch  ;Get the low 8 bits of the cylinder number
+    out dx, al
+    inc edx     ;Goto base + 5, Cylinder high bits
+    mov al, cl  ;Bits [7:6] have top two bits of cylinder number
+    shr al, 6   ;Shift them down to clear bottom 6 bits
+    out dx, al  
+    inc edx     ;Goto base + 6, Drive/Head controller register
+    pop rax     ;Get back the drive head number from dh into ah
+    mov al, ah  
+    and al, 0Fh ;Save only bottom nybble
+    or al, byte [rbp + fdiskEntry.msBit]    ;Add the MS bits to al
+    out dx, al
+    pop rax
+    clc
     ret
-.setupCHSFail0:
-    mov ah, 20h ;General controller failure
-    ret
+.sCHSFailed:
+    mov byte [msdStatus], 20h   ;General controller failure
+    ret ;Carry flag propagated
     
 ;LBA functions
 .readLBA:

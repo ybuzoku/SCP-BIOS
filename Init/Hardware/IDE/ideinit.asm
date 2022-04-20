@@ -64,20 +64,14 @@ IDE:
     call .identifyDrive ;Slave ata1
 .ii5:
 ;Now return the control of each host to the master drives
-; and set interrupts
+
     mov al, 0A0h
     mov edx, ata0_base
     call ATA.selectDrive
-    add edx, 206h
-    xor al, al
-    out dx, al  ;Set interrupts
 
     mov al, 0A0h
     mov edx, ata1_base
     call ATA.selectDrive
-    add edx, 206h
-    xor al, al
-    out dx, al  ;Set interrupts
 
     jmp .ideInitEnd
 ;===========================

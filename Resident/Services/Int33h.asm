@@ -758,8 +758,10 @@ fdisk_io:
 ;Cherry pick status to avoid resetting status
     cmp ah, 01h
     je .fdiskStatus
-    
+
     mov byte [msdStatus], 0 ;Reset the status
+    call ATA.getTablePointer    ;Get table pointer in rbp for all functions
+    jc .badFunctionRequest  ;If the device doenst exist, bad bad bad!
 
     test ah, ah
     jz .fdiskReset
@@ -780,6 +782,7 @@ fdisk_io:
     cmp ah, 85h
     je .fdiskFormatSector
 
+.badFunctionRequest:
     mov ah, 01h
     mov byte [msdStatus], ah   ;Invalid function requested signature
 .badExit:
@@ -802,8 +805,6 @@ fdisk_io:
     iretq
 ;Misc functions
 .fdiskReset:
-    call ATA.getChannelBase ;Get the base in dx
-    and edx, 0FFFh  ;Save low 12 bits
     call ATA.resetChannel
     mov eax, 0  ;No issue
     mov ebx, 5  ;Reset failed
@@ -820,8 +821,25 @@ fdisk_io:
     jmp short .okExit
 ;CHS functions
 .fdiskReadCHS:
+    push rdi
+    call ATA.readCHS
+    pop rdi
+    jc .fdiskError
+    jmp .okExit
+    
 .fdiskWriteCHS:
+    push rsi
+    call ATA.writeCHS
+    pop rsi
+    jc .fdiskError
+    jmp .okExit
 .fdiskVerifyCHS:
+    push rsi
+    call ATA.verifyCHS
+    pop rsi
+    jc .fdiskError
+    jmp .okExit
+
 ;Format a whole "track" (for now just overwrite)
 .fdiskFormat:
 
@@ -833,4 +851,55 @@ fdisk_io:
 ;Format a series of sectors (for now just overwrite)
 
     iretq
+.fdiskError:
+;A common error handler that checks the status and error register 
+; to see what the error may have been. If nothing, then the error
+; that is in the msdStatus byte is left as is, unless it is 0
+; where a Undefined Error is placed.
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto status
+    call ATA.wait400ns
+    in al, dx   ;Get status byte
+    test al, 80h    ;If busy is STILL set, controller failure
+    jnz .fdiskCtrlrFailed
+    test al, 20h    ;Test drive fault error
+    jnz .fdiskErrorDriveFault
+    test al, 1  ;Test the error bit is set
+    jz .fdiskErrorNoBit ;If not set then check if we have an error code 
+    sub edx, 6  ;Goto base + 1, Error register
+    in al, dx   ;Get Error register
+    test al, al 
+    jz .fdiskNoErrorData
+    mov ah, al
+    and ah, 84h ;Save abort and interface crc
+    cmp ah, 84h
+    je .fdiskCRCError
+    test al, 40h    ;Test the uncorrectable Error bit
+    jnz .fdiskCRCError
+    mov ah, al
+    and ah, 14h ;If either bit is set, then it is a bad sector number
+    jnz .fdiskBadAddress
+.fdiskErrorUnknown: ;Fallthrough here
+    mov byte [msdStatus], 0BBh  ;Unknown Error code
+    jmp .badExit
+.fdiskBadAddress:
+    mov byte [msdStatus], 04h   ;Sector not found
+    jmp .badExit
+.fdiskCRCError:
+    mov byte [msdStatus], 10h   ;Uncorrectable CRC error
+    jmp .badExit
+.fdiskNoErrorData:
+    mov byte [msdStatus], 0E0h  ;Status error = 0
+    jmp .badExit
+.fdiskErrorNoBit:
+    mov ah, byte [msdStatus]
+    test ah, ah
+    jnz .badExit    ;If there is a code, leave it in situ and exit service
+
+.fdiskErrorDriveFault:
+    mov byte [msdStatus], 07h  ;Drive parameter activity failed
+    jmp .badExit
+.fdiskCtrlrFailed:
+    mov byte [msdStatus], 020h  ;Controller failure code
+    jmp .badExit
 ;------------------------End of Interrupt------------------------
