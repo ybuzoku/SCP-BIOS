@@ -858,6 +858,7 @@ fdisk_io:
     pop rdi
     jc .fdiskError
     jmp .okExit
+
 .fdiskWriteLBA:
     push rdi
     push rsi
@@ -870,6 +871,7 @@ fdisk_io:
     pop rdi
     jc .fdiskError
     jmp .okExit
+
 .fdiskVerifyLBA:
     push rdi
     push rsi
@@ -882,6 +884,7 @@ fdisk_io:
     pop rdi
     jc .fdiskError
     jmp .okExit
+
 .fdiskFormatSector:
 ;Format a series of sectors (for now just overwrite with fillbyte)
     push rdi
@@ -895,6 +898,7 @@ fdisk_io:
     pop rdi
     jc .fdiskError
     jmp .okExit
+    
 .fdiskError:
 ;A common error handler that checks the status and error register 
 ; to see what the error may have been. If nothing, then the error

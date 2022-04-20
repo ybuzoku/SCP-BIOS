@@ -5897,95 +5897,99 @@
    953 00001BC6 5F                  <1>     pop rdi
    954 00001BC7 7274                <1>     jc .fdiskError
    955 00001BC9 E94FFFFFFF          <1>     jmp .okExit
-   956                              <1> .fdiskWriteLBA:
-   957 00001BCE 57                  <1>     push rdi
-   958 00001BCF 56                  <1>     push rsi
-   959 00001BD0 488D3425[D2370000]  <1>     lea rsi, ATA.writeLBA
-   960 00001BD8 488D3C25[8F380000]  <1>     lea rdi, ATA.writeLBA48
-   961 00001BE0 F6450004            <1>     test byte [rbp + fdiskEntry.signature], fdeLBA48
-   962 00001BE4 480F44FE            <1>     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
-   963 00001BE8 FFD7                <1>     call rdi    ;rdi is a free parameter anyway
-   964 00001BEA 5E                  <1>     pop rsi
-   965 00001BEB 5F                  <1>     pop rdi
-   966 00001BEC 724F                <1>     jc .fdiskError
-   967 00001BEE E92AFFFFFF          <1>     jmp .okExit
-   968                              <1> .fdiskVerifyLBA:
-   969 00001BF3 57                  <1>     push rdi
-   970 00001BF4 56                  <1>     push rsi
-   971 00001BF5 488D3425[F0370000]  <1>     lea rsi, ATA.verifyLBA
-   972 00001BFD 488D3C25[AD380000]  <1>     lea rdi, ATA.verifyLBA48
-   973 00001C05 F6450004            <1>     test byte [rbp + fdiskEntry.signature], fdeLBA48
-   974 00001C09 480F44FE            <1>     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
-   975 00001C0D FFD7                <1>     call rdi    ;rdi is a free parameter anyway
-   976 00001C0F 5E                  <1>     pop rsi
-   977 00001C10 5F                  <1>     pop rdi
-   978 00001C11 722A                <1>     jc .fdiskError
-   979 00001C13 E905FFFFFF          <1>     jmp .okExit
-   980                              <1> .fdiskFormatSector:
-   981                              <1> ;Format a series of sectors (for now just overwrite with fillbyte)
-   982 00001C18 57                  <1>     push rdi
-   983 00001C19 56                  <1>     push rsi
-   984 00001C1A 488D3425[0E380000]  <1>     lea rsi, ATA.formatLBA
-   985 00001C22 488D3C25[CB380000]  <1>     lea rdi, ATA.formatLBA48
-   986 00001C2A F6450004            <1>     test byte [rbp + fdiskEntry.signature], fdeLBA48
-   987 00001C2E 480F44FE            <1>     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
-   988 00001C32 FFD7                <1>     call rdi    ;rdi is a free parameter anyway
-   989 00001C34 5E                  <1>     pop rsi
-   990 00001C35 5F                  <1>     pop rdi
-   991 00001C36 7205                <1>     jc .fdiskError
-   992 00001C38 E9E0FEFFFF          <1>     jmp .okExit
-   993                              <1> .fdiskError:
-   994                              <1> ;A common error handler that checks the status and error register 
-   995                              <1> ; to see what the error may have been. If nothing, then the error
-   996                              <1> ; that is in the msdStatus byte is left as is, unless it is 0
-   997                              <1> ; where a Undefined Error is placed.
-   998 00001C3D 0FB75513            <1>     movzx edx, word [rbp + fdiskEntry.ioBase]
-   999 00001C41 81C207000000        <1>     add edx, 7  ;Goto status
-  1000 00001C47 E8DA180000          <1>     call ATA.wait400ns
-  1001 00001C4C EC                  <1>     in al, dx   ;Get status byte
-  1002 00001C4D A880                <1>     test al, 80h    ;If busy is STILL set, controller failure
-  1003 00001C4F 7578                <1>     jnz .fdiskCtrlrFailed
-  1004 00001C51 A820                <1>     test al, 20h    ;Test drive fault error
-  1005 00001C53 7567                <1>     jnz .fdiskErrorDriveFault
-  1006 00001C55 A801                <1>     test al, 1  ;Test the error bit is set
-  1007 00001C57 7454                <1>     jz .fdiskErrorNoBit ;If not set then check if we have an error code 
-  1008 00001C59 81EA06000000        <1>     sub edx, 6  ;Goto base + 1, Error register
-  1009 00001C5F EC                  <1>     in al, dx   ;Get Error register
-  1010 00001C60 84C0                <1>     test al, al 
-  1011 00001C62 743C                <1>     jz .fdiskNoErrorData
-  1012 00001C64 88C4                <1>     mov ah, al
-  1013 00001C66 80E484              <1>     and ah, 84h ;Save abort and interface crc
-  1014 00001C69 80FC84              <1>     cmp ah, 84h
-  1015 00001C6C 7425                <1>     je .fdiskCRCError
-  1016 00001C6E A840                <1>     test al, 40h    ;Test the uncorrectable Error bit
-  1017 00001C70 7521                <1>     jnz .fdiskCRCError
-  1018 00001C72 88C4                <1>     mov ah, al
-  1019 00001C74 80E414              <1>     and ah, 14h ;If either bit is set, then it is a bad sector number
-  1020 00001C77 750D                <1>     jnz .fdiskBadAddress
-  1021                              <1> .fdiskErrorUnknown: ;Fallthrough here
-  1022 00001C79 C60425[A9010000]BB  <1>     mov byte [msdStatus], 0BBh  ;Unknown Error code
-  1023 00001C81 E984FEFFFF          <1>     jmp .badExit
-  1024                              <1> .fdiskBadAddress:
-  1025 00001C86 C60425[A9010000]04  <1>     mov byte [msdStatus], 04h   ;Sector not found
-  1026 00001C8E E977FEFFFF          <1>     jmp .badExit
-  1027                              <1> .fdiskCRCError:
-  1028 00001C93 C60425[A9010000]10  <1>     mov byte [msdStatus], 10h   ;Uncorrectable CRC error
-  1029 00001C9B E96AFEFFFF          <1>     jmp .badExit
-  1030                              <1> .fdiskNoErrorData:
-  1031 00001CA0 C60425[A9010000]E0  <1>     mov byte [msdStatus], 0E0h  ;Status error = 0
-  1032 00001CA8 E95DFEFFFF          <1>     jmp .badExit
-  1033                              <1> .fdiskErrorNoBit:
-  1034 00001CAD 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]
-  1035 00001CB4 84E4                <1>     test ah, ah
-  1036 00001CB6 0F854EFEFFFF        <1>     jnz .badExit    ;If there is a code, leave it in situ and exit service
-  1037                              <1> 
-  1038                              <1> .fdiskErrorDriveFault:
-  1039 00001CBC C60425[A9010000]07  <1>     mov byte [msdStatus], 07h  ;Drive parameter activity failed
-  1040 00001CC4 E941FEFFFF          <1>     jmp .badExit
-  1041                              <1> .fdiskCtrlrFailed:
-  1042 00001CC9 C60425[A9010000]20  <1>     mov byte [msdStatus], 020h  ;Controller failure code
-  1043 00001CD1 E934FEFFFF          <1>     jmp .badExit
-  1044                              <1> ;------------------------End of Interrupt------------------------
+   956                              <1> 
+   957                              <1> .fdiskWriteLBA:
+   958 00001BCE 57                  <1>     push rdi
+   959 00001BCF 56                  <1>     push rsi
+   960 00001BD0 488D3425[D2370000]  <1>     lea rsi, ATA.writeLBA
+   961 00001BD8 488D3C25[8F380000]  <1>     lea rdi, ATA.writeLBA48
+   962 00001BE0 F6450004            <1>     test byte [rbp + fdiskEntry.signature], fdeLBA48
+   963 00001BE4 480F44FE            <1>     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+   964 00001BE8 FFD7                <1>     call rdi    ;rdi is a free parameter anyway
+   965 00001BEA 5E                  <1>     pop rsi
+   966 00001BEB 5F                  <1>     pop rdi
+   967 00001BEC 724F                <1>     jc .fdiskError
+   968 00001BEE E92AFFFFFF          <1>     jmp .okExit
+   969                              <1> 
+   970                              <1> .fdiskVerifyLBA:
+   971 00001BF3 57                  <1>     push rdi
+   972 00001BF4 56                  <1>     push rsi
+   973 00001BF5 488D3425[F0370000]  <1>     lea rsi, ATA.verifyLBA
+   974 00001BFD 488D3C25[AD380000]  <1>     lea rdi, ATA.verifyLBA48
+   975 00001C05 F6450004            <1>     test byte [rbp + fdiskEntry.signature], fdeLBA48
+   976 00001C09 480F44FE            <1>     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+   977 00001C0D FFD7                <1>     call rdi    ;rdi is a free parameter anyway
+   978 00001C0F 5E                  <1>     pop rsi
+   979 00001C10 5F                  <1>     pop rdi
+   980 00001C11 722A                <1>     jc .fdiskError
+   981 00001C13 E905FFFFFF          <1>     jmp .okExit
+   982                              <1> 
+   983                              <1> .fdiskFormatSector:
+   984                              <1> ;Format a series of sectors (for now just overwrite with fillbyte)
+   985 00001C18 57                  <1>     push rdi
+   986 00001C19 56                  <1>     push rsi
+   987 00001C1A 488D3425[0E380000]  <1>     lea rsi, ATA.formatLBA
+   988 00001C22 488D3C25[CB380000]  <1>     lea rdi, ATA.formatLBA48
+   989 00001C2A F6450004            <1>     test byte [rbp + fdiskEntry.signature], fdeLBA48
+   990 00001C2E 480F44FE            <1>     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+   991 00001C32 FFD7                <1>     call rdi    ;rdi is a free parameter anyway
+   992 00001C34 5E                  <1>     pop rsi
+   993 00001C35 5F                  <1>     pop rdi
+   994 00001C36 7205                <1>     jc .fdiskError
+   995 00001C38 E9E0FEFFFF          <1>     jmp .okExit
+   996                              <1>     
+   997                              <1> .fdiskError:
+   998                              <1> ;A common error handler that checks the status and error register 
+   999                              <1> ; to see what the error may have been. If nothing, then the error
+  1000                              <1> ; that is in the msdStatus byte is left as is, unless it is 0
+  1001                              <1> ; where a Undefined Error is placed.
+  1002 00001C3D 0FB75513            <1>     movzx edx, word [rbp + fdiskEntry.ioBase]
+  1003 00001C41 81C207000000        <1>     add edx, 7  ;Goto status
+  1004 00001C47 E8DA180000          <1>     call ATA.wait400ns
+  1005 00001C4C EC                  <1>     in al, dx   ;Get status byte
+  1006 00001C4D A880                <1>     test al, 80h    ;If busy is STILL set, controller failure
+  1007 00001C4F 7578                <1>     jnz .fdiskCtrlrFailed
+  1008 00001C51 A820                <1>     test al, 20h    ;Test drive fault error
+  1009 00001C53 7567                <1>     jnz .fdiskErrorDriveFault
+  1010 00001C55 A801                <1>     test al, 1  ;Test the error bit is set
+  1011 00001C57 7454                <1>     jz .fdiskErrorNoBit ;If not set then check if we have an error code 
+  1012 00001C59 81EA06000000        <1>     sub edx, 6  ;Goto base + 1, Error register
+  1013 00001C5F EC                  <1>     in al, dx   ;Get Error register
+  1014 00001C60 84C0                <1>     test al, al 
+  1015 00001C62 743C                <1>     jz .fdiskNoErrorData
+  1016 00001C64 88C4                <1>     mov ah, al
+  1017 00001C66 80E484              <1>     and ah, 84h ;Save abort and interface crc
+  1018 00001C69 80FC84              <1>     cmp ah, 84h
+  1019 00001C6C 7425                <1>     je .fdiskCRCError
+  1020 00001C6E A840                <1>     test al, 40h    ;Test the uncorrectable Error bit
+  1021 00001C70 7521                <1>     jnz .fdiskCRCError
+  1022 00001C72 88C4                <1>     mov ah, al
+  1023 00001C74 80E414              <1>     and ah, 14h ;If either bit is set, then it is a bad sector number
+  1024 00001C77 750D                <1>     jnz .fdiskBadAddress
+  1025                              <1> .fdiskErrorUnknown: ;Fallthrough here
+  1026 00001C79 C60425[A9010000]BB  <1>     mov byte [msdStatus], 0BBh  ;Unknown Error code
+  1027 00001C81 E984FEFFFF          <1>     jmp .badExit
+  1028                              <1> .fdiskBadAddress:
+  1029 00001C86 C60425[A9010000]04  <1>     mov byte [msdStatus], 04h   ;Sector not found
+  1030 00001C8E E977FEFFFF          <1>     jmp .badExit
+  1031                              <1> .fdiskCRCError:
+  1032 00001C93 C60425[A9010000]10  <1>     mov byte [msdStatus], 10h   ;Uncorrectable CRC error
+  1033 00001C9B E96AFEFFFF          <1>     jmp .badExit
+  1034                              <1> .fdiskNoErrorData:
+  1035 00001CA0 C60425[A9010000]E0  <1>     mov byte [msdStatus], 0E0h  ;Status error = 0
+  1036 00001CA8 E95DFEFFFF          <1>     jmp .badExit
+  1037                              <1> .fdiskErrorNoBit:
+  1038 00001CAD 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]
+  1039 00001CB4 84E4                <1>     test ah, ah
+  1040 00001CB6 0F854EFEFFFF        <1>     jnz .badExit    ;If there is a code, leave it in situ and exit service
+  1041                              <1> 
+  1042                              <1> .fdiskErrorDriveFault:
+  1043 00001CBC C60425[A9010000]07  <1>     mov byte [msdStatus], 07h  ;Drive parameter activity failed
+  1044 00001CC4 E941FEFFFF          <1>     jmp .badExit
+  1045                              <1> .fdiskCtrlrFailed:
+  1046 00001CC9 C60425[A9010000]20  <1>     mov byte [msdStatus], 020h  ;Controller failure code
+  1047 00001CD1 E934FEFFFF          <1>     jmp .badExit
+  1048                              <1> ;------------------------End of Interrupt------------------------
     96                                  %include "./Resident/Services/Int34h.asm"
     97                              <1> ;------------------Serial IO Interrupts Int 34h------------------
     98                              <1> serial_baud_table:    ;DLAB devisor values
