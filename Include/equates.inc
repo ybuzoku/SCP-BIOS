@@ -144,6 +144,8 @@ struc fdiskEntry
     .wSecTrc    resw 1  ;Number of CHS Sectors per Track
     .lbaMax     resd 1  ;Number of maximum sector accessible by LBA28
     .lbaMax48   resq 1  ;Number of maximum sector accessible by LBA48
+    .ioBase     resw 1  ;IO Base address
+    .msBit      resb 1  ;Master Slave bit in 0A0h/0B0h format
 endstruc
 ;.signature is as follows:
 ;.signature[0] set = Device present and OK to use.

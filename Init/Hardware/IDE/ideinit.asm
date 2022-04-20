@@ -90,7 +90,8 @@ IDE:
 ; in the table.
 ;If it fails, doesnt inc the fixed drives number counter
 ;Called with:   dx = ataX base register
-;               rbx = Points to table entry to write 
+;               rbx = Points to table entry to write
+;               al = A0h for master, B0h for slave
 
     push rax
     push rdx
@@ -109,6 +110,8 @@ IDE:
     jc .idExit  ;If the carry flag set, the device timed out
     ;Now get information and build tables here
     mov byte [rbx + fdiskEntry.signature], 0    ;Clear signature byte in table
+    mov word [rbx + fdiskEntry.ioBase], dx      ;Add iobase and masterslave status
+    mov byte [rbx + fdiskEntry.msBit], al       
 ;CHS, none of CHS is allowed to be 0 but may be because obsolete on new drives
     mov ax, word [rdi + idCurrCyl]
     test ax, ax
@@ -184,6 +187,8 @@ IDE:
     mov word [rbx + fdiskEntry.wCylinder], ax
     mov word [rbx + fdiskEntry.wHeads], ax
     mov word [rbx + fdiskEntry.wSecTrc], ax
+    mov word [rbx + fdiskEntry.ioBase], ax
+    mov byte [rbx + fdiskEntry.msBit], al
     jmp short .idExit
 .idDeviceOK:
     or byte [rbx + fdiskEntry.signature], fdePresent

@@ -111,6 +111,7 @@ ATA:
 .driveNotSelected:
     stc
     jmp short .skipSelection
+
 .driveSelectWait:
 ; Called with dx = ataXbase
 ; Reads the alternate status register 14 times
@@ -198,18 +199,72 @@ ATA:
 ;CHS functions
 .readCHS:
     call .setupCHS
+    jc .rCHSend
+    ;Send command!
+.rCHSend:
     ret
+
 .writeCHS:
     call .setupCHS
+    jc .wCHSend
+
+.wCHSend:
     ret
+
 .verifyCHS:
     call .setupCHS
+    jc .vCHSend
+
+.vCHSend:
     ret
+
 .setupCHS:
-    ;Select the drive, set up the CHS registers
+    ;Select the drive, then set up the CHS registers
     ; and return to the caller to enact the transaction
-    
+    xchg dl, dh
+    mov ebp, edx    ;Have Drive number in bph and Head number in bpl
+    xchg dl, dh
+    call .getChannelBase    ;Return in bit 12 master/slave bit and in dx[11:0] io addr
+    push rax
+    mov al, dh  ;Get dx[15:8] in al. Bit 12 of dx becomes bit 4 of al
+    and al, 10h ;Save master slave bit
+    or al, 0A0h ;Add bit pattern to al
+    mov ah, al
+    and edx, 0FFFh   ;Clear the upper nybble of data
+    call .selectDrive
+    pop rax    
+    jc .setupCHSFail0
+;Drive now selected on channel. channel base in dx[11:0]
+    add edx, 2  ;Goto ataXbase + 2, Sector Count
+    out dx, al  ;Put out the sector count 
+    inc edx     ;Goto ataXbase + 3, Sector Number
+    push rax    ;Save sector count
+    mov al, cl  ;Upper two bits of cl have a cylinder number. Clear them
+    and al, 03Fh
+    out dx, al  ;Out the sector to start at
+    inc edx     ;Goto ataXbase + 4, Cylinder Low
+    mov al, ch
+    out dx, al  ;Out the low 8 bits of the cylinder address to start at
+    inc edx     ;Goto ataXbase + 5, Cylinder High
+    mov al, cl  ;Lower five bits of cl have the sector number. Shift down
+    shr al, 6
+    out dx, al  ;Out the hight 2 bits of the cylinder address to start at
+    inc edx     ;Goto ataXbase + 6, Drive/Head Register
+    mov eax, ebp    ;Get back from ebp the value of dx switched into eax
+    ;ah has drive number, al has head number
+    and al, 0Fh ;Ensure only bottom nybble is alive
+    and ah, 1   ;Save only bottom bit (must be 0 for master, 1 for slave)
+    or ah, 0Ah  ;Set magic bits for CHS
+    shl ah, 4   ;Move low nybble high
+    or al, ah   ;Add the nybble to the head number that is low
+    out dx, al
+    sub edx, 6  ;Goto ataXbase + 0, Data Register
+    pop rax     ;Return sector count
     ret
+.setupCHSFail0:
+    mov ah, 20h ;General controller failure
+    ret
+    
 ;LBA functions
 .readLBA:
     call .setupLBA

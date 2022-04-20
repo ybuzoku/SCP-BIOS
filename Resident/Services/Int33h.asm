@@ -746,12 +746,23 @@ fdiskdpt: ;Fixed drive table, only cyl, nhd and spt are valid.
 ;All registers not mentioned above, preserved.
 ;Still use msdStatus as the error byte dumping ground. For now, 
 ; do not use the ata specific status bytes. 
+; Fixed disk BIOS does NOT return how many sectors were 
+; successfully transferred!
 ;----------------------------------------------------------------
 fdisk_io:
-    test ah, ah
-    jz .fdiskReset
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rbp
+;Cherry pick status to avoid resetting status
     cmp ah, 01h
     je .fdiskStatus
+    
+    mov byte [msdStatus], 0 ;Reset the status
+
+    test ah, ah
+    jz .fdiskReset
     cmp ah, 02h
     je .fdiskReadCHS
     cmp ah, 03h
@@ -771,20 +782,42 @@ fdisk_io:
 
     mov ah, 01h
     mov byte [msdStatus], ah   ;Invalid function requested signature
-.bad:
-    or byte [rsp + 2*8h], 1    ;Set Carry flag on for invalid function
+.badExit:
+    pop rbp
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+    mov ah, byte [msdStatus]
+    or byte [rsp + 2*8h], 1    ;Set Carry flag
     iretq 
+.okExit:
+    pop rbp
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+    mov ah, byte [msdStatus]
+    and byte [rsp + 2*8h], 0FEh ;Clear Carry flag    
+    iretq
+;Misc functions
 .fdiskReset:
     call ATA.getChannelBase ;Get the base in dx
     and edx, 0FFFh  ;Save low 12 bits
     call ATA.resetChannel
+    mov eax, 0  ;No issue
+    mov ebx, 5  ;Reset failed
+    cmovc eax, ebx  ;Only move if carry set
+    mov byte [msdStatus], al    ;Save status byte
+    jc .badExit ;Carry is still preserved
+    jmp short .okExit
 
 .fdiskStatus:
     mov ah, byte [msdStatus]    ;Save old status
     mov byte [msdStatus], 0     ;Clear the status
     test ah, ah
-    jnz .bad    ;Set carry flag if status is non-zero
-    iretq
+    jnz .badExit    ;Set carry flag if status is non-zero
+    jmp short .okExit
 ;CHS functions
 .fdiskReadCHS:
 .fdiskWriteCHS:
