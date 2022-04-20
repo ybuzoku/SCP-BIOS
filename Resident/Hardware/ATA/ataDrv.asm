@@ -284,13 +284,14 @@ ATA:
 .w0:
     mov ecx, 256    ;Number of words in a sector
 .w1:
-    outsw    ;Read that many words!
+    outsw    ;Write that many words!
     jmp short $ + 2
-    loop .w1 ;Read one sector, one word at a time
+    loop .w1 ;Write one sector, one word at a time
     dec al
     jnz .w0  ;Keep going up by a sector
     ;Here wait for device to stop being busy. 
     ;If it doesnt after ~4 seconds, declare an error
+.formatEP:  ;Where the format routine enters the write routine
     mov ecx, -1 ;About 4 seconds
     add edx, 7  ;Goto status register
 .wBSYcheck:
@@ -347,6 +348,37 @@ ATA:
     clc
     ret
 
+.format:
+    ;A write which writes a byte to disk (0E5h for classical reasons)
+    out dx, al  ;Output the command byte!
+    mov al, cl  ;Return sector count into al
+
+    ;Now we wait for the DRQ bit in the status register to set
+    mov cx, -1  ;Data should be ready within ~67 miliseconds
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 206h  ;Dummy read on Alt status register
+    mov bl, al     ;Save sector count in bl
+.formatWait:
+    call .wait400ns
+    dec cx
+    jz .rTimeout
+    test al, 8      ;If DRQ set?  
+    jz .formatWait  ;If not, keep waiting
+;Now we can write the data
+    movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
+    ;movzx eax, bl   ;Zero extend the sector count
+    mov bh, bl  ;Move sector count into bh to use as counter
+    mov eax, 0E5E5h 
+.f0:
+    mov ecx, 256    ;Number of words in a sector
+.f1:
+    out dx, ax  ;Write E5h to the disk!!
+    jmp short $ + 2
+    loop .f1 ;Write one sector, one word at a time
+    dec bh
+    jnz .f0  ;Keep going up by a sector
+    jmp .formatEP   ;Goto the format entry point
+
 ;CHS functions
 .readCHS:
 ;Called with rdi as a free register to use
@@ -380,6 +412,20 @@ ATA:
     add edx, 7  ;Goto command register
     mov al, 40h ;ATA VERIFY COMMAND!
     jmp .verify
+    
+.formatCHS:
+;Ignore al (number of sectors) and cl[5:0] (Starting sector number)
+    mov ax, word [rbp + fdiskEntry.wSecTrc] ;Get sectors in a track to clear
+    ;Sectors per track is always less than 256 so byte is ok!
+    and cl, 0C0h    ;Clear bottom 6 bits. 
+    or cl, 1        ;All tracks start at sector 1
+    call .setupCHS
+    jc .errorExit
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 30h ;ATA WRITE COMMAND!
+    jmp .format
 
 .setupCHS:
     ;First sets the chosen device, then sets all the registers
@@ -415,7 +461,7 @@ ATA:
 .sCHSFailed:
     mov byte [msdStatus], 20h   ;General controller failure
     ret ;Carry flag propagated
-    
+
 ;LBA functions
 .readLBA:
     call .setupLBA
@@ -446,6 +492,16 @@ ATA:
     mov cl, al  ;Save sector count in cl
     mov al, 40h ;ATA VERIFY COMMAND!
     jmp .verify
+
+.formatLBA:
+    call .setupLBA
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 30h ;ATA WRITE COMMAND!
+    jmp .format
 
 .setupLBA:
     ;First sets the chosen device, then sets all the registers
@@ -484,7 +540,6 @@ ATA:
     mov byte [msdStatus], 20h   ;General controller failure
     ret ;Carry flag propagated
 
-
 ;LBA48 functions
 .readLBA48:
     call .setupLBA48
@@ -505,6 +560,7 @@ ATA:
     mov cl, al  ;Save sector count in cl
     mov al, 34h ;ATA WRITE EXT COMMAND!
     jmp .write
+
 .verifyLBA48:
     call .setupLBA48
     jc .errorExit
@@ -514,6 +570,16 @@ ATA:
     mov cl, al  ;Save sector count in cl
     mov al, 42h ;ATA VERIFY EXT COMMAND!
     jmp .verify
+
+.formatLBA48:
+    call .setupLBA48
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 34h ;ATA WRITE EXT COMMAND!
+    jmp .format
 
 .setupLBA48:
 ;First sets the chosen device, then sets all the registers

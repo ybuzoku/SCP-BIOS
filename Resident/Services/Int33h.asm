@@ -841,7 +841,9 @@ fdisk_io:
 
 ;Format a whole "track" (for now just overwrite)
 .fdiskFormat:
-
+    call ATA.formatCHS
+    jc .fdiskError
+    jmp .okExit
 ;LBA functions
 .fdiskReadLBA:
     xchg bx, bx
@@ -882,8 +884,17 @@ fdisk_io:
     jmp .okExit
 .fdiskFormatSector:
 ;Format a series of sectors (for now just overwrite with fillbyte)
-
-    iretq
+    push rdi
+    push rsi
+    lea rsi, ATA.formatLBA
+    lea rdi, ATA.formatLBA48
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+    call rdi    ;rdi is a free parameter anyway
+    pop rsi
+    pop rdi
+    jc .fdiskError
+    jmp .okExit
 .fdiskError:
 ;A common error handler that checks the status and error register 
 ; to see what the error may have been. If nothing, then the error
