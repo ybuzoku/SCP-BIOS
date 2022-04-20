@@ -211,18 +211,12 @@ ATA:
 .rcBad:
     stc             ;Set carry
     ret
-
-;CHS functions
-.readCHS:
-;Called with rdi as a free register to use
-;All other registers have parameters as in Int 33h function ah=02h
-    call .setupCHS
-    jc .rCHSexit
-    ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
-    add edx, 7  ;Goto command register
-    mov cl, al  ;Save sector count in cl
-    mov al, 20h ;ATA READ COMMAND!
+;Common functions:
+;Jumped to with: 
+; al = Primary function number
+; cl = Sector count
+; dx = Command register for drive
+.read:
     out dx, al  ;Output the command byte!
     mov al, cl  ;Return sector count into al
 
@@ -232,52 +226,43 @@ ATA:
     add edx, 206h  ;Dummy read on Alt status register
     mov rdi, rbx    ;Move the read buffer pointer to rdi
     mov bl, al      ;Save sector count in bl
-.rCHSwait:
+.rWait:
     call .wait400ns
     dec cx
-    jz .rCHSTimeout
+    jz .rTimeout
     test al, 8      ;If DRQ set?  
-    jz .rCHSwait    ;If not, keep waiting
+    jz .rWait    ;If not, keep waiting
 ;Now we can read the data
     movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
     movzx eax, bl   ;Zero extend the sector count
-.readCHSLoop:
+.readLoop:
     mov ecx, 256    ;Number of words in a sector
     rep insw    ;Read that many words!
     dec al      ;Reduce the number of sectors read by 1
-    jnz .readCHSLoop
+    jnz .readLoop
     ;Here check status register to ensure error isnt set
     add edx, 7
     mov ecx, -1
 .readExitloop:
     dec ecx
-    jz .chsError
+    jz .errorExit
     in al, dx
     test al, 80h        ;Check if BSY bit still set (i.e not ready yet)
     jnz .readExitloop   ;If BSY still set keep looping
     test al, 61h        ;Check if DSDY bit or Error bits are set
     jz .readExitloop    ;If DSDY not set, wait
     test al, 21h    ;Check status bits 0 and 5 (error and drive fault)
-    jnz .chsError
-.rCHSexit:
+    jnz .errorExit
+.rExit:
     clc
     ret
-.rCHSTimeout:
+.rTimeout:
     mov byte [msdStatus], 80h   ;Timeout occured
-.chsError:
+.errorExit:
     stc
     ret
 
-.writeCHS:
-;Called with rsi as a free register to use
-;All other registers have parameters as in Int 33h function ah=02h
-    call .setupCHS
-    jc .rCHSexit
-    ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
-    add edx, 7  ;Goto command register
-    mov cl, al  ;Save sector count in cl
-    mov al, 30h ;ATA WRITE COMMAND!
+.write:
     out dx, al  ;Output the command byte!
     mov al, cl  ;Return sector count into al
 
@@ -285,88 +270,116 @@ ATA:
     mov cx, -1  ;Data should be ready within ~67 miliseconds
     movzx edx, word [rbp + fdiskEntry.ioBase]
     add edx, 206h  ;Dummy read on Alt status register
-    mov rdi, rbx    ;Move the write buffer pointer to rdi
+    mov rsi, rbx    ;Move the write buffer pointer to rsi
     mov bl, al      ;Save sector count in bl
-.wCHSwait:
+.writeWait:
     call .wait400ns
     dec cx
-    jz .rCHSTimeout
+    jz .rTimeout
     test al, 8      ;If DRQ set?  
-    jz .wCHSwait    ;If not, keep waiting
+    jz .writeWait    ;If not, keep waiting
 ;Now we can write the data
     movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
     movzx eax, bl   ;Zero extend the sector count
-.wCHS0:
+.w0:
     mov ecx, 256    ;Number of words in a sector
-.wCHS1:
+.w1:
     outsw    ;Read that many words!
     jmp short $ + 2
-    loop .wCHS1 ;Read one sector, one word at a time
+    loop .w1 ;Read one sector, one word at a time
     dec al
-    jnz .wCHS0  ;Keep going up by a sector
+    jnz .w0  ;Keep going up by a sector
     ;Here wait for device to stop being busy. 
     ;If it doesnt after ~4 seconds, declare an error
     mov ecx, -1 ;About 4 seconds
     add edx, 7  ;Goto status register
-.wchsBSYcheck:
+.wBSYcheck:
     dec ecx
-    jz .chsError   ;If after 4 seconds the device is still BSY, consider it failing
+    jz .errorExit   ;If after 4 seconds the device is still BSY, consider it failing
     in al, dx   ;Read status reg
     test al, 80h    ;Check BSY
-    jnz .wchsBSYcheck    ;If it is no longer BSY, check error status
+    jnz .wBSYcheck   ;If it is no longer BSY, check error status
     test al, 61h        ;Check if DSDY bit or Error bits are set
-    jz .wchsBSYcheck    ;If not set, do not send next command
-.wchsFlushBuffers:
+    jz .wBSYcheck    ;If not set, do not send next command
+;NOW FLUSH THE DISK BUFFERS TO DISK
     ;Here check status register to ensure error isnt set
     test al, 21h    ;Test bits 0 and 5 (error and drive fault)
-    jnz .chsError
+    jnz .errorExit
     ;Now we must flush cache on the device
     mov al, 0E7h    ;FLUSH CACHE COMMAND
     out dx, al
     ;This command can take 30 seconds to complete so we check status 
     ; every ms to see if BSY is clear yet.
     mov ebx, 30000   ;30,000 miliseconds in 30 seconds
-.flushCheck:
+.wFlushCheck:
     dec ebx
-    jz .chsError
+    jz .errorExit
     mov ecx, 1
     mov ah, 86h
     int 35h
     in al, dx   ;Read the status byte
     test al, 80h    ;Are we still busy?
-    jnz .flushCheck ;IF yes, loop again
+    jnz .wFlushCheck ;IF yes, loop again
     test al, 61h    ;Check if DSDY bit or Error bits are set
-    jz .flushCheck  ;Whilst it is not set, keep looping
+    jz .wFlushCheck  ;Whilst it is not set, keep looping
     test al, 21h    ;Test bits 0 and 5 (error and drive fault)
-    jnz .chsError   ;If either are set, return fail
+    jnz .errorExit   ;If either are set, return fail
     clc
     ret
 
-.verifyCHS:
-    call .setupCHS
-    jc .rCHSexit
-    ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
-    add edx, 7  ;Goto command register
-    mov al, 40h ;ATA VERIFY COMMAND!
+.verify:
     out dx, al  ;Output the command byte!
     ;Now we wait for BSY to go low and DRDY to go high
     mov cx, -1  ;Data should be ready within ~67 miliseconds
     movzx edx, word [rbp + fdiskEntry.ioBase]
     add edx, 7  ;Goto status register
-.vCHSloop:
+.vLoop:
     dec cx
-    jz .chsError
+    jz .errorExit
     in al, dx   ;Get status
     test al, 80h    ;BSY bit set
-    jnz .vCHSloop
+    jnz .vLoop
     ;Once it clears come here
     test al, 61h    ;Check if DSDY bit or Error bits are set
-    jz .vCHSloop    ;Whilst it is not set, keep looping
+    jz .vLoop    ;Whilst it is not set, keep looping
     test al, 21h    ;Test bits 0 and 5 (error and drive fault)
-    jnz .chsError   ;If either are set, return fail
+    jnz .errorExit   ;If either are set, return fail
     clc
     ret
+
+;CHS functions
+.readCHS:
+;Called with rdi as a free register to use
+;All other registers have parameters as in Int 33h function ah=02h
+    call .setupCHS
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 20h ;ATA READ COMMAND!
+    jmp .read
+
+.writeCHS:
+;Called with rsi as a free register to use
+;All other registers have parameters as in Int 33h function ah=02h
+    call .setupCHS
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 30h ;ATA WRITE COMMAND!
+    jmp .write
+
+.verifyCHS:
+    call .setupCHS
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov al, 40h ;ATA VERIFY COMMAND!
+    jmp .verify
 
 .setupCHS:
     ;First sets the chosen device, then sets all the registers
@@ -406,15 +419,73 @@ ATA:
 ;LBA functions
 .readLBA:
     call .setupLBA
-    ret
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 20h ;ATA READ COMMAND!
+    jmp .read
+
 .writeLBA:
+    xchg bx, bx
     call .setupLBA
-    ret
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 30h ;ATA WRITE COMMAND!
+    jmp .write
+
 .verifyLBA:
     call .setupLBA
-    ret
+    jc .errorExit
+    ;Send command
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto command register
+    mov cl, al  ;Save sector count in cl
+    mov al, 40h ;ATA VERIFY COMMAND!
+    jmp .verify
+
 .setupLBA:
+    ;First sets the chosen device, then sets all the registers
+    ; except for the command and then returns
+    call .selectDriveFromTable
+    jc .sLBAFailed
+    mov dh, al  ;Save sector count in dh
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 2      ;Goto base + 2, Sector count
+    out dx, al      ;Output sector number
+    inc edx         ;Goto base + 3, LBA low
+    mov al, cl      ;Get LBA low address
+    shr ecx, 8      ;Get second byte low
+    out dx, al      
+
+    inc edx         ;Goto base + 4, LBA mid
+    mov al, cl      ;Get LBA second byte
+    shr ecx, 8      ;Get third byte low
+    out dx, al
+
+    inc edx         ;Goto base + 5, LBA high
+    mov al, cl      ;Get LBA third byte
+    shr ecx, 8      ;Get final nybble into cl
+    out dx, al
+
+    inc edx         ;Goto base + 6, LBA upper bits and drive select
+    mov al, cl      ;Get final nybble into al
+    and al, 0Fh     ;Clear extra bits
+    or al, byte [rbp + fdiskEntry.msBit]    ;Add the master/slave bit and fixed bits
+    or al, 40h      ;Set LBA bit
+    out dx, al
+    mov al, dh  ;Return sector count into al
+    clc
     ret
+.sLBAFailed:
+    mov byte [msdStatus], 20h   ;General controller failure
+    ret ;Carry flag propagated
+
+
 ;LBA48 functions
 .readLBA48:
     call .setupLBA48

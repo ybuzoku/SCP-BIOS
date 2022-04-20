@@ -833,10 +833,9 @@ fdisk_io:
     pop rsi
     jc .fdiskError
     jmp .okExit
+
 .fdiskVerifyCHS:
-    push rsi
     call ATA.verifyCHS
-    pop rsi
     jc .fdiskError
     jmp .okExit
 
@@ -845,8 +844,21 @@ fdisk_io:
 
 ;LBA functions
 .fdiskReadLBA:
+    push rdi
+    call ATA.readLBA
+    pop rdi
+    jc .fdiskError
+    jmp .okExit
 .fdiskWriteLBA:
+    push rsi
+    call ATA.writeLBA
+    pop rsi
+    jc .fdiskError
+    jmp .okExit
 .fdiskVerifyLBA:
+    call ATA.verifyLBA
+    jc .fdiskError
+    jmp .okExit
 .fdiskFormatSector:
 ;Format a series of sectors (for now just overwrite)
 
