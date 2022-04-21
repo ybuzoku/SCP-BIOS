@@ -104,8 +104,7 @@ pci_scan:    ;Enumerate PCI devices (formerly, USB devices)
     out dx, eax
     add dx, 4
     in eax, dx  ;Get BAR 4 address
-    ;call IDE.addControllerTable
-    ;jc .u11     ;If this fails, exit gracefully
+    call IDE.addControllerTable ;Function will not add if we maxed out controllers
     jmp .u11
 .ipemsg:    db 0Ah, 0Dh,"IDE ATA Controller found. Type: ", 0
 .ipemsg2:   db 0Ah, 0Dh, "IDE ATA Controller set to compatibility mode",0

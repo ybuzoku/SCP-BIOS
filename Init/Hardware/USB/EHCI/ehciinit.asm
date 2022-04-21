@@ -66,6 +66,6 @@ hciParse:
     jmp short .exit
 .echiInitMsg db 0Ah,0Dh,"Initialising USB and EHCI root hubs...",0
 .noEHCI:
-;For now, since all MSD based work goes through ehci, jump to the end
-    jmp end
+;If no EHCI, skip MSD search on EHCI bus. Goto Int 33h init
+    jmp int33hinit.i33iend  ;Could go to int33hinit, but this is minutely faster
 .exit:

@@ -10,10 +10,10 @@
 disk_io:
     cld ;Ensure all string reads/writes are in the right way
     test dl, 80h
-    jnz .baddev    ;If bit 7 set, exit (temp for v0.9)
+    jnz fdisk_io    ;If bit 7 set, goto Fixed disk routines
     push rdx
     inc dl          ;Inc device number count to absolute value
-    cmp dl, byte [i33Devices]
+    cmp dl, byte [numMSD]   ;For now, numMSD, eventually, numRemDrv
     pop rdx
     ja .baddev
     cmp ah, 16h
@@ -730,4 +730,266 @@ fdiskdpt: ;Fixed drive table, only cyl, nhd and spt are valid.
 .clz:   dw  1023    ;Cylinder for landing zone
 .spt:   db  63      ;Sectors per track
 .res:   db  0       ;Reserved byte
+
+;----------------------Fixed Disk Int 33h Ext-------------------
+; Subfunctions in ah
+;Input:  dl = Drive number, 
+;        dh = Head number,
+;        rbx = Address of buffer, 
+;        al = number of sectors, 
+;        ch = Cylinder number (low 8 bits), 
+;        cl[7:6] = Cylinder number (upper 2 bits), 
+;        cl[5:0] = Sector number
+;Input LBA: dl = Drive Number, rbx = Address of Buffer, 
+;           al = number of sectors, rcx = LBA number
+;
+;All registers not mentioned above, preserved.
+;Still use msdStatus as the error byte dumping ground. For now, 
+; do not use the ata specific status bytes. 
+; Fixed disk BIOS does NOT return how many sectors were 
+; successfully transferred!
+;----------------------------------------------------------------
+fdisk_io:
+    push rbp
+    push rax
+    push rbx
+    push rcx
+    push rdx
+;Cherry pick status to avoid resetting status
+    cmp ah, 01h
+    je .fdiskStatus
+
+    mov byte [msdStatus], 0 ;Reset the status
+    call ATA.getTablePointer    ;Get table pointer in rbp for all functions
+    jc .badFunctionRequest  ;If the device doenst exist, bad bad bad!
+
+    test ah, ah
+    jz .fdiskReset
+    cmp ah, 02h
+    je .fdiskReadCHS
+    cmp ah, 03h
+    je .fdiskWriteCHS
+    cmp ah, 04h
+    je .fdiskVerifyCHS
+    cmp ah, 05h
+    je .fdiskFormat
+    cmp ah, 08h
+    je .fdiskParametersCHS
+    cmp ah, 82h
+    je .fdiskReadLBA
+    cmp ah, 83h
+    je .fdiskWriteLBA
+    cmp ah, 84h
+    je .fdiskVerifyLBA
+    cmp ah, 85h
+    je .fdiskFormatSector
+    cmp ah, 88h 
+    je .fdiskParametersLBA
+
+.badFunctionRequest:
+    mov ah, 01h
+    mov byte [msdStatus], ah   ;Invalid function requested signature
+.badExit:
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+    pop rbp
+    mov ah, byte [msdStatus]
+    or byte [rsp + 2*8h], 1    ;Set Carry flag
+    iretq 
+.okExit:
+    pop rdx
+    pop rcx
+.paramExit:
+    pop rbx
+    pop rax
+    pop rbp
+    mov ah, byte [msdStatus]
+    and byte [rsp + 2*8h], 0FEh ;Clear Carry flag    
+    iretq
+;Misc functions
+.fdiskReset:
+    call ATA.resetChannel
+    mov eax, 0  ;No issue
+    mov ebx, 5  ;Reset failed
+    cmovc eax, ebx  ;Only move if carry set
+    mov byte [msdStatus], al    ;Save status byte
+    jc .badExit ;Carry is still preserved
+    jmp short .okExit
+
+.fdiskStatus:
+    mov ah, byte [msdStatus]    ;Save old status
+    mov byte [msdStatus], 0     ;Clear the status
+    test ah, ah
+    jnz .badExit    ;Set carry flag if status is non-zero
+    jmp short .okExit
+;CHS functions
+.fdiskReadCHS:
+    push rdi
+    call ATA.readCHS
+    pop rdi
+    jc .fdiskError
+    jmp .okExit
+    
+.fdiskWriteCHS:
+    push rsi
+    call ATA.writeCHS
+    pop rsi
+    jc .fdiskError
+    jmp .okExit
+
+.fdiskVerifyCHS:
+    call ATA.verifyCHS
+    jc .fdiskError
+    jmp .okExit
+
+;Format a whole "track" (for now just overwrite)
+.fdiskFormat:
+    call ATA.formatCHS
+    jc .fdiskError
+    jmp .okExit
+
+.fdiskParametersCHS:
+;Reads CHS drive parameters for given drive 
+;Output: dl = Number of fixed disks in system
+;        dh = Max head number for chosen drive
+;        ch = Cylinder number
+;        cl[7:6] = High two bits of Cylinder number
+;        cl[5:0] = Sectors per track
+;        ah = 0
+    pop rdx
+    pop rcx
+    movzx eax, word [rbp + fdiskEntry.wHeads]
+    mov dh, al
+    movzx eax, word [rbp + fdiskEntry.wCylinder]
+    mov ch, al  ;Low 8 bits 
+    shr ax, 2   ;Move bits [1:0] of ah to bits [7:6] of al
+    and al, 0C0h    ;Clear lower bits [5:0]
+    mov cl, al
+    movzx eax, word [rbp + fdiskEntry.wSecTrc]
+    and al, 3Fh ;Save only bits [5:0]
+    or cl, al   ;Add the sector per track bits here
+    mov dl, byte [fdiskNum] ;Get number of fixed disks in dl
+    jmp .paramExit
+
+;LBA functions
+.fdiskReadLBA:
+    push rdi
+    push rsi
+    lea rsi, ATA.readLBA
+    lea rdi, ATA.readLBA48
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+    call rdi    ;rdi is a free parameter anyway
+    pop rsi
+    pop rdi
+    jc .fdiskError
+    jmp .okExit
+
+.fdiskWriteLBA:
+    push rdi
+    push rsi
+    lea rsi, ATA.writeLBA
+    lea rdi, ATA.writeLBA48
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+    call rdi    ;rdi is a free parameter anyway
+    pop rsi
+    pop rdi
+    jc .fdiskError
+    jmp .okExit
+
+.fdiskVerifyLBA:
+    push rdi
+    push rsi
+    lea rsi, ATA.verifyLBA
+    lea rdi, ATA.verifyLBA48
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+    call rdi    ;rdi is a free parameter anyway
+    pop rsi
+    pop rdi
+    jc .fdiskError
+    jmp .okExit
+
+.fdiskFormatSector:
+;Format a series of sectors (for now just overwrite with fillbyte)
+    push rdi
+    push rsi
+    lea rsi, ATA.formatLBA
+    lea rdi, ATA.formatLBA48
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
+    call rdi    ;rdi is a free parameter anyway
+    pop rsi
+    pop rdi
+    jc .fdiskError
+    jmp .okExit
+.fdiskParametersLBA:
+;Output: rcx = qLastLBANum (Qword address of last LBA)
+;        dl = Number of fixed disks in system
+;        Fixed disks have a fixed sector size of 512 bytes
+;Recall last LBA value is the first NON-user usable LBA
+;Will return LBA48 if the device uses LBA48 in rcx
+    pop rdx
+    pop rcx
+    xor ecx, ecx    ;Zero whole of rcx
+    mov ecx, dword [rbp + fdiskEntry.lbaMax]
+    mov rax, qword [rbp + fdiskEntry.lbaMax48]
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovnz rcx, rax ;Move lba48 value into rcx if LBA48 bit set
+    mov dl, byte [fdiskNum] ;Number of fixed disks
+    jmp .paramExit
+.fdiskError:
+;A common error handler that checks the status and error register 
+; to see what the error may have been. If nothing, then the error
+; that is in the msdStatus byte is left as is, unless it is 0
+; where a Undefined Error is placed.
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Goto status
+    call ATA.wait400ns
+    in al, dx   ;Get status byte
+    test al, 80h    ;If busy is STILL set, controller failure
+    jnz .fdiskCtrlrFailed
+    test al, 20h    ;Test drive fault error
+    jnz .fdiskErrorDriveFault
+    test al, 1  ;Test the error bit is set
+    jz .fdiskErrorNoBit ;If not set then check if we have an error code 
+    sub edx, 6  ;Goto base + 1, Error register
+    in al, dx   ;Get Error register
+    test al, al 
+    jz .fdiskNoErrorData
+    mov ah, al
+    and ah, 84h ;Save abort and interface crc
+    cmp ah, 84h
+    je .fdiskCRCError
+    test al, 40h    ;Test the uncorrectable Error bit
+    jnz .fdiskCRCError
+    mov ah, al
+    and ah, 14h ;If either bit is set, then it is a bad sector number
+    jnz .fdiskBadAddress
+.fdiskErrorUnknown: ;Fallthrough here
+    mov byte [msdStatus], 0BBh  ;Unknown Error code
+    jmp .badExit
+.fdiskBadAddress:
+    mov byte [msdStatus], 04h   ;Sector not found
+    jmp .badExit
+.fdiskCRCError:
+    mov byte [msdStatus], 10h   ;Uncorrectable CRC error
+    jmp .badExit
+.fdiskNoErrorData:
+    mov byte [msdStatus], 0E0h  ;Status error = 0
+    jmp .badExit
+.fdiskErrorNoBit:
+    mov ah, byte [msdStatus]
+    test ah, ah
+    jnz .badExit    ;If there is a code, leave it in situ and exit service
+
+.fdiskErrorDriveFault:
+    mov byte [msdStatus], 07h  ;Drive parameter activity failed
+    jmp .badExit
+.fdiskCtrlrFailed:
+    mov byte [msdStatus], 020h  ;Controller failure code
+    jmp .badExit
 ;------------------------End of Interrupt------------------------

@@ -105,7 +105,7 @@ Segment codeResident follows=codeInit vfollows=data align=1 valign=1
 %include "./Resident/Services/Int3Eh.asm"
 %include "./Resident/Services/Int3Fh.asm"
 ;========================RESIDENT DRIVERS=====================
-%include "./Resident/Hardware/IDE/ideDriv.asm"
+%include "./Resident/Hardware/ATA/ataDrv.asm"
 %include "./Resident/Hardware/USB/EHCI/ehciDriv.asm"
 ;====================================CPU Interrupts=============================
 %include "./Resident/Hardware/CPU/xception.asm"

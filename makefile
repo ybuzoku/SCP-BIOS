@@ -36,7 +36,7 @@
 
 assemble:
 	nasm scpbios.asm -o ./Binaries/scpbios.bin -f bin -l scpbios.lst -O0
-	dd if=./Binaries/scpbios.bin of=./Images/TestImage.ima bs=512 seek=34 conv=notrunc
+	dd if=./Binaries/scpbios.bin of=./Images/TestImage.ima bs=512 seek=33 conv=notrunc
 	cp ./Images/TestImage.ima ./Images/TestImageMSD.ima
 
 #Add a new boot sector to current image
@@ -53,6 +53,6 @@ fresh:
 	dd if=./Binaries/loader.bin of=./Images/TestImage.ima bs=512 count=1 conv=notrunc
 
 	nasm scpbios.asm -o ./Binaries/scpbios.bin -f bin -l scpbios.lst -O0
-	dd if=./Binaries/scpbios.bin of=./Images/TestImage.ima bs=512 seek=34 conv=notrunc
+	dd if=./Binaries/scpbios.bin of=./Images/TestImage.ima bs=512 seek=33 conv=notrunc
 
 	cp ./Images/TestImage.ima ./Images/TestImageMSD.ima

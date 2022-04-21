@@ -3,7 +3,7 @@ ORG	600h
 
 relocBase   equ 600h ;Relocate to 600h
 loadAddress equ 800h
-startSector equ 34
+startSector equ 33
     jmp short start
     nop
 ;---------------------------Tables--------------------------
@@ -148,7 +148,7 @@ SysInitTable:
 .lengthb db 0Ch
 .numSecb db 1
 .resWord dw 00h
-.FileLBA dq 88  ;Start at Sector 88
+.FileLBA dq 64h  ;Start at Sector 100
 
 times 510-($-$$) db 0E8h
     db 55h

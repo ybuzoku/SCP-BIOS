@@ -135,8 +135,36 @@ sata_subclass   equ    06h
 ideTableEntrySize     equ 10h
 ;----------------------FDD equates---------------------------
 fdd_base        equ    3F0h
+;----------------------ATA equates---------------------------
+struc fdiskEntry
+    .signature  resb 1 
+    ;CHS really shouldnt be used
+    .wHeads     resw 1  ;Number of CHS Heads
+    .wCylinder  resw 1  ;Number of CHS Cylinders
+    .wSecTrc    resw 1  ;Number of CHS Sectors per Track
+    .lbaMax     resd 1  ;Number of maximum sector accessible by LBA28
+    .lbaMax48   resq 1  ;Number of maximum sector accessible by LBA48
+    .ioBase     resw 1  ;IO Base address
+    .msBit      resb 1  ;Master Slave bit in 0A0h/0B0h format
+endstruc
+;.signature is as follows:
+;.signature[0] set = Device present and OK to use.
+;.signature[1] set = LBA 28 supported, detected by non-zero LBA28 field
+;.signature[2] set = LBA 48 supported, detected by bit set AND non-zero 
+;                       LBA 48 sectors field
+;.signature[7:3] = Reserved
+;Bitfield equates
+    fdePresent  equ 1
+    fdeLBA28    equ 2
+    fdeLBA48    equ 4
+
+;Equates for the ATA identify command
+    idCurrCyl   equ 2*54    ;54th word
+    idCurrHed   equ 2*55    ;55th word
+    idCurrSecTk equ 2*56    ;56th word
+    idLBASectrs equ 2*60    ;60th word
+    idLBA48Sec  equ 2*100   ;100th word
 ;----------------------Int 33h Equates-----------------------
-fdiskTableEntrySize   equ 10h
 int33TblEntrySize     equ 10h
 ;------------------------------------------------------------
 ;------------------------------------------------------------

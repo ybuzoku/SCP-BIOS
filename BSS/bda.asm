@@ -96,12 +96,12 @@ scr_vga_ptrs    resq 8  ;VGA pointers
 ;       Mass storage Data Area          :
 ;----------------------------------------
 i33Devices      resb 1  ;Number of devices Int 33h is aware of
-msdStatus       resb 1  ;Status byte. Used by BIOS for all transfers with MSD.
+msdStatus       resb 1  ;Status byte. Used by BIOS for all transfers with Int 33h.
 fdiskNum        resb 1  ;Number of fixed disks
-ir14_mutex      resb 1
-ir14_status     resb 1
-ir15_mutex      resb 1
-ir15_status     resb 1
+ata0CmdByte     resb 1  ;Contains bitfield of instructions, Bit 0 is master/slave, Bit 1 is Data Mutex
+ata0Status      resb 1  ;Contains the status of the last transaction
+ata1CmdByte     resb 1
+ata1Status      resb 1
 diskDptPtr      resq 1
 fdiskDptPtr     resq 1
 ;----------------------------------------
@@ -203,8 +203,7 @@ ideControllerTable:     resb  2*ideTableEntrySize ;Max 2 controllers
 ;----------------------------------------
 ;           ATA Tables                  :
 ;----------------------------------------
-fdiskTable:     resb 4*fdiskTableEntrySize  ;Max 4 fixed disks
-; - BIOS address of device
+fdiskTable:     resb 4*fdiskEntry_size  ;Max 4 fixed disks
 ;----------------------------------------
 ;            Int33h Table Area          :
 ;----------------------------------------
