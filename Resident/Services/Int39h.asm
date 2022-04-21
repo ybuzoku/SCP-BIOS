@@ -22,6 +22,8 @@ bootstrapInt:
 
     mov esi, 10
 ;Now load one sector of second prog from device 00h or 80h
+    cmp byte [numMSD], 0    ;If we have no removable devices, skip checking rem dev
+    jz .e3
     xor dx, dx  ;This also clears carry flag so no checking ah
 .e0:
     mov rbx, 7c00h
@@ -32,7 +34,7 @@ bootstrapInt:
     jnc .e1
 
     dec esi
-    jz .efail
+    jz .e2  ;Try again for fixed disk or if on fixed disk, exit
 
     xor ah, ah  ;Reset the device in dl
     int 33h
@@ -42,10 +44,12 @@ bootstrapInt:
     je .leaveBIOS
 ;If we dont goto leaveBIOS, then we try again with device number 80h if it exists
 ;If already at device 80h, fail.
+.e2:
     cmp dl, 80h
     je .efail
     cmp byte [fdiskNum], dl ;Recall, dl is zero here
     je .efail   ;Don't waste time if there are no fixed disks
+.e3:
     mov dl, 80h ;Try first fixed disk now
     mov esi, 10 ;Reload repeat count
     clc
