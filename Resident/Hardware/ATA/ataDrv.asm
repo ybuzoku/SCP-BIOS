@@ -412,7 +412,7 @@ ATA:
     add edx, 7  ;Goto command register
     mov al, 40h ;ATA VERIFY COMMAND!
     jmp .verify
-    
+
 .formatCHS:
 ;Ignore al (number of sectors) and cl[5:0] (Starting sector number)
     mov ax, word [rbp + fdiskEntry.wSecTrc] ;Get sectors in a track to clear
@@ -508,7 +508,7 @@ ATA:
     ; except for the command and then returns
     call .selectDriveFromTable
     jc .sLBAFailed
-    mov dh, al  ;Save sector count in dh
+    push rax        ;Save sector count on stack
     movzx edx, word [rbp + fdiskEntry.ioBase]
     add edx, 2      ;Goto base + 2, Sector count
     out dx, al      ;Output sector number
@@ -533,7 +533,7 @@ ATA:
     or al, byte [rbp + fdiskEntry.msBit]    ;Add the master/slave bit and fixed bits
     or al, 40h      ;Set LBA bit
     out dx, al
-    mov al, dh  ;Return sector count into al
+    pop rax  ;Return sector count into al
     clc
     ret
 .sLBAFailed:
@@ -586,7 +586,7 @@ ATA:
     ; except for the command and then returns
     call .selectDriveFromTable
     jc .sLBAFailed
-    mov dh, al  ;Save sector count in dh
+    push rax        ;Save sector count on stack
     movzx edx, word [rbp + fdiskEntry.ioBase]
     add edx, 2      ;Goto base + 2, Sector count
     ror rcx, 24     ;Move the upper three bytes low
@@ -607,10 +607,11 @@ ATA:
     mov al, cl      ;Get LBA byte 6 into al
     out dx, al
 
-    shr rcx, 16     ;Shift down by two to eliminate two dummy bytes
+    shr rcx, 24     ;Shift down by an extra two to eliminate two dummy bytes
 ;cl now has LBA byte 1 again
     sub edx, 3      ;Goto base + 2, Write low byte of sector count
-    mov al, dh      ;Get back sector count from dh
+    pop rax         ;Get back sector count from stack
+    push rax        ;Push it back onto the stack
     out dx, al
 
     inc edx         ;Goto base + 3, Write LBA byte 1
@@ -632,6 +633,6 @@ ATA:
     or al, 40h      ;Set LBA bit
     out dx, al
 
-    mov al, dh  ;Return sector count into al
+    pop rax  ;Return sector count into al
     clc
     ret

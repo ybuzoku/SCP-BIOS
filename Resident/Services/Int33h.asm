@@ -846,7 +846,6 @@ fdisk_io:
     jmp .okExit
 ;LBA functions
 .fdiskReadLBA:
-    xchg bx, bx
     push rdi
     push rsi
     lea rsi, ATA.readLBA
@@ -898,7 +897,7 @@ fdisk_io:
     pop rdi
     jc .fdiskError
     jmp .okExit
-    
+
 .fdiskError:
 ;A common error handler that checks the status and error register 
 ; to see what the error may have been. If nothing, then the error
