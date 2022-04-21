@@ -224,21 +224,27 @@ ATA:
     mov rdi, rbx    ;Move the read buffer pointer to rdi
     mov bl, al      ;Save sector count in bl
 .rWait:
-    mov cx, -1  ;Data should be ready within ~67 miliseconds
+    mov ecx, -1  ;Data should be ready within ~67 miliseconds
     movzx edx, word [rbp + fdiskEntry.ioBase]
-    add edx, 206h  ;Dummy read on Alt status register
+    add edx, 7  ;Dummy read on status register
 .rWaitLoop:
-    call .wait400ns
-    dec cx
+    dec ecx
     jz .rTimeout
-    test al, 8       ;If DRQ set?  
-    jz .rWaitLoop    ;If not, keep waiting
+    in al, dx
+    test al, 80h     ;Is BSY set?
+    jnz .rWaitLoop   ;If so, keep looping
+    test al, 21h     ;Are error bits set?  
+    jnz .errorExit   ;If not, must be ok to go
+    test al, 8h      ;Check DRQ, data ready bit is set
+    jz .rWaitLoop
 ;Now we can read the data
-    movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
+    sub edx, 7   ;Point to base=data register
     mov ecx, 256    ;Number of words in a sector
-    rep insw    ;Read that many words!
+.r0:
+    insw    ;Read that many words!
     jmp short $ + 2
-    dec al      ;Reduce the number of sectors read by 1
+    loop .r0    ;Read the sector, one word at a time
+    dec bl      ;Reduce the number of sectors read by 1
     jnz .rWait
     ;Here check status register to ensure error isnt set
     add edx, 7
@@ -270,23 +276,27 @@ ATA:
     mov rsi, rbx    ;Move the write buffer pointer to rsi
     mov bl, al      ;Save sector count in bl
 .writeWait:
-    mov cx, -1  ;Data should be ready within ~67 miliseconds
+    mov ecx, -1  ;Data should be ready within ~67 miliseconds
     movzx edx, word [rbp + fdiskEntry.ioBase]
-    add edx, 206h  ;Dummy read on Alt status register
+    add edx, 7  ;Dummy read on Alt status register
 .writeWaitLoop:
-    call .wait400ns
-    dec cx
+    dec ecx
     jz .rTimeout
-    test al, 8           ;If DRQ set?  
-    jz .writeWaitLoop    ;If not, keep waiting
+    in al, dx
+    test al, 80h     ;Is BSY set?
+    jnz .writeWaitLoop   ;If so, keep looping
+    test al, 21h     ;Are error bits set?  
+    jnz .errorExit   ;If not, must be ok to go
+    test al, 8h      ;Check DRQ, data ready bit is set
+    jz .writeWaitLoop
 ;Now we can write the data
-    movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
+    sub edx, 7   ;Point to base=data register
     mov ecx, 256    ;Number of words in a sector
 .w1:
     outsw    ;Write that many words!
     jmp short $ + 2
     loop .w1 ;Write one sector, one word at a time
-    dec al
+    dec bl
     jnz .writeWait  ;Keep going up by a sector
     ;Here wait for device to stop being busy. 
     ;If it doesnt after ~4 seconds, declare an error
@@ -353,29 +363,31 @@ ATA:
     mov al, cl  ;Return sector count into al
 
     ;Now we wait for the DRQ bit in the status register to set
-    mov cx, -1  ;Data should be ready within ~67 miliseconds
-    movzx edx, word [rbp + fdiskEntry.ioBase]
-    add edx, 206h  ;Dummy read on Alt status register
-    mov bl, al     ;Save sector count in bl
+    mov bl, al     ;Save sector count in bl to use as counter
 .formatWait:
-    call .wait400ns
-    dec cx
+    mov ecx, -1  ;Data should be ready within ~67 miliseconds
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 7  ;Dummy read on Alt status register
+.formatWaitLoop:
+    dec ecx
     jz .rTimeout
-    test al, 8      ;If DRQ set?  
-    jz .formatWait  ;If not, keep waiting
-;Now we can write the data
-    movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
-    ;movzx eax, bl   ;Zero extend the sector count
-    mov bh, bl  ;Move sector count into bh to use as counter
-    mov eax, 0E5E5h 
-.f0:
+    in al, dx
+    test al, 80h     ;Is BSY set?
+    jnz .formatWaitLoop   ;If so, keep looping
+    test al, 21h     ;Are error bits set?  
+    jnz .errorExit   ;If not, must be ok to go
+    test al, 8h      ;Check DRQ, data ready bit is set
+    jz .formatWaitLoop
+;Now we can write the format data
+    sub edx, 7
     mov ecx, 256    ;Number of words in a sector
+    mov eax, 0E5E5h ;Format Signature Word
 .f1:
     out dx, ax  ;Write E5h to the disk!!
     jmp short $ + 2
     loop .f1 ;Write one sector, one word at a time
-    dec bh
-    jnz .f0  ;Keep going up by a sector
+    dec bl
+    jnz .formatWait  ;Keep going up by a sector
     jmp .formatEP   ;Goto the format entry point
 
 ;CHS functions

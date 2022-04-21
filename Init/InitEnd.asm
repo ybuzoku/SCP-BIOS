@@ -38,7 +38,6 @@ end:
     cmp byte [i33Devices], 0    ;If there are no i33 devices, skip bootstrap
     jz endNoDevFound
 
-    mov word [7DFEh], 0 ;Clear out the old bootloader signature
     int 39h             ;Bootstrap loader
 endNoDevFound:
     mov rbp, endboot
