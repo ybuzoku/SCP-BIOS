@@ -1,7 +1,7 @@
 
 - NASM Map file ---------------------------------------------------------------
 
-Source file:  scpbios.asm
+Source file:  ./Source/scpbios.asm
 Output file:  ./Binaries/scpbios.bin
 
 -- Program origin -------------------------------------------------------------

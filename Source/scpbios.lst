@@ -1,6 +1,6 @@
-     1                                  [map all scpbios.map]
+     1                                  [map all ./Source/scpbios.map]
      2                                  ;-----------------------------------SCPBIOS-----------------------------------
-     3                                  %include "./Include/equates.inc"
+     3                                  %include "./Source/Include/equates.inc"
      4                              <1> ;------------------------------------Equates------------------------------------
      5                              <1> permissionflags equ 003h    ;Page table Permission flags
      6                              <1> codedescriptor     equ 0008h
@@ -183,7 +183,7 @@
      5                                  ;                 BIOS SYSTEM TABLE AREA                        :
      6                                  ;----------------------------------------------------------------
      7                                  Segment BIOSTables nobits start=BIOSStartAddr align=1
-     8                                  %include "./BSS/gtables.asm"
+     8                                  %include "./Source/BSS/gtables.asm"
      9                              <1> ;Global Data BIOS tables
     10 00000000 <res 1000h>         <1> BIOSIDTable     resq 2*256  ;256 paragraph entries reserved for IDT
     11 00001000 <res 6000h>         <1> BIOSPageTbl     resq 0C00h  ;6000 bytes for page tables
@@ -193,7 +193,7 @@
     10                                  ;                    BIOS DATA AREA STARTS HERE                 :
     11                                  ;----------------------------------------------------------------
     12                                  Segment data nobits follows=BIOSTables align=1 
-    13                                  %include "./BSS/bda.asm"
+    13                                  %include "./Source/BSS/bda.asm"
     14                              <1> ;Refer to MEMMAP.TXT for memory address reference!
     15                              <1> ;If Interrupt call is faulty, Carry will be set AND either:
     16                              <1> ;                    ah=80h => Invalid function.
@@ -425,7 +425,7 @@
     23                                  ;                   Must be the last segment                    :
     24                                  ;----------------------------------------------------------------
     25                                  Segment xdata nobits follows=MCPseg align=40h    ;eXtra data seg
-    26                                  %include "./BSS/xbda.asm"
+    26                                  %include "./Source/BSS/xbda.asm"
     27                              <1> ;eXtended BDA area for data transfers
     28                              <1> 
     29                              <1> ;This segment comes after the resident code and is the transaction
@@ -471,7 +471,7 @@
     47                                  ;----------------------------------------------------------------
     48                                  Segment codeInit start=BIOSInitAddr align=1
     49                                  BITS 16
-    50                                  %include "./Init/RealInit.asm"
+    50                                  %include "./Source/Init/RealInit.asm"
     51                              <1> ;First set stack and save the SysInit Ptr, then set A20, check CPUID and 
     52                              <1> ; exended features. Then tell BIOS that we are going long and perhaps 
     53                              <1> ; protected then get the Int 11h word, store at 0:800h
@@ -852,7 +852,7 @@
    427 000002DC [BF02000000000000]  <1> .Base       dq GDT                 ; GDT offset.
    428                              <1> ;----------------------------------------------------------------
     51                                  BITS 64
-    52                                  %include "./Init/LongInit.asm"
+    52                                  %include "./Source/Init/LongInit.asm"
     53                              <1> ;----------------------------------------------------------------
     54                              <1> ;                    Long Mode Initialisation                   :
     55                              <1> ;----------------------------------------------------------------
@@ -1300,7 +1300,7 @@
    455                              <1> ;----------------------------------------------------------------
    456                              <1> ;                        End of Initialisation                  :
    457                              <1> ;----------------------------------------------------------------
-    53                                  %include "./Init/Hardware/PIC/picinit.asm"
+    53                                  %include "./Source/Init/Hardware/PIC/picinit.asm"
     54                              <1> ;----------------------------------------------------------------
     55                              <1> ;                PIC Initialisation procedure                   :
     56                              <1> ;----------------------------------------------------------------
@@ -1341,7 +1341,7 @@
     91                              <1> ;----------------------------------------------------------------
     92                              <1> ;                        End of Initialisation                  :
     93                              <1> ;----------------------------------------------------------------
-    54                                  %include "./Init/Hardware/PCI/init.asm"
+    54                                  %include "./Source/Init/Hardware/PCI/init.asm"
     55                              <1> ;----------------------------------------------------------------
     56                              <1> ;                            PCI Enumeration                    :
     57                              <1> ;----------------------------------------------------------------
@@ -1855,7 +1855,7 @@
    527                              <1> ;----------------------------------------------------------------
    528                              <1> ;                            End Proc                           :
    529                              <1> ;----------------------------------------------------------------
-    55                                  %include "./Init/Hardware/Timers/pitinit.asm"
+    55                                  %include "./Source/Init/Hardware/Timers/pitinit.asm"
     56                              <1> ;----------------------------------------------------------------
     57                              <1> ;                PIT Initialisation procedure                   :
     58                              <1> ;----------------------------------------------------------------
@@ -1870,7 +1870,7 @@
     67                              <1> ;----------------------------------------------------------------
     68                              <1> ;                     End of Initialisation                     :
     69                              <1> ;----------------------------------------------------------------
-    56                                  %include "./Init/Hardware/Timers/rtcinit.asm"
+    56                                  %include "./Source/Init/Hardware/Timers/rtcinit.asm"
     57                              <1> ;----------------------------------------------------------------
     58                              <1> ;                RTC Initialisation procedure                   :
     59                              <1> ;----------------------------------------------------------------
@@ -1914,7 +1914,7 @@
     97                              <1> ;----------------------------------------------------------------
     98                              <1> ;                     End of Initialisation                     :
     99                              <1> ;----------------------------------------------------------------
-    57                                  %include "./Init/Hardware/Timers/beepOK.asm"
+    57                                  %include "./Source/Init/Hardware/Timers/beepOK.asm"
     58                              <1>     ;This is a short routine to just confirm 
     59                              <1>     ;that the timer initialisation worked fine
     60 00000DFA 48B9C8000000000000- <1>     mov rcx, 200    ;Beep for a 200ms
@@ -1922,7 +1922,7 @@
     61 00000E04 BBA9040000          <1>     mov ebx, 04A9h  ;Frequency divisor for 1000Hz tone
     62 00000E09 66B800C5            <1>     mov ax, 0C500h
     63 00000E0D CD35                <1>     int 35h
-    58                                  %include "./Init/Hardware/Serial/rs232ini.asm"
+    58                                  %include "./Source/Init/Hardware/Serial/rs232ini.asm"
     59                              <1> ;----------------------------------------------------------------
     60                              <1> ;                Serial Port Initialisation procedure           :
     61                              <1> ;----------------------------------------------------------------
@@ -1995,7 +1995,7 @@
    127                              <1> ;----------------------------------------------------------------
    128                              <1> ;                     End of Initialisation                     :
    129                              <1> ;----------------------------------------------------------------
-    59                                  %include "./Init/Hardware/PS2/ps2init.asm"
+    59                                  %include "./Source/Init/Hardware/PS2/ps2init.asm"
     60                              <1> ;----------------------------------------------------------------
     61                              <1> ;             PS/2 Keyboard Initialisation procedure            :
     62                              <1> ;----------------------------------------------------------------
@@ -2402,7 +2402,7 @@
    448                              <1> ;----------------------------------------------------------------
    449                              <1> ;                      End of Initialisation                    :
    450                              <1> ;----------------------------------------------------------------
-    60                                  %include "./Sysdebug/init.asm"
+    60                                  %include "./Source/Sysdebug/init.asm"
     61                              <1> ;----------------------------------------------------------------
     62                              <1> ;              Debugger Initialisation procedures               :
     63                              <1> ;----------------------------------------------------------------
@@ -2419,7 +2419,7 @@
     61                                  ;----------------------------------------------------------------
     62                                  ;              Drive Enum and Initialisation procedures         :
     63                                  ;----------------------------------------------------------------
-    64                                  %include "./Init/Hardware/IDE/ideinit.asm"
+    64                                  %include "./Source/Init/Hardware/IDE/ideinit.asm"
     65                              <1> 
     66                              <1> IDE:
     67                              <1> .ideInitialisation:
@@ -2645,7 +2645,7 @@
    286                              <1> ;     Exit target label     :
    287                              <1> ;============================
    288                              <1> .ideInitEnd:
-    65                                  %include "./Init/Hardware/USB/EHCI/ehciinit.asm"
+    65                                  %include "./Source/Init/Hardware/USB/EHCI/ehciinit.asm"
     66                              <1> ;            ------------USB section below------------
     67                              <1> ;                   ---- PCI table parse ----
     68                              <1> ;Parse the PCI tables for ehci controllers
@@ -2724,7 +2724,7 @@
    134                              <1> ;If no EHCI, skip MSD search on EHCI bus. Goto Int 33h init
    135 0000151B E95F010000          <1>     jmp int33hinit.i33iend  ;Could go to int33hinit, but this is minutely faster
    136                              <1> .exit:
-    66                                  %include "./Init/Hardware/USB/MSD/msdinit.asm"
+    66                                  %include "./Source/Init/Hardware/USB/MSD/msdinit.asm"
     67                              <1> remDevInit:
     68                              <1> ;Devices on root hubs have been enumerated, and added to tables,
     69                              <1> ;Now we reset them (in the case of MSD) and enumerate further (on Hubs)
@@ -2802,7 +2802,7 @@
    129 0000160E 20646576696365732E- <1>
    129 00001617 2E2E00              <1>
    130                              <1> .exit:
-    67                                  %include "./Init/Hardware/MSD/i33init.asm"
+    67                                  %include "./Source/Init/Hardware/MSD/i33init.asm"
     68                              <1> ;----------------------------------------------------------------
     69                              <1> ;                      Int 33h Initialisation                   :
     70                              <1> ;----------------------------------------------------------------    
@@ -2846,7 +2846,7 @@
     68                                  ;----------------------------------------------------------------
     69                                  ;                         End of Enum                           :
     70                                  ;----------------------------------------------------------------    
-    71                                  %include "./Init/InitEnd.asm"
+    71                                  %include "./Source/Init/InitEnd.asm"
     72                              <1> ;----------------------------------------------------------------
     73                              <1> ;                End of Enum and Initialisation                 :
     74                              <1> ;----------------------------------------------------------------   
@@ -3110,7 +3110,7 @@
    283 00001A3B 6D204D656D6F72793A- <1>
    283 00001A44 2000                <1>
    284 00001A46 4B00                <1> .kb:                db "K",0
-    72                                  %include "./Init/IntTable.asm"
+    72                                  %include "./Source/Init/IntTable.asm"
     73                              <1> ;----------------------Interrupt Tables--------------------------
     74                              <1> IDT_TABLE:
     75                              <1> CPU_IDT:
@@ -3181,7 +3181,7 @@
     76                                  ;                BIOS RESIDENT CODE AREA STARTS HERE            :
     77                                  ;----------------------------------------------------------------
     78                                  Segment codeResident follows=codeInit vfollows=data align=1 valign=1
-    79                                  %include "./Resident/Misc/Procs/common.asm"
+    79                                  %include "./Source/Resident/Misc/Procs/common.asm"
     80                              <1> ;A file containing common procs
     81                              <1> 
     82                              <1> ;---------------------------------Procs--------------------------
@@ -3335,7 +3335,7 @@
     80                                  ;--------------------Interrupt Service routines------------------
     81                                  
     82                                  ;======================HARDWARE INTERRUPTS=======================
-    83                                  %include "./Resident/Hardware/Timers/pitInt.asm"
+    83                                  %include "./Source/Resident/Hardware/Timers/pitInt.asm"
     84                              <1> ;----------------Timer Interrupt IRQ 0/Int 20h-------------------
     85                              <1> ;This interrupt simply increments an internal timer and 
     86                              <1> ; calls a software interrupt (5Ch) which can be used by user 
@@ -3363,7 +3363,7 @@
    107 0000014C 58                  <1>     pop rax
    108 0000014D 48CF                <1>     iretq
    109                              <1> ;-------------------------End of Interrupt-----------------------
-    84                                  %include "./Resident/Hardware/PS2/keybInt.asm"
+    84                                  %include "./Source/Resident/Hardware/PS2/keybInt.asm"
     85                              <1> ;----------------Keyboard Interrupt IRQ 1/Int 21h----------------
     86                              <1> ;This interrupt takes scancodes from the PC keyboard, translates 
     87                              <1> ; them into scancode/ASCII char pair and stores the pair into 
@@ -3846,7 +3846,7 @@
    469 000009BF 005800000000000000- <1>  dw 5800h, 0000h, 0000h, 0000h, 5800h, 5800h, 0000h, 0000h ;F12
    469 000009C8 58005800000000      <1>
    470                              <1> ;------------------------End of Interrupt------------------------
-    85                                  %include "./Resident/Hardware/Serial/serInt.asm"
+    85                                  %include "./Source/Resident/Hardware/Serial/serInt.asm"
     86                              <1> ;------------------Serial Interrupt IRQ 3/Int 23h----------------
     87                              <1> ;Serves serial ports 1 and 3 should they exist. Only considers 
     88                              <1> ; data recieving. Disregards all sending data interrupts.
@@ -3958,7 +3958,7 @@
    194 00000AA7 FB                  <1>     sti
    195 00000AA8 48CF                <1>     iretq
    196                              <1> ;------------------------End of Interrupt------------------------
-    86                                  %include "./Resident/Hardware/MSD/fddInt.asm"
+    86                                  %include "./Source/Resident/Hardware/MSD/fddInt.asm"
     87                              <1> ;----------------FDD Interrupt IRQ 6/Int 26h---------------------
     88                              <1> fdd_IRQ6:
     89 00000AAA 50                  <1>     push rax
@@ -3967,7 +3967,7 @@
     92 00000AAF 58                  <1>     pop rax
     93 00000AB0 48CF                <1>     iretq
     94                              <1> ;------------------------End of Interrupt------------------------
-    87                                  %include "./Resident/Hardware/Timers/rtcInt.asm"
+    87                                  %include "./Source/Resident/Hardware/Timers/rtcInt.asm"
     88                              <1> ;---------------RTC Interrupt IRQ 8/Int 28h----------------------
     89                              <1> ; This IRQ should only trigger for the periodic and alarm 
     90                              <1> ; interrupts. If a programmer wishes to use the time update 
@@ -4004,7 +4004,7 @@
    121 00000AE2 58                  <1>     pop rax
    122 00000AE3 48CF                <1>     iretq
    123                              <1> ;------------------------End of Interrupt------------------------
-    88                                  %include "./Resident/Hardware/MSD/hddInt.asm"
+    88                                  %include "./Source/Resident/Hardware/MSD/hddInt.asm"
     89                              <1> ;---------------HDD Interrupt IRQ 14/Int 2Eh---------------------
     90                              <1> hdd_IRQ14:
     91 00000AE5 50                  <1>     push rax
@@ -4019,7 +4019,7 @@
    100 00000AF9 58                  <1>     pop rax
    101 00000AFA 48CF                <1>     iretq
    102                              <1> ;------------------------End of Interrupt------------------------
-    89                                  %include "./Resident/Hardware/USB/EHCI/ehciInt.asm"
+    89                                  %include "./Source/Resident/Hardware/USB/EHCI/ehciInt.asm"
     90                              <1> ;-------------------EHCI Int Handler/Int 2Xh---------------------
     91                              <1> ;This is installed by the PCI proc at runtime, onto the 
     92                              <1> ; appropriate IRQ.
@@ -4090,7 +4090,7 @@
    157 00000B7B 50                  <1>     push rax
    158 00000B7C EB9C                <1>     jmp short .nonIRQmain
    159                              <1> ;------------------------End of Interrupt------------------------
-    90                                  %include "./Resident/Hardware/spurInt.asm"
+    90                                  %include "./Source/Resident/Hardware/spurInt.asm"
     91                              <1> ;-----------------Spurious Int Handler/Int 27h-------------------
     92                              <1> ; Catches and handles spurious interrupts on the first pic.
     93                              <1> ;----------------------------------------------------------------
@@ -4143,7 +4143,7 @@
    140 00000BD5 48CF                <1>     iretq
    141                              <1> ;------------------------End of Interrupt------------------------
     91                                  ;========================SOFTWARE INTERRUPTS=====================
-    92                                  %include "./Resident/Services/Int30h.asm"
+    92                                  %include "./Source/Resident/Services/Int30h.asm"
     93                              <1> ;----------------------Video Interrupt Int 30h-------------------
     94                              <1> scr_io_table:
     95 00000BD7 [A40C000000000000]  <1>     dq    scr_io.change_mode     ;AH = 0 -> Change Screen Mode (Currently no 
@@ -4978,7 +4978,7 @@
    899                              <1> 
    900 00001300 C3                  <1>     ret
    901                              <1> ;------------------------End of Interrupt------------------------
-    93                                  %include "./Resident/Services/Int31h.asm"
+    93                                  %include "./Source/Resident/Services/Int31h.asm"
     94                              <1> ;-----------------------Basic Config Int 31h---------------------
     95                              <1> ;This interrupt returns in ax the Hardware Bitfield from the 
     96                              <1> ; data area and the mass storage device details.
@@ -4997,7 +4997,7 @@
    108                              <1> 
    109 00001336 48CF                <1>     iretq
    110                              <1> ;------------------------End of Interrupt------------------------
-    94                                  %include "./Resident/Services/Int32h.asm"
+    94                                  %include "./Source/Resident/Services/Int32h.asm"
     95                              <1> ;------------------------Basic RAM Int 32h-----------------------
     96                              <1> ;This interrupt returns in ax amount of conventional memory in ax
     97                              <1> ;----------------------------------------------------------------
@@ -5009,7 +5009,7 @@
    102 00001355 [D5010000]          <1>
    103 00001359 48CF                <1>     iretq
    104                              <1> ;------------------------End of Interrupt------------------------
-    95                                  %include "./Resident/Services/Int33h.asm"
+    95                                  %include "./Source/Resident/Services/Int33h.asm"
     96                              <1> ;---------------------Storage Interrupt Int 33h------------------
     97                              <1> ;Input : dl = Drive number, rbx = Address of buffer, 
     98                              <1> ;        al = number of sectors, ch = Track number, 
@@ -6030,7 +6030,7 @@
   1088 00001D29 C60425[A9010000]20  <1>     mov byte [msdStatus], 020h  ;Controller failure code
   1089 00001D31 E9EAFDFFFF          <1>     jmp .badExit
   1090                              <1> ;------------------------End of Interrupt------------------------
-    96                                  %include "./Resident/Services/Int34h.asm"
+    96                                  %include "./Source/Resident/Services/Int34h.asm"
     97                              <1> ;------------------Serial IO Interrupts Int 34h------------------
     98                              <1> serial_baud_table:    ;DLAB devisor values
     99 00001D36 1704                <1>     dw    0417h    ;110 baud,     00
@@ -6228,7 +6228,7 @@
    291 00001EBD B486                <1>     mov ah, 86h
    292 00001EBF E9FAFEFFFF          <1>     jmp .sbadcommon
    293                              <1> ;------------------------End of Interrupt------------------------
-    97                                  %include "./Resident/Services/Int35h.asm"
+    97                                  %include "./Source/Resident/Services/Int35h.asm"
     98                              <1> ;-------------------Misc IO Interrupts Int 35h-------------------
     99                              <1> ;Misc features int that can be used for a variety of things.
    100                              <1> ;This will break compatibility with BIOS, since hopefully more 
@@ -6622,7 +6622,7 @@
    470 0000225F B486                <1>     mov ah, 86h     ;Unsupported function call
    471 00002261 E994FCFFFF          <1>     jmp .badout  
    472                              <1> ;------------------------End of Interrupt------------------------
-    98                                  %include "./Resident/Services/Int36h.asm"
+    98                                  %include "./Source/Resident/Services/Int36h.asm"
     99                              <1> ;-------------------Keyboard Interrupt Int 36h-------------------
    100                              <1> ; Software keyboard interrupt. 
    101                              <1> ; ah = 0 -> Read the next scancode/ASCII struck from the keyboard
@@ -6685,7 +6685,7 @@
    158                              <1> .kbpa1:
    159 000022E7 C3                  <1>     ret
    160                              <1> ;------------------------End of Interrupt------------------------
-    99                                  %include "./Resident/Services/Int37h.asm"
+    99                                  %include "./Source/Resident/Services/Int37h.asm"
    100                              <1> ;------------------------Printer Int 37h-------------------------
    101                              <1> ; Reserved for printer specific functions. Both USB and Parallel.
    102                              <1> ; Not currently supported
@@ -6695,7 +6695,7 @@
    106 000022EA 804C241001          <1>     or byte [rsp+ 2*8h], 1    ;Set carry
    107 000022EF 48CF                <1>     iretq
    108                              <1> ;------------------------End of Interrupt------------------------
-   100                                  %include "./Sysdebug/sysdeb.asm"
+   100                                  %include "./Source/Sysdebug/sysdeb.asm"
    101                              <1> ;---------------------MCP Interrupt Int 38h----------------------
    102                              <1> ;This interrupt superceeds the IBM BASIC routine caller. 
    103                              <1> ;This is a 64 bit port of my 16 bit MCP monitor program, 
@@ -7975,7 +7975,7 @@
   1297 0000317C 2000                <1> .prompt2    db 20h,0
   1298 0000317E 0A0D00              <1> .crlf       db    0Ah, 0Dh, 0
   1299                              <1> ;------------------------End of Interrupt------------------------
-   101                                  %include "./Resident/Services/Int39h.asm"
+   101                                  %include "./Source/Resident/Services/Int39h.asm"
    102                              <1> ;-------------------Restart Interrupt Int 39h--------------------
    103                              <1> ;This interrupt allows the user to soft reboot
    104                              <1> ;----------------------------------------------------------------
@@ -8054,7 +8054,7 @@
    174 00003213 804C241001          <1>     or byte [rsp + 2*8h], 1 ;Set carry flag
    175 00003218 48CF                <1>     iretq
    176                              <1> ;------------------------End of Interrupt------------------------
-   102                                  %include "./Resident/Services/Int3Ah.asm"
+   102                                  %include "./Source/Resident/Services/Int3Ah.asm"
    103                              <1> ;-----------------System Timer Interrupt Int 3Ah-----------------
    104                              <1> ;System Timer functions:
    105                              <1> ; ah=0 -> Get tick count
@@ -8379,14 +8379,14 @@
    424 00003483 FB                  <1>     sti
    425 00003484 C3                  <1>     ret
    426                              <1> ;------------------------End of Interrupt------------------------
-   103                                  %include "./Resident/Services/Int3Bh.asm"
+   103                                  %include "./Source/Resident/Services/Int3Bh.asm"
    104                              <1> ;-----------------CTRL+BREAK Interrupt Int 3Bh-------------------
    105                              <1> ;CTRL+Break will call this!
    106                              <1> ;----------------------------------------------------------------
    107                              <1> ctrlbreak_io:
    108 00003485 48CF                <1>     iretq
    109                              <1> ;------------------------End of Interrupt-------------------------
-   104                                  %include "./Resident/Services/Int3Dh.asm"
+   104                                  %include "./Source/Resident/Services/Int3Dh.asm"
    105                              <1> ;------------Screen Mode Parameters Interrupt Int 3Dh-------------
    106                              <1> ;This Interrupt returns in r8 the pointer to screen mode 
    107                              <1> ; parameters. It replaces the nice pointers in the IVT of yore.
@@ -8397,14 +8397,14 @@
    111 00003489 [6001000000000000]  <1>
    112 00003491 48CF                <1>     iretq
    113                              <1> ;------------------------End of Interrupt------------------------
-   105                                  %include "./Resident/Services/Int3Eh.asm"
+   105                                  %include "./Source/Resident/Services/Int3Eh.asm"
    106                              <1> ;-----------------Disk Params Interrupt Int 3Eh------------------
    107                              <1> disk_params_io:
    108 00003493 4C8B0425[AF010000]  <1>     mov r8, qword [diskDptPtr]    
    109 0000349B 4C8B0C25[B7010000]  <1>     mov r9, qword [fdiskDptPtr]
    110 000034A3 48CF                <1>     iretq
    111                              <1> ;------------------------End of Interrupt------------------------
-   106                                  %include "./Resident/Services/Int3Fh.asm"
+   106                                  %include "./Source/Resident/Services/Int3Fh.asm"
    107                              <1> ;------------------CGA font Interrupt Int 3Fh--------------------
    108                              <1> ;This Interrupt returns in r8 the pointer to the CGA font.
    109                              <1> ;It replaces the nice pointers in the IVT of yore.
@@ -8419,7 +8419,7 @@
    116 000034BB 48CF                <1>     iretq
    117                              <1> ;------------------------End of Interrupt------------------------
    107                                  ;========================RESIDENT DRIVERS=====================
-   108                                  %include "./Resident/Hardware/ATA/ataDrv.asm"
+   108                                  %include "./Source/Resident/Hardware/ATA/ataDrv.asm"
    109                              <1> ;ATA driver!
    110                              <1> ATA:
    111                              <1> .identifyDevice:
@@ -9069,7 +9069,7 @@
    755 000039D4 58                  <1>     pop rax  ;Return sector count into al
    756 000039D5 F8                  <1>     clc
    757 000039D6 C3                  <1>     ret
-   109                                  %include "./Resident/Hardware/USB/EHCI/ehciDriv.asm"
+   109                                  %include "./Source/Resident/Hardware/USB/EHCI/ehciDriv.asm"
    110                              <1> ;--------------------USB Driver and data area--------------------
    111                              <1> ;Note, this needs to be updated.
    112                              <1> ;All SCSI, MSD and HUB related functions are grouped in this file
@@ -12011,7 +12011,7 @@
   2924 00005349 5B                  <1>     pop rbx
   2925 0000534A C3                  <1>     ret
    110                                  ;====================================CPU Interrupts=============================
-   111                                  %include "./Resident/Hardware/CPU/xception.asm"
+   111                                  %include "./Source/Resident/Hardware/CPU/xception.asm"
    112                              <1> i0:
    113 0000534B 4831C0              <1>     xor rax, rax
    114 0000534E E936010000          <1>     jmp cpu_2args
@@ -12293,7 +12293,7 @@
    317 0000574D 303132333435363738- <1> .ascii:    db '0123456789ABCDEF'
    317 00005756 39414243444546      <1>
    112                                  ;==========================Dummy Interrupts======================
-   113                                  %include "./Resident/Hardware/dummyInt.asm"
+   113                                  %include "./Source/Resident/Hardware/dummyInt.asm"
    114                              <1> dummy_interrupt:
    115                              <1> .pic2:
    116 0000575D 50                  <1>     push rax
@@ -12308,7 +12308,7 @@
    125 00005769 58                  <1>     pop rax
    126                              <1> dummy_return_64:
    127 0000576A 48CF                <1>     iretq
-   114                                  %include "./Resident/Misc/version.asm"
+   114                                  %include "./Source/Resident/Misc/version.asm"
    115                              <1> ;----------------------------------------------------------------
    116 0000576C 76302E392053435042- <1> signature:    db "v0.9 SCPBIOS"    ;12 byte signature
    116 00005775 494F53              <1>

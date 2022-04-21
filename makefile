@@ -35,24 +35,24 @@
 #############################################################################
 
 assemble:
-	nasm scpbios.asm -o ./Binaries/scpbios.bin -f bin -l scpbios.lst -O0
+	nasm ./Source/scpbios.asm -o ./Binaries/scpbios.bin -f bin -l ./Source/scpbios.lst -O0
 	dd if=./Binaries/scpbios.bin of=./Images/TestImage.ima bs=512 seek=33 conv=notrunc
 	cp ./Images/TestImage.ima ./Images/TestImageMSD.ima
 
 #Add a new boot sector to current image
 loader:
-	nasm ./Boot/loader.asm -o ./Binaries/loader.bin -f bin -l ./Boot/loader.lst -O0
+	nasm ./Source/Boot/loader.asm -o ./Binaries/loader.bin -f bin -l ./Source/Boot/loader.lst -O0
 	dd if=./Binaries/loader.bin of=./Images/TestImage.ima bs=512 count=1 conv=notrunc
 	cp ./Images/TestImage.ima ./Images/TestImageMSD.ima
 
 #Create a fresh disk image
 fresh:
-	dd if=/dev/zero of=./MyDisk.IMA bs=512 count=2880 conv=notrunc
+	dd if=/dev/zero of=./TestImage.ima bs=512 count=2880 conv=notrunc
 
-	nasm ./Boot/loader.asm -o ./Binaries/loader.bin -f bin -l ./Boot/loader.lst -O0
+	nasm ./Source/Boot/loader.asm -o ./Binaries/loader.bin -f bin -l ./Source/Boot/loader.lst -O0
 	dd if=./Binaries/loader.bin of=./Images/TestImage.ima bs=512 count=1 conv=notrunc
 
-	nasm scpbios.asm -o ./Binaries/scpbios.bin -f bin -l scpbios.lst -O0
+	nasm ./Source/scpbios.asm -o ./Binaries/scpbios.bin -f bin -l ./Source/scpbios.lst -O0
 	dd if=./Binaries/scpbios.bin of=./Images/TestImage.ima bs=512 seek=33 conv=notrunc
 
 	cp ./Images/TestImage.ima ./Images/TestImageMSD.ima
