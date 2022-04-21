@@ -750,11 +750,11 @@ fdiskdpt: ;Fixed drive table, only cyl, nhd and spt are valid.
 ; successfully transferred!
 ;----------------------------------------------------------------
 fdisk_io:
+    push rbp
     push rax
     push rbx
     push rcx
     push rdx
-    push rbp
 ;Cherry pick status to avoid resetting status
     cmp ah, 01h
     je .fdiskStatus
@@ -773,6 +773,8 @@ fdisk_io:
     je .fdiskVerifyCHS
     cmp ah, 05h
     je .fdiskFormat
+    cmp ah, 08h
+    je .fdiskParametersCHS
     cmp ah, 82h
     je .fdiskReadLBA
     cmp ah, 83h
@@ -781,25 +783,28 @@ fdisk_io:
     je .fdiskVerifyLBA
     cmp ah, 85h
     je .fdiskFormatSector
+    cmp ah, 88h 
+    je .fdiskParametersLBA
 
 .badFunctionRequest:
     mov ah, 01h
     mov byte [msdStatus], ah   ;Invalid function requested signature
 .badExit:
-    pop rbp
     pop rdx
     pop rcx
     pop rbx
     pop rax
+    pop rbp
     mov ah, byte [msdStatus]
     or byte [rsp + 2*8h], 1    ;Set Carry flag
     iretq 
 .okExit:
-    pop rbp
     pop rdx
     pop rcx
+.paramExit:
     pop rbx
     pop rax
+    pop rbp
     mov ah, byte [msdStatus]
     and byte [rsp + 2*8h], 0FEh ;Clear Carry flag    
     iretq
@@ -844,6 +849,30 @@ fdisk_io:
     call ATA.formatCHS
     jc .fdiskError
     jmp .okExit
+
+.fdiskParametersCHS:
+;Reads CHS drive parameters for given drive 
+;Output: dl = Number of fixed disks in system
+;        dh = Max head number for chosen drive
+;        ch = Cylinder number
+;        cl[7:6] = High two bits of Cylinder number
+;        cl[5:0] = Sectors per track
+;        ah = 0
+    pop rdx
+    pop rcx
+    movzx eax, word [rbp + fdiskEntry.wHeads]
+    mov dh, al
+    movzx eax, word [rbp + fdiskEntry.wCylinder]
+    mov ch, al  ;Low 8 bits 
+    shr ax, 2   ;Move bits [1:0] of ah to bits [7:6] of al
+    and al, 0C0h    ;Clear lower bits [5:0]
+    mov cl, al
+    movzx eax, word [rbp + fdiskEntry.wSecTrc]
+    and al, 3Fh ;Save only bits [5:0]
+    or cl, al   ;Add the sector per track bits here
+    mov dl, byte [fdiskNum] ;Get number of fixed disks in dl
+    jmp .paramExit
+
 ;LBA functions
 .fdiskReadLBA:
     push rdi
@@ -897,7 +926,21 @@ fdisk_io:
     pop rdi
     jc .fdiskError
     jmp .okExit
-
+.fdiskParametersLBA:
+;Output: rcx = qLastLBANum (Qword address of last LBA)
+;        dl = Number of fixed disks in system
+;        Fixed disks have a fixed sector size of 512 bytes
+;Recall last LBA value is the first NON-user usable LBA
+;Will return LBA48 if the device uses LBA48 in rcx
+    pop rdx
+    pop rcx
+    xor ecx, ecx    ;Zero whole of rcx
+    mov ecx, dword [rbp + fdiskEntry.lbaMax]
+    mov rax, qword [rbp + fdiskEntry.lbaMax48]
+    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    cmovnz rcx, rax ;Move lba48 value into rcx if LBA48 bit set
+    mov dl, byte [fdiskNum] ;Number of fixed disks
+    jmp .paramExit
 .fdiskError:
 ;A common error handler that checks the status and error register 
 ; to see what the error may have been. If nothing, then the error
