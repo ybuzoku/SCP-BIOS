@@ -238,6 +238,7 @@ ATA:
 .readLoop:
     mov ecx, 256    ;Number of words in a sector
     rep insw    ;Read that many words!
+    jmp short $ + 2
     dec al      ;Reduce the number of sectors read by 1
     jnz .readLoop
     ;Here check status register to ensure error isnt set
