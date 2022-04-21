@@ -3,7 +3,7 @@ ORG	600h
 
 relocBase   equ 600h ;Relocate to 600h
 loadAddress equ 800h
-startSector equ 34
+startSector equ 33
     jmp short start
     nop
 ;---------------------------Tables--------------------------
