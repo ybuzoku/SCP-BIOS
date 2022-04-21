@@ -221,26 +221,25 @@ ATA:
     mov al, cl  ;Return sector count into al
 
     ;Now we wait for the DRQ bit in the status register to set
-    mov cx, -1  ;Data should be ready within ~67 miliseconds
-    movzx edx, word [rbp + fdiskEntry.ioBase]
-    add edx, 206h  ;Dummy read on Alt status register
     mov rdi, rbx    ;Move the read buffer pointer to rdi
     mov bl, al      ;Save sector count in bl
 .rWait:
+    mov cx, -1  ;Data should be ready within ~67 miliseconds
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 206h  ;Dummy read on Alt status register
+.rWaitLoop:
     call .wait400ns
     dec cx
     jz .rTimeout
-    test al, 8      ;If DRQ set?  
-    jz .rWait    ;If not, keep waiting
+    test al, 8       ;If DRQ set?  
+    jz .rWaitLoop    ;If not, keep waiting
 ;Now we can read the data
     movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
-    movzx eax, bl   ;Zero extend the sector count
-.readLoop:
     mov ecx, 256    ;Number of words in a sector
     rep insw    ;Read that many words!
     jmp short $ + 2
     dec al      ;Reduce the number of sectors read by 1
-    jnz .readLoop
+    jnz .rWait
     ;Here check status register to ensure error isnt set
     add edx, 7
     mov ecx, -1
@@ -268,28 +267,27 @@ ATA:
     mov al, cl  ;Return sector count into al
 
     ;Now we wait for the DRQ bit in the status register to set
-    mov cx, -1  ;Data should be ready within ~67 miliseconds
-    movzx edx, word [rbp + fdiskEntry.ioBase]
-    add edx, 206h  ;Dummy read on Alt status register
     mov rsi, rbx    ;Move the write buffer pointer to rsi
     mov bl, al      ;Save sector count in bl
 .writeWait:
+    mov cx, -1  ;Data should be ready within ~67 miliseconds
+    movzx edx, word [rbp + fdiskEntry.ioBase]
+    add edx, 206h  ;Dummy read on Alt status register
+.writeWaitLoop:
     call .wait400ns
     dec cx
     jz .rTimeout
-    test al, 8      ;If DRQ set?  
-    jz .writeWait    ;If not, keep waiting
+    test al, 8           ;If DRQ set?  
+    jz .writeWaitLoop    ;If not, keep waiting
 ;Now we can write the data
     movzx edx, word [rbp + fdiskEntry.ioBase]   ;Point to base=data register
-    movzx eax, bl   ;Zero extend the sector count
-.w0:
     mov ecx, 256    ;Number of words in a sector
 .w1:
     outsw    ;Write that many words!
     jmp short $ + 2
     loop .w1 ;Write one sector, one word at a time
     dec al
-    jnz .w0  ;Keep going up by a sector
+    jnz .writeWait  ;Keep going up by a sector
     ;Here wait for device to stop being busy. 
     ;If it doesnt after ~4 seconds, declare an error
 .formatEP:  ;Where the format routine enters the write routine
