@@ -1030,6 +1030,8 @@ MCP_int:
     mov qword [rdx], rbx    ;Move the userRip into rdx
     mov rbx, qword [rax + 00h]
     mov qword [rdx + 10h], rbx  ;Move new flags into position on stack
+    mov rbx, qword [rax + 80h]  ;Get rax
+    mov qword [mcpUserRaxStore], rbx
     mov rbx, qword [rax + 78h]
     mov rcx, qword [rax + 70h]
     mov rdx, qword [rax + 68h]
