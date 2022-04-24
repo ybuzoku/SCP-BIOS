@@ -782,6 +782,8 @@ fdisk_io:
     je .fdiskFormat
     cmp ah, 08h
     je .fdiskParametersCHS
+    cmp ah, 16h 
+    je .okExit    ;Pseudo return changeline, always return ok (ah = 0), CF=NC
     cmp ah, 82h
     je .fdiskReadLBA
     cmp ah, 83h
