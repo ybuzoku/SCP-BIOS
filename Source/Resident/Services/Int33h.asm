@@ -286,16 +286,23 @@ disk_io:
     iretq
 .lbareadparams:
 ;Reads drive parameters (for drive dl which is always valid at this point)
-;Output: rax = dBlockSize (Dword for LBA block size)
+;Output: rbx = dBlockSize (Dword for LBA block size)
 ;        rcx = qLastLBANum (Qword address of last LBA)
+;         dl = Number of removable devices 
+;         ah = 0
     push rdx
+    push rax
     movzx rax, dl   ;Move drive number offset into rax
     mov rdx, int33TblEntrySize
     mul rdx
     lea rdx, qword [diskDevices + rax]  ;Move address into rdx
-    mov eax, dword [rdx + 3]    ;Get dBlockSize for device
+    xor ebx, ebx
+    mov ebx, dword [rdx + 3]    ;Get dBlockSize for device
     mov rcx, qword [rdx + 7]    ;Get qLastLBANum for device
+    pop rax
     pop rdx
+    mov dl, byte [numMSD]
+    xor ah, ah
     and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .sectorsEHCI:
@@ -801,8 +808,8 @@ fdisk_io:
 .okExit:
     pop rdx
     pop rcx
-.paramExit:
     pop rbx
+.paramExit:
     pop rax
     pop rbp
     mov ah, byte [msdStatus]
@@ -857,9 +864,11 @@ fdisk_io:
 ;        ch = Cylinder number
 ;        cl[7:6] = High two bits of Cylinder number
 ;        cl[5:0] = Sectors per track
+;        ebx = Dword, sector size
 ;        ah = 0
     pop rdx
     pop rcx
+    pop rbx
     movzx eax, word [rbp + fdiskEntry.wHeads]
     mov dh, al
     movzx eax, word [rbp + fdiskEntry.wCylinder]
@@ -871,6 +880,8 @@ fdisk_io:
     and al, 3Fh ;Save only bits [5:0]
     or cl, al   ;Add the sector per track bits here
     mov dl, byte [fdiskNum] ;Get number of fixed disks in dl
+    xor ebx, ebx
+    mov ebx, 200h       ;Currently, hardcode sector size of 512 bytes
     jmp .paramExit
 
 ;LBA functions
@@ -927,19 +938,24 @@ fdisk_io:
     jc .fdiskError
     jmp .okExit
 .fdiskParametersLBA:
-;Output: rcx = qLastLBANum (Qword address of last LBA)
+;Output: 
+;        ebx = Dword, sector size
+;        rcx = qLastLBANum (Qword address of last LBA)
 ;        dl = Number of fixed disks in system
 ;        Fixed disks have a fixed sector size of 512 bytes
 ;Recall last LBA value is the first NON-user usable LBA
 ;Will return LBA48 if the device uses LBA48 in rcx
     pop rdx
     pop rcx
+    pop rbx
     xor ecx, ecx    ;Zero whole of rcx
     mov ecx, dword [rbp + fdiskEntry.lbaMax]
     mov rax, qword [rbp + fdiskEntry.lbaMax48]
     test byte [rbp + fdiskEntry.signature], fdeLBA48
     cmovnz rcx, rax ;Move lba48 value into rcx if LBA48 bit set
     mov dl, byte [fdiskNum] ;Number of fixed disks
+    xor ebx, ebx
+    mov ebx, 200h       ;Currently, hardcode sector size of 512 bytes
     jmp .paramExit
 .fdiskError:
 ;A common error handler that checks the status and error register 
