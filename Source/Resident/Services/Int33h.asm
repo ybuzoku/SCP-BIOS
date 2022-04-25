@@ -450,15 +450,6 @@ disk_io:
     mov byte [msdStatus], r11b  ;Return back the original status byte
     pop rax
     mov ah, dl                  ;Place return value in ah
-    call .dcRetPop
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
-    iretq
-.dcError:
-    pop rax ;Just return the old rax value
-    call .dcRetPop
-    or byte [rsp + 2*8h], 1    ;Set Carry flag on for invalid function
-    iretq
-.dcRetPop:
     pop r11
     pop r10
     pop r9
@@ -469,7 +460,22 @@ disk_io:
     pop rdx
     pop rcx
     pop rbx
-    ret
+    and byte [rsp + 2*8h], 0FEh ;Clear CF
+    iretq
+.dcError:
+    pop rax ;Just return the old rax value
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rbp
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rbx
+    or byte [rsp + 2*8h], 1    ;Set Carry flag on for invalid function
+    iretq
 .dcRoot:
 ;Root hub procedure.
     call USB.ehciAdjustAsyncSchedCtrlr  ;Reset the bus if needed
