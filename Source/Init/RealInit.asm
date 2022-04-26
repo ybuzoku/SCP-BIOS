@@ -20,6 +20,10 @@ realInit:
     mov dword [SysInitTable.FileLBA], eax
     mov eax, dword [es:bx + 8]      ;Get high dword
     mov dword [SysInitTable.FileLBA + 4], eax
+
+    mov ax, 03
+    int 10h ;Reset the video graphics mode using BIOS 
+    
     push es
 .a20Proc:
     push ax
