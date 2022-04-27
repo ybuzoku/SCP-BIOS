@@ -83,11 +83,11 @@ keyb1:
     call ps2talk.wDat
 .k1:
     call ps2talk.rDat   ;read from ps2data
-    cmp al, 0AAh        ;success
-    je keyb2
-    cmp al, 0FAh        ;ACK    
-    je .k1              ;Loop if ACK recieved, just read ps2data
-    jmp keyb1           ;Else, loop whole thing (assume fail recieved)
+    cmp al, 0FAh
+    jne keyb1           ;If not ACK, restart the process
+    call ps2talk.rDat   ;Now read operation status 
+    cmp al, 0AAh        
+    jne keyb1           ;If not success, restart the whole process
     
 ;Step 10
 keyb2:
@@ -164,6 +164,7 @@ keybinitend:
 ;Enable scancode translation and enable Interrupts on port 1
     mov al, 20h      ;Get command byte from command port
     call ps2talk.wCmd  ;al should contain command byte
+    call ps2talk.rDat
     mov ah, al       ;temp save cmd byte in ah
     ;Set translate bit on and set scancode 2
     or ah, 41h  ;Set translate on and IRQ on port 1 on
