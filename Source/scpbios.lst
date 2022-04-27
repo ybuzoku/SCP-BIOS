@@ -1253,7 +1253,7 @@
    411 000007B7 48B940000000000000- <1>     mov rcx, ((IDT_TABLE_Length >> 3))
    411 000007C0 00                  <1>
    412 000007C1 48BD-               <1>     mov rbp, IDT_TABLE
-   412 000007C3 [2D19000000000000]  <1>
+   412 000007C3 [D118000000000000]  <1>
    413                              <1> idtLoop:
    414 000007CB 488B44F500          <1>     mov rax, qword [rbp+(rsi*8)]
    415 000007D0 E8(CB000000)        <1>     call idtWriteEntry
@@ -1296,10 +1296,10 @@
    448                              <1> ;Print Boot Message
    449 00000835 66B80413            <1>     mov ax, 1304h
    450 00000839 48BD-               <1>     mov rbp, startboot
-   450 0000083B [6716000000000000]  <1>
+   450 0000083B [0B16000000000000]  <1>
    451 00000843 CD30                <1>     int 30h
    452                              <1> 
-   453 00000845 E8110F0000          <1>     call memprint    ;Print Memory status
+   453 00000845 E8B50E0000          <1>     call memprint    ;Print Memory status
    454                              <1> 
    455                              <1> ;----------------------------------------------------------------
    456                              <1> ;                        End of Initialisation                  :
@@ -1459,7 +1459,7 @@
    158 000009A0 EF                  <1>     out dx, eax
    159 000009A1 6681C20400          <1>     add dx, 4
    160 000009A6 ED                  <1>     in eax, dx  ;Get BAR 4 address
-   161 000009A7 E823090000          <1>     call IDE.addControllerTable ;Function will not add if we maxed out controllers
+   161 000009A7 E8C7080000          <1>     call IDE.addControllerTable ;Function will not add if we maxed out controllers
    162 000009AC E93BFFFFFF          <1>     jmp .u11
    163 000009B1 0A0D49444520415441- <1> .ipemsg:    db 0Ah, 0Dh,"IDE ATA Controller found. Type: ", 0
    163 000009BA 20436F6E74726F6C6C- <1>
@@ -2005,7 +2005,7 @@
     62                              <1> ;----------------------------------------------------------------
     63                              <1> keybsetup:
     64 00000EA7 48BD-               <1>     mov rbp, ps2Str.startMsg
-    64 00000EA9 [C610000000000000]  <1>
+    64 00000EA9 [6A10000000000000]  <1>
     65 00000EB1 48B804130000000000- <1>     mov rax, 1304h    ;print 0 terminated string
     65 00000EBA 00                  <1>
     66 00000EBB 30FF                <1>     xor bh, bh
@@ -2036,9 +2036,9 @@
     91                              <1> ;----------------------------------------------------------------
     92                              <1> ;Step 1
     93 00000EBF B0AD                <1>     mov al, 0ADh
-    94 00000EC1 E8D3010000          <1>     call ps2talk.wCmd
+    94 00000EC1 E877010000          <1>     call ps2talk.wCmd
     95 00000EC6 B0A7                <1>     mov al, 0A7h        ;Cancel second interface if it exists (DO NOT REENABLE)
-    96 00000EC8 E8CC010000          <1>     call ps2talk.wCmd
+    96 00000EC8 E870010000          <1>     call ps2talk.wCmd
     97                              <1> ;Step 2
     98 00000ECD B1FF                <1>     mov cl, -1
     99                              <1> initFlush:
@@ -2048,236 +2048,196 @@
    103                              <1> ;Step 3
    104                              <1> keyb0:
    105 00000ED5 B020                <1>     mov al, 20h
-   106 00000ED7 E8BD010000          <1>     call ps2talk.wCmd    ;out ps2command, al
-   107 00000EDC E8AB010000          <1>     call ps2talk.rDat    ;Read config byte into al
+   106 00000ED7 E861010000          <1>     call ps2talk.wCmd    ;out ps2command, al
+   107 00000EDC E84F010000          <1>     call ps2talk.rDat    ;Read config byte into al
    108                              <1> ;Step 4
    109 00000EE1 88C3                <1>     mov bl, al        ;copy al into bl to check for bit 2
    110 00000EE3 80E3BC              <1>     and bl, 0BCh      ;Disable translation, enable later
    111                              <1> ;Step 5
    112 00000EE6 B060                <1>     mov al, 60h
-   113 00000EE8 E8AC010000          <1>     call ps2talk.wCmd    ;Write config byte command
+   113 00000EE8 E850010000          <1>     call ps2talk.wCmd    ;Write config byte command
    114 00000EED 88D8                <1>     mov al, bl
-   115 00000EEF E8AD010000          <1>     call ps2talk.wDat    ;Out new config byte
+   115 00000EEF E851010000          <1>     call ps2talk.wDat    ;Out new config byte
    116                              <1> ;Step 6
    117 00000EF4 B0AA                <1>     mov al, 0AAh ;Can reset the config byte, out bl to ps2data at end of stage
-   118 00000EF6 E89E010000          <1>     call ps2talk.wCmd
-   119 00000EFB E88C010000          <1>     call ps2talk.rDat
+   118 00000EF6 E842010000          <1>     call ps2talk.wCmd
+   119 00000EFB E830010000          <1>     call ps2talk.rDat
    120 00000F00 3C55                <1>     cmp al, 55h
-   121 00000F02 0F85A1010000        <1>     jne ps2error
+   121 00000F02 0F8545010000        <1>     jne ps2error
    122                              <1>     
    123 00000F08 B060                <1>     mov al, 60h  ;Previous code may have reset our new config byte, resend it!
-   124 00000F0A E88A010000          <1>     call ps2talk.wCmd            ;Write config byte command
+   124 00000F0A E82E010000          <1>     call ps2talk.wCmd            ;Write config byte command
    125 00000F0F 88D8                <1>     mov al, bl
-   126 00000F11 E88B010000          <1>     call ps2talk.wDat            ;Out new config byte
+   126 00000F11 E82F010000          <1>     call ps2talk.wDat            ;Out new config byte
    127                              <1> ;Step 7
    128 00000F16 B0AB                <1>     mov al, 0ABh            ;Test port 1
-   129 00000F18 E87C010000          <1>     call ps2talk.wCmd
-   130 00000F1D E86A010000          <1>     call ps2talk.rDat
+   129 00000F18 E820010000          <1>     call ps2talk.wCmd
+   130 00000F1D E80E010000          <1>     call ps2talk.rDat
    131 00000F22 84C0                <1>     test al, al             ;Check al is zero
-   132 00000F24 0F857F010000        <1>     jnz ps2error
+   132 00000F24 0F8523010000        <1>     jnz ps2error
    133                              <1> ;Step 8
    134 00000F2A B0AE                <1>     mov al, 0AEh            ;Enable port 1
-   135 00000F2C E868010000          <1>     call ps2talk.wCmd
+   135 00000F2C E80C010000          <1>     call ps2talk.wCmd
    136                              <1> ;Step 9
    137 00000F31 31C9                <1>     xor ecx, ecx
    138                              <1> keyb1:
    139 00000F33 FEC9                <1>     dec cl ;timeout counter
-   140 00000F35 0F846E010000        <1>     jz ps2error
-   141 00000F3B B0FF                <1>     mov al, 0FFh
-   142 00000F3D E85F010000          <1>     call ps2talk.wDat
+   140 00000F35 0F8412010000        <1>     jz ps2error
+   141 00000F3B B0FF                <1>     mov al, 0FFh        ;Reset device
+   142 00000F3D E803010000          <1>     call ps2talk.wDat
    143                              <1> .k1:
-   144 00000F42 E845010000          <1>     call ps2talk.rDat   ;read from ps2data
+   144 00000F42 E8E9000000          <1>     call ps2talk.rDat   ;read from ps2data
    145 00000F47 3CAA                <1>     cmp al, 0AAh        ;success
-   146 00000F49 7409                <1>     je keyb20
+   146 00000F49 7409                <1>     je keyb2
    147 00000F4B 3CFA                <1>     cmp al, 0FAh        ;ACK    
    148 00000F4D 74F3                <1>     je .k1              ;Loop if ACK recieved, just read ps2data
    149 00000F4F E9DFFFFFFF          <1>     jmp keyb1           ;Else, loop whole thing (assume fail recieved)
-   150                              <1> ;Step 10
-   151                              <1> keyb20:
-   152 00000F54 31C9                <1>     xor ecx, ecx
-   153                              <1> keyb2:
-   154 00000F56 FFC9                <1>     dec ecx
-   155 00000F58 0F844B010000        <1>     jz ps2error
-   156                              <1> .k0:
-   157 00000F5E B0F0                <1>     mov al, 0F0h
-   158 00000F60 E83C010000          <1>     call ps2talk.wDat
-   159                              <1>     
-   160 00000F65 B401                <1>     mov ah, 01h
-   161 00000F67 E820010000          <1>     call ps2talk.rDat
-   162 00000F6C 3CFE                <1>     cmp al, 0FEh    ;Did we recieve an resend?
-   163 00000F6E 74EE                <1>     je .k0          ;Resend the data!
-   164 00000F70 3CFA                <1>     cmp al, 0FAh    ;Compare to Ack?
-   165 00000F72 75E2                <1>     jne keyb2       ;If not equal, dec one from the loop counter and try again
-   166                              <1>     
-   167 00000F74 B001                <1>     mov al, 01h     ;write 01 to data port (set scan code set 1)
-   168 00000F76 E826010000          <1>     call ps2talk.wDat
-   169                              <1> .k1:
-   170 00000F7B E80C010000          <1>     call ps2talk.rDat    ;read data port for ACK or resend response
-   171 00000F80 3CFA                <1>     cmp al, 0FAh
-   172 00000F82 7407                <1>     je keyb3    ;IF ack revieved, scancode set, advance.
-   173 00000F84 E2F5                <1>     loop .k1     ;Keep polling port
-   174 00000F86 E9CBFFFFFF          <1>     jmp keyb2
-   175                              <1> ;Step 11
-   176                              <1> keyb3:
-   177 00000F8B 31C9                <1>     xor ecx, ecx
-   178                              <1> .k0:
-   179 00000F8D 66FFC9              <1>     dec cx
-   180 00000F90 0F8413010000        <1>     jz ps2error
-   181 00000F96 B0F4                <1>     mov al, 0F4h
-   182 00000F98 E804010000          <1>     call ps2talk.wDat
-   183                              <1> .k1:
-   184 00000F9D E8EA000000          <1>     call ps2talk.rDat ;read data port for ACK or resend response
-   185 00000FA2 3CFA                <1>     cmp al, 0FAh
-   186 00000FA4 7407                <1>     je keyb4
-   187 00000FA6 E2F5                <1>     loop .k1      ;Keep polling port
-   188 00000FA8 E9E0FFFFFF          <1>     jmp .k0       ;Fail, retry the whole process
-   189                              <1>     
-   190                              <1> ;Step 12
-   191                              <1> keyb4:
-   192 00000FAD B0ED                <1>     mov al, 0EDh     ;Set lights
-   193 00000FAF E8ED000000          <1>     call ps2talk.wDat
-   194 00000FB4 E8D3000000          <1>     call ps2talk.rDat  ;get response, remember ps2talk does its own timeout
-   195 00000FB9 3CFA                <1>     cmp al, 0FAh
-   196 00000FBB 75F0                <1>     jne keyb4        ;No ack, try again.
-   197                              <1> .k1:
-   198 00000FBD B000                <1>     mov al, 00h        ;No lights on
-   199 00000FBF E8DD000000          <1>     call ps2talk.wDat
-   200 00000FC4 E8C3000000          <1>     call ps2talk.rDat  ;Recieve ACK
-   201                              <1> 
-   202                              <1> keyb5:
-   203 00000FC9 B0EE                <1>     mov al, 0EEh     ;Echo command
-   204 00000FCB E8D1000000          <1>     call ps2talk.wDat
-   205 00000FD0 30C0                <1>     xor al, al       ;Zero al to ensure that the result is EEh
-   206                              <1> .k1:
-   207 00000FD2 E8B5000000          <1>     call ps2talk.rDat
-   208 00000FD7 3CEE                <1>     cmp al, 0EEh
-   209 00000FD9 7410                <1>     je keyb6           ;If equal, continue
-   210 00000FDB 488D2C25[B4100000]  <1>     lea rbp, ps2Str.noecho
-   211 00000FE3 66B80413            <1>     mov ax, 1304h
-   212 00000FE7 30FF                <1>     xor bh, bh
-   213 00000FE9 CD30                <1>     int 30h
-   214                              <1> keyb6:    ;Set typematic rate/delay, 250ms, 30 reports/second
-   215 00000FEB B0F3                <1>     mov al, 0F3h     ;Set typematic rate
-   216 00000FED E8AF000000          <1>     call ps2talk.wDat
-   217 00000FF2 30C0                <1>     xor al, al       ;Set rate
-   218 00000FF4 E8A8000000          <1>     call ps2talk.wDat
-   219 00000FF9 30C9                <1>     xor cl, cl
-   220                              <1> .k1:
-   221 00000FFB FEC9                <1>     dec cl
-   222 00000FFD 0F84A6000000        <1>     jz ps2error
-   223 00001003 E884000000          <1>     call ps2talk.rDat
-   224 00001008 3CFA                <1>     cmp al, 0FAh    ;Ack?
-   225 0000100A 75EF                <1>     jnz .k1
-   226                              <1> 
-   227 0000100C B1FF                <1>     mov cl, -1
-   228                              <1> keyb7:
-   229                              <1> ;Enable the keyboard to transmit scancodes
-   230 0000100E FEC9                <1>     dec cl
-   231 00001010 0F8493000000        <1>     jz ps2error
-   232 00001016 B0F4                <1>     mov al, 0F4h    ;Enable scanning
-   233 00001018 6687DB              <1>     xchg bx, bx
-   234 0000101B E881000000          <1>     call ps2talk.wDat
-   235 00001020 E867000000          <1>     call ps2talk.rDat
-   236 00001025 3CFA                <1>     cmp al, 0FAh    ;Ack?
-   237 00001027 75E5                <1>     jne keyb7
-   238                              <1> 
-   239                              <1> scancode_faff:
-   240                              <1>     ;Set scancode 2
-   241 00001029 B1FF                <1>     mov cl, -1
-   242 0000102B B302                <1>     mov bl, 2   ;Scancode 2
-   243                              <1> .k1:
-   244 0000102D FEC9                <1>     dec cl
-   245 0000102F 7478                <1>     jz ps2error
-   246 00001031 B0F0                <1>     mov al, 0F0h    ;Scancode command
-   247 00001033 E869000000          <1>     call ps2talk.wDat
-   248 00001038 E84F000000          <1>     call ps2talk.rDat
-   249 0000103D 3CFA                <1>     cmp al, 0FAh    ;Ack?
-   250 0000103F 75EC                <1>     jne .k1
-   251                              <1> 
-   252 00001041 B1FF                <1>     mov cl, -1
-   253                              <1> .k2:
-   254 00001043 FEC9                <1>     dec cl
-   255 00001045 7462                <1>     jz ps2error
-   256 00001047 88D8                <1>     mov al, bl  ;Get scancode set into al
-   257 00001049 E853000000          <1>     call ps2talk.wDat
-   258 0000104E E839000000          <1>     call ps2talk.rDat
-   259 00001053 3CFA                <1>     cmp al, 0FAh    ;Ack?   
-   260 00001055 75D6                <1>     jne .k1 ;Restart the whole process
-   261                              <1> 
-   262                              <1> keybinitend:
-   263                              <1> ;Enable scancode translation and enable Interrupts on port 1
-   264 00001057 B020                <1>     mov al, 20h      ;Get command byte from command port
-   265 00001059 E83B000000          <1>     call ps2talk.wCmd  ;al should contain command byte
-   266 0000105E 88C4                <1>     mov ah, al       ;temp save cmd byte in ah
-   267                              <1>     ;Set translate bit on and set scancode 2
-   268 00001060 80CC41              <1>     or ah, 41h  ;Set translate on and IRQ on port 1 on
-   269 00001063 80E4EF              <1>     and ah, 0EFh    ;Clear bit 4, to set port clock on
-   270 00001066 B060                <1>     mov al, 60h
-   271 00001068 E82C000000          <1>     call ps2talk.wCmd
-   272 0000106D 88E0                <1>     mov al, ah  ;Move command with bit set into al
-   273 0000106F E82D000000          <1>     call ps2talk.wDat   ;And send
-   274                              <1> 
-   275                              <1> ;Unmask IRQ1 here
-   276 00001074 E421                <1>     in al, pic1data
-   277 00001076 24FD                <1>     and al, 0FDh    ;Unmask bit 1
-   278 00001078 E621                <1>     out pic1data, al
-   279                              <1> ;Now keep looping until the keyboard buffer is empty
-   280                              <1> .cleanBuffer:
-   281 0000107A B401                <1>     mov ah, 01
-   282 0000107C CD36                <1>     int 36h
-   283 0000107E 745F                <1>     jz endPS2Init
-   284 00001080 30E4                <1>     xor ah, ah
-   285 00001082 CD36                <1>     int 36h
-   286 00001084 E9F1FFFFFF          <1>     jmp .cleanBuffer
-   287                              <1> ;Relevant Procs for PS/2 keyboard setup
-   288                              <1> ps2talk:
-   289                              <1> ;    .rStat - Read Status port into al
-   290                              <1> ;    .rDat - Read Data port into al
-   291                              <1> ;    .wCmd - Write al into Command port 
-   292                              <1> ;    .wDat - Write al into Data port
-   293                              <1> .rStat:
-   294 00001089 E464                <1>     in al, ps2status
-   295 0000108B C3                  <1>     ret
-   296                              <1> .rDat:
-   297 0000108C EB00                <1>     jmp short $ + 2
-   298 0000108E E464                <1>     in al, ps2status
-   299 00001090 A801                <1>     test al, 1    ;Can something be read from KB?
-   300 00001092 74F8                <1>     jz .rDat        ;Zero if no. Not zero = read.
-   301 00001094 EB00                <1>     jmp short $ + 2
-   302 00001096 E460                <1>     in al, ps2data  ;Read it in
-   303 00001098 C3                  <1>     ret
-   304                              <1> .wCmd:
-   305 00001099 E8(B6000000)        <1>     call ps2wait    ;preserves ax
-   306 0000109E E664                <1>     out ps2command, al
-   307 000010A0 C3                  <1>     ret
-   308                              <1> .wDat:
-   309 000010A1 E8(B6000000)        <1>     call ps2wait
-   310 000010A6 E660                <1>     out ps2data, al
-   311 000010A8 C3                  <1>     ret
-   312                              <1> ps2error:
-   313 000010A9 B0FF                <1>     mov al, -1  ;MASK IRQ lines if error
-   314 000010AB E621                <1>     out pic1data, al
-   315 000010AD E6A1                <1>     out pic2data, al
-   316 000010AF F390                <1>     pause
-   317 000010B1 F4                  <1>     hlt
-   318 000010B2 EBF5                <1>     jmp short ps2error
-   319                              <1> ps2Str:
-   320 000010B4 4E6F204563686F2072- <1> .noecho  db "No Echo recieved ", 0
-   320 000010BD 656369657665642000  <1>
-   321 000010C6 0A0D50532F32204B65- <1> .startMsg db 0Ah, 0Dh,'PS/2 Keyboard... ',0 
-   321 000010CF 79626F6172642E2E2E- <1>
-   321 000010D8 2000                <1>
-   322 000010DA 4F4B0A0D00          <1> .okMsg  db "OK",0Ah,0Dh,0
-   323                              <1> endPS2Init:
-   324 000010DF 48BD-               <1>     mov rbp, ps2Str.okMsg
-   324 000010E1 [DA10000000000000]  <1>
-   325 000010E9 48B804130000000000- <1>     mov rax, 1304h    ;print 0 terminated string
-   325 000010F2 00                  <1>
-   326 000010F3 30FF                <1>     xor bh, bh
-   327 000010F5 CD30                <1>     int 30h
-   328                              <1> ;----------------------------------------------------------------
-   329                              <1> ;                      End of Initialisation                    :
-   330                              <1> ;----------------------------------------------------------------
+   150                              <1>     
+   151                              <1> ;Step 10
+   152                              <1> keyb2:
+   153 00000F54 B0ED                <1>     mov al, 0EDh        ;Set lights
+   154 00000F56 E8EA000000          <1>     call ps2talk.wDat
+   155 00000F5B E8D0000000          <1>     call ps2talk.rDat  ;get response, remember ps2talk does its own timeout
+   156 00000F60 3CFA                <1>     cmp al, 0FAh
+   157 00000F62 75F0                <1>     jne keyb2        ;No ack, try again.
+   158                              <1> .k1:
+   159 00000F64 B000                <1>     mov al, 00h        ;No lights on
+   160 00000F66 E8DA000000          <1>     call ps2talk.wDat
+   161 00000F6B E8C0000000          <1>     call ps2talk.rDat  ;Recieve ACK
+   162                              <1> 
+   163                              <1> keyb3:
+   164 00000F70 B0EE                <1>     mov al, 0EEh     ;Echo command
+   165 00000F72 E8CE000000          <1>     call ps2talk.wDat
+   166 00000F77 30C0                <1>     xor al, al       ;Zero al to ensure that the result is EEh
+   167                              <1> .k1:
+   168 00000F79 E8B2000000          <1>     call ps2talk.rDat
+   169 00000F7E 3CEE                <1>     cmp al, 0EEh
+   170 00000F80 7410                <1>     je keyb4           ;If equal, continue
+   171 00000F82 488D2C25[58100000]  <1>     lea rbp, ps2Str.noecho
+   172 00000F8A 66B80413            <1>     mov ax, 1304h
+   173 00000F8E 30FF                <1>     xor bh, bh
+   174 00000F90 CD30                <1>     int 30h
+   175                              <1> keyb4:    ;Set typematic rate/delay, 250ms, 30 reports/second
+   176 00000F92 B0F3                <1>     mov al, 0F3h     ;Set typematic rate
+   177 00000F94 E8AC000000          <1>     call ps2talk.wDat
+   178 00000F99 30C0                <1>     xor al, al       ;Set rate
+   179 00000F9B E8A5000000          <1>     call ps2talk.wDat
+   180 00000FA0 30C9                <1>     xor cl, cl
+   181                              <1> .k1:
+   182 00000FA2 FEC9                <1>     dec cl
+   183 00000FA4 0F84A3000000        <1>     jz ps2error
+   184 00000FAA E881000000          <1>     call ps2talk.rDat
+   185 00000FAF 3CFA                <1>     cmp al, 0FAh    ;Ack?
+   186 00000FB1 75EF                <1>     jnz .k1
+   187                              <1> 
+   188 00000FB3 B1FF                <1>     mov cl, -1
+   189                              <1> keyb5:
+   190                              <1> ;Enable the keyboard to transmit scancodes
+   191 00000FB5 FEC9                <1>     dec cl
+   192 00000FB7 0F8490000000        <1>     jz ps2error
+   193 00000FBD B0F4                <1>     mov al, 0F4h    ;Enable scanning
+   194 00000FBF E881000000          <1>     call ps2talk.wDat
+   195 00000FC4 E867000000          <1>     call ps2talk.rDat
+   196 00000FC9 3CFA                <1>     cmp al, 0FAh    ;Ack?
+   197 00000FCB 75E8                <1>     jne keyb5
+   198                              <1> 
+   199                              <1> scancode_faff:
+   200                              <1>     ;Set scancode 2
+   201 00000FCD B1FF                <1>     mov cl, -1
+   202 00000FCF B302                <1>     mov bl, 2   ;Scancode 2
+   203                              <1> .k1:
+   204 00000FD1 FEC9                <1>     dec cl
+   205 00000FD3 7478                <1>     jz ps2error
+   206 00000FD5 B0F0                <1>     mov al, 0F0h    ;Scancode command
+   207 00000FD7 E869000000          <1>     call ps2talk.wDat
+   208 00000FDC E84F000000          <1>     call ps2talk.rDat
+   209 00000FE1 3CFA                <1>     cmp al, 0FAh    ;Ack?
+   210 00000FE3 75EC                <1>     jne .k1
+   211                              <1> 
+   212 00000FE5 B1FF                <1>     mov cl, -1
+   213                              <1> .k2:
+   214 00000FE7 FEC9                <1>     dec cl
+   215 00000FE9 7462                <1>     jz ps2error
+   216 00000FEB 88D8                <1>     mov al, bl  ;Get scancode set into al
+   217 00000FED E853000000          <1>     call ps2talk.wDat
+   218 00000FF2 E839000000          <1>     call ps2talk.rDat
+   219 00000FF7 3CFA                <1>     cmp al, 0FAh    ;Ack?   
+   220 00000FF9 75D6                <1>     jne .k1 ;Restart the whole process
+   221                              <1> 
+   222                              <1> keybinitend:
+   223                              <1> ;Enable scancode translation and enable Interrupts on port 1
+   224 00000FFB B020                <1>     mov al, 20h      ;Get command byte from command port
+   225 00000FFD E83B000000          <1>     call ps2talk.wCmd  ;al should contain command byte
+   226 00001002 88C4                <1>     mov ah, al       ;temp save cmd byte in ah
+   227                              <1>     ;Set translate bit on and set scancode 2
+   228 00001004 80CC41              <1>     or ah, 41h  ;Set translate on and IRQ on port 1 on
+   229 00001007 80E4EF              <1>     and ah, 0EFh    ;Clear bit 4, to set port clock on
+   230 0000100A B060                <1>     mov al, 60h
+   231 0000100C E82C000000          <1>     call ps2talk.wCmd
+   232 00001011 88E0                <1>     mov al, ah  ;Move command with bit set into al
+   233 00001013 E82D000000          <1>     call ps2talk.wDat   ;And send
+   234                              <1> 
+   235                              <1> ;Unmask IRQ1 here
+   236 00001018 E421                <1>     in al, pic1data
+   237 0000101A 24FD                <1>     and al, 0FDh    ;Unmask bit 1
+   238 0000101C E621                <1>     out pic1data, al
+   239                              <1> ;Now keep looping until the keyboard buffer is empty
+   240                              <1> .cleanBuffer:
+   241 0000101E B401                <1>     mov ah, 01
+   242 00001020 CD36                <1>     int 36h
+   243 00001022 745F                <1>     jz endPS2Init
+   244 00001024 30E4                <1>     xor ah, ah
+   245 00001026 CD36                <1>     int 36h
+   246 00001028 E9F1FFFFFF          <1>     jmp .cleanBuffer
+   247                              <1> ;Relevant Procs for PS/2 keyboard setup
+   248                              <1> ps2talk:
+   249                              <1> ;    .rStat - Read Status port into al
+   250                              <1> ;    .rDat - Read Data port into al
+   251                              <1> ;    .wCmd - Write al into Command port 
+   252                              <1> ;    .wDat - Write al into Data port
+   253                              <1> .rStat:
+   254 0000102D E464                <1>     in al, ps2status
+   255 0000102F C3                  <1>     ret
+   256                              <1> .rDat:
+   257 00001030 EB00                <1>     jmp short $ + 2
+   258 00001032 E464                <1>     in al, ps2status
+   259 00001034 A801                <1>     test al, 1    ;Can something be read from KB?
+   260 00001036 74F8                <1>     jz .rDat        ;Zero if no. Not zero = read.
+   261 00001038 EB00                <1>     jmp short $ + 2
+   262 0000103A E460                <1>     in al, ps2data  ;Read it in
+   263 0000103C C3                  <1>     ret
+   264                              <1> .wCmd:
+   265 0000103D E8(B6000000)        <1>     call ps2wait    ;preserves ax
+   266 00001042 E664                <1>     out ps2command, al
+   267 00001044 C3                  <1>     ret
+   268                              <1> .wDat:
+   269 00001045 E8(B6000000)        <1>     call ps2wait
+   270 0000104A E660                <1>     out ps2data, al
+   271 0000104C C3                  <1>     ret
+   272                              <1> ps2error:
+   273 0000104D B0FF                <1>     mov al, -1  ;MASK IRQ lines if error
+   274 0000104F E621                <1>     out pic1data, al
+   275 00001051 E6A1                <1>     out pic2data, al
+   276 00001053 F390                <1>     pause
+   277 00001055 F4                  <1>     hlt
+   278 00001056 EBF5                <1>     jmp short ps2error
+   279                              <1> ps2Str:
+   280 00001058 4E6F204563686F2072- <1> .noecho  db "No Echo recieved ", 0
+   280 00001061 656369657665642000  <1>
+   281 0000106A 0A0D50532F32204B65- <1> .startMsg db 0Ah, 0Dh,'PS/2 Keyboard... ',0 
+   281 00001073 79626F6172642E2E2E- <1>
+   281 0000107C 2000                <1>
+   282 0000107E 4F4B0A0D00          <1> .okMsg  db "OK",0Ah,0Dh,0
+   283                              <1> endPS2Init:
+   284 00001083 48BD-               <1>     mov rbp, ps2Str.okMsg
+   284 00001085 [7E10000000000000]  <1>
+   285 0000108D 48B804130000000000- <1>     mov rax, 1304h    ;print 0 terminated string
+   285 00001096 00                  <1>
+   286 00001097 30FF                <1>     xor bh, bh
+   287 00001099 CD30                <1>     int 30h
+   288                              <1> ;----------------------------------------------------------------
+   289                              <1> ;                      End of Initialisation                    :
+   290                              <1> ;----------------------------------------------------------------
     60                                  %include "./Source/Sysdebug/init.asm"
     61                              <1> ;----------------------------------------------------------------
     62                              <1> ;              Debugger Initialisation procedures               :
@@ -2285,13 +2245,13 @@
     64                              <1> debuggerInit:
     65                              <1> ;Int 40h can be used by the Debugger to return to it or if a DOS present, 
     66                              <1> ; to return to DOS.
-    67 000010F7 48B8-               <1>     mov rax, MCP_int ;The application return point
-    67 000010F9 [AE23000000000000]  <1>
-    68 00001101 48BE40000000000000- <1>     mov rsi, 40h
-    68 0000110A 00                  <1>
-    69 0000110B 66BA008F            <1>     mov dx, 8F00h    ;Attribs
-    70 0000110F BB08000000          <1>     mov ebx, codedescriptor
-    71 00001114 E8(CB000000)        <1>     call idtWriteEntry    
+    67 0000109B 48B8-               <1>     mov rax, MCP_int ;The application return point
+    67 0000109D [AE23000000000000]  <1>
+    68 000010A5 48BE40000000000000- <1>     mov rsi, 40h
+    68 000010AE 00                  <1>
+    69 000010AF 66BA008F            <1>     mov dx, 8F00h    ;Attribs
+    70 000010B3 BB08000000          <1>     mov ebx, codedescriptor
+    71 000010B8 E8(CB000000)        <1>     call idtWriteEntry    
     61                                  ;----------------------------------------------------------------
     62                                  ;              Drive Enum and Initialisation procedures         :
     63                                  ;----------------------------------------------------------------
@@ -2310,68 +2270,68 @@
     76                              <1> ;               83h = Ctrlr 2, Slave
     77                              <1> 
     78                              <1> ;To make algorithm work, set ataXCmdByte to 1
-    79 00001119 C60425[AB010000]01  <1>     mov byte [ata0CmdByte], 1
-    80 00001121 C60425[AD010000]01  <1>     mov byte [ata1CmdByte], 1
+    79 000010BD C60425[AB010000]01  <1>     mov byte [ata0CmdByte], 1
+    80 000010C5 C60425[AD010000]01  <1>     mov byte [ata1CmdByte], 1
     81                              <1> 
     82                              <1> ;Here, consider resetting drives on both channels
     83                              <1>     ;ATA Channel 0 Master
-    84 00001129 488D1C25[7B030000]  <1>     lea rbx, fdiskTable
-    85 00001131 B0A0                <1>     mov al, 0A0h
-    86 00001133 88C4                <1>     mov ah, al  ;Save in ah
-    87 00001135 BAF0010000          <1>     mov edx, ata0_base
-    88 0000113A E8(4E350000)        <1>     call ATA.selectDrive    ;Ignore status for master
-    89 0000113F 88E0                <1>     mov al, ah  ;Bring back
-    90 00001141 7205                <1>     jc .ii0    ;If Master failed to select, ignore trying to identify it
-    91 00001143 E879000000          <1>     call .identifyDrive ;Master ata0
+    84 000010CD 488D1C25[7B030000]  <1>     lea rbx, fdiskTable
+    85 000010D5 B0A0                <1>     mov al, 0A0h
+    86 000010D7 88C4                <1>     mov ah, al  ;Save in ah
+    87 000010D9 BAF0010000          <1>     mov edx, ata0_base
+    88 000010DE E8(4E350000)        <1>     call ATA.selectDrive    ;Ignore status for master
+    89 000010E3 88E0                <1>     mov al, ah  ;Bring back
+    90 000010E5 7205                <1>     jc .ii0    ;If Master failed to select, ignore trying to identify it
+    91 000010E7 E879000000          <1>     call .identifyDrive ;Master ata0
     92                              <1> .ii0:
     93                              <1>     ;ATA Channel 0 Slave
-    94 00001148 4881C316000000      <1>     add rbx, fdiskEntry_size
-    95 0000114F 0C10                <1>     or al, 10h ;Change from A0h to B0h
-    96 00001151 88C4                <1>     mov ah, al
-    97 00001153 E8(4E350000)        <1>     call ATA.selectDrive ;Master should set slave status to 0 if non-existent
-    98 00001158 7302                <1>     jnc .ii1   ;If slave successfully was selected, skip the next line
-    99 0000115A 30C0                <1>     xor al, al  ;Mock the "00" response that would be placed on the bus by the master
+    94 000010EC 4881C316000000      <1>     add rbx, fdiskEntry_size
+    95 000010F3 0C10                <1>     or al, 10h ;Change from A0h to B0h
+    96 000010F5 88C4                <1>     mov ah, al
+    97 000010F7 E8(4E350000)        <1>     call ATA.selectDrive ;Master should set slave status to 0 if non-existent
+    98 000010FC 7302                <1>     jnc .ii1   ;If slave successfully was selected, skip the next line
+    99 000010FE 30C0                <1>     xor al, al  ;Mock the "00" response that would be placed on the bus by the master
    100                              <1> .ii1:
-   101 0000115C 84C0                <1>     test al, al
-   102 0000115E 88E0                <1>     mov al, ah  ;Bring back
-   103 00001160 7405                <1>     jz .ii2 ;If al was zero, skip slave identification
-   104 00001162 E85A000000          <1>     call .identifyDrive  ;Slave ata0
+   101 00001100 84C0                <1>     test al, al
+   102 00001102 88E0                <1>     mov al, ah  ;Bring back
+   103 00001104 7405                <1>     jz .ii2 ;If al was zero, skip slave identification
+   104 00001106 E85A000000          <1>     call .identifyDrive  ;Slave ata0
    105                              <1> 
    106                              <1> .ii2:
    107                              <1>     ;ATA Channel 1 Master
-   108 00001167 4881C316000000      <1>     add rbx, fdiskEntry_size
-   109 0000116E BA70010000          <1>     mov edx, ata1_base
-   110 00001173 24EF                <1>     and al, 0EFh    ;Clear bit 4
-   111 00001175 88C4                <1>     mov ah, al  ;Save in ah
-   112 00001177 E8(4E350000)        <1>     call ATA.selectDrive    ;Ignore status for master
-   113 0000117C 88E0                <1>     mov al, ah  ;Bring back
-   114 0000117E 7205                <1>     jc .ii3     ;If Master failed to select, ignore trying to identify it
-   115 00001180 E83C000000          <1>     call .identifyDrive ;Master ata1
+   108 0000110B 4881C316000000      <1>     add rbx, fdiskEntry_size
+   109 00001112 BA70010000          <1>     mov edx, ata1_base
+   110 00001117 24EF                <1>     and al, 0EFh    ;Clear bit 4
+   111 00001119 88C4                <1>     mov ah, al  ;Save in ah
+   112 0000111B E8(4E350000)        <1>     call ATA.selectDrive    ;Ignore status for master
+   113 00001120 88E0                <1>     mov al, ah  ;Bring back
+   114 00001122 7205                <1>     jc .ii3     ;If Master failed to select, ignore trying to identify it
+   115 00001124 E83C000000          <1>     call .identifyDrive ;Master ata1
    116                              <1> .ii3:
    117                              <1>     ;ATA Channel 1 Slave
-   118 00001185 4881C316000000      <1>     add rbx, fdiskEntry_size
-   119 0000118C 0C10                <1>     or al, 10h ;Change from A0h to B0h
-   120 0000118E 88C4                <1>     mov ah, al
-   121 00001190 E8(4E350000)        <1>     call ATA.selectDrive ;Master should set slave status to 0 if non-existent
-   122 00001195 7302                <1>     jnc .ii4   ;If slave successfully was selected, skip the next line
-   123 00001197 30C0                <1>     xor al, al  ;Mock the "00" response that would be placed on the bus by the master
+   118 00001129 4881C316000000      <1>     add rbx, fdiskEntry_size
+   119 00001130 0C10                <1>     or al, 10h ;Change from A0h to B0h
+   120 00001132 88C4                <1>     mov ah, al
+   121 00001134 E8(4E350000)        <1>     call ATA.selectDrive ;Master should set slave status to 0 if non-existent
+   122 00001139 7302                <1>     jnc .ii4   ;If slave successfully was selected, skip the next line
+   123 0000113B 30C0                <1>     xor al, al  ;Mock the "00" response that would be placed on the bus by the master
    124                              <1> .ii4:
-   125 00001199 84C0                <1>     test al, al
-   126 0000119B 88E0                <1>     mov al, ah  ;Bring back
-   127 0000119D 7405                <1>     jz .ii5 ;If al was zero, skip slave identification
-   128 0000119F E81D000000          <1>     call .identifyDrive ;Slave ata1
+   125 0000113D 84C0                <1>     test al, al
+   126 0000113F 88E0                <1>     mov al, ah  ;Bring back
+   127 00001141 7405                <1>     jz .ii5 ;If al was zero, skip slave identification
+   128 00001143 E81D000000          <1>     call .identifyDrive ;Slave ata1
    129                              <1> .ii5:
    130                              <1> ;Now return the control of each host to the master drives
    131                              <1> 
-   132 000011A4 B0A0                <1>     mov al, 0A0h
-   133 000011A6 BAF0010000          <1>     mov edx, ata0_base
-   134 000011AB E8(4E350000)        <1>     call ATA.selectDrive
+   132 00001148 B0A0                <1>     mov al, 0A0h
+   133 0000114A BAF0010000          <1>     mov edx, ata0_base
+   134 0000114F E8(4E350000)        <1>     call ATA.selectDrive
    135                              <1> 
-   136 000011B0 B0A0                <1>     mov al, 0A0h
-   137 000011B2 BA70010000          <1>     mov edx, ata1_base
-   138 000011B7 E8(4E350000)        <1>     call ATA.selectDrive
+   136 00001154 B0A0                <1>     mov al, 0A0h
+   137 00001156 BA70010000          <1>     mov edx, ata1_base
+   138 0000115B E8(4E350000)        <1>     call ATA.selectDrive
    139                              <1> 
-   140 000011BC E944010000          <1>     jmp .ideInitEnd
+   140 00001160 E944010000          <1>     jmp .ideInitEnd
    141                              <1> ;===========================
    142                              <1> ;     Callable procs       :
    143                              <1> ;===========================
@@ -2385,110 +2345,110 @@
    151                              <1> ;               rbx = Points to table entry to write
    152                              <1> ;               al = A0h for master, B0h for slave
    153                              <1> 
-   154 000011C1 50                  <1>     push rax
-   155 000011C2 52                  <1>     push rdx
-   156 000011C3 31C9                <1>     xor ecx, ecx
-   157 000011C5 488D3C25[C0030000]  <1>     lea rdi, sectorbuffer
+   154 00001165 50                  <1>     push rax
+   155 00001166 52                  <1>     push rdx
+   156 00001167 31C9                <1>     xor ecx, ecx
+   157 00001169 488D3C25[C0030000]  <1>     lea rdi, sectorbuffer
    158                              <1>     ;Clean entries we want to read before hand
-   159 000011CD 66894F6C            <1>     mov word [rdi + idCurrCyl], cx     ;Clear current cylinders
-   160 000011D1 66894F6E            <1>     mov word [rdi + idCurrHed], cx     ;Clear current heads
-   161 000011D5 66894F70            <1>     mov word [rdi + idCurrSecTk], cx   ;Clear current sectors/track
-   162 000011D9 66898FA6000000      <1>     mov word [rdi + 83*2], cx          ;Clear LBA48 supported bit word
-   163 000011E0 894F78              <1>     mov dword [rdi + idLBASectrs], ecx ;Clear UserAddressableSectors
-   164 000011E3 48898FC8000000      <1>     mov qword [rdi + idLBA48Sec], rcx  ;Clear UserAddressableSectors for LBA48
-   165 000011EA 57                  <1>     push rdi
-   166 000011EB E8(F1340000)        <1>     call ATA.identifyDevice
-   167 000011F0 5F                  <1>     pop rdi
-   168 000011F1 0F82D5000000        <1>     jc .idExit  ;If the carry flag set, the device timed out
+   159 00001171 66894F6C            <1>     mov word [rdi + idCurrCyl], cx     ;Clear current cylinders
+   160 00001175 66894F6E            <1>     mov word [rdi + idCurrHed], cx     ;Clear current heads
+   161 00001179 66894F70            <1>     mov word [rdi + idCurrSecTk], cx   ;Clear current sectors/track
+   162 0000117D 66898FA6000000      <1>     mov word [rdi + 83*2], cx          ;Clear LBA48 supported bit word
+   163 00001184 894F78              <1>     mov dword [rdi + idLBASectrs], ecx ;Clear UserAddressableSectors
+   164 00001187 48898FC8000000      <1>     mov qword [rdi + idLBA48Sec], rcx  ;Clear UserAddressableSectors for LBA48
+   165 0000118E 57                  <1>     push rdi
+   166 0000118F E8(F1340000)        <1>     call ATA.identifyDevice
+   167 00001194 5F                  <1>     pop rdi
+   168 00001195 0F82D5000000        <1>     jc .idExit  ;If the carry flag set, the device timed out
    169                              <1>     ;Now get information and build tables here
-   170 000011F7 C60300              <1>     mov byte [rbx + fdiskEntry.signature], 0    ;Clear signature byte in table
-   171 000011FA 66895313            <1>     mov word [rbx + fdiskEntry.ioBase], dx      ;Add iobase and masterslave status
-   172 000011FE 884315              <1>     mov byte [rbx + fdiskEntry.msBit], al       
+   170 0000119B C60300              <1>     mov byte [rbx + fdiskEntry.signature], 0    ;Clear signature byte in table
+   171 0000119E 66895313            <1>     mov word [rbx + fdiskEntry.ioBase], dx      ;Add iobase and masterslave status
+   172 000011A2 884315              <1>     mov byte [rbx + fdiskEntry.msBit], al       
    173                              <1> ;CHS, none of CHS is allowed to be 0 but may be because obsolete on new drives
-   174 00001201 668B476C            <1>     mov ax, word [rdi + idCurrCyl]
-   175 00001205 6685C0              <1>     test ax, ax
-   176 00001208 741E                <1>     jz .id0
-   177 0000120A 66894303            <1>     mov word [rbx + fdiskEntry.wCylinder], ax
-   178 0000120E 668B476E            <1>     mov ax, word [rdi + idCurrHed]
-   179 00001212 6685C0              <1>     test ax, ax
-   180 00001215 7411                <1>     jz .id0
-   181 00001217 66894301            <1>     mov word [rbx + fdiskEntry.wHeads], ax
-   182 0000121B 668B4770            <1>     mov ax, word [rdi + idCurrSecTk]
-   183 0000121F 6685C0              <1>     test ax, ax
-   184 00001222 7404                <1>     jz .id0
-   185 00001224 66894305            <1>     mov word [rbx + fdiskEntry.wSecTrc], ax
+   174 000011A5 668B476C            <1>     mov ax, word [rdi + idCurrCyl]
+   175 000011A9 6685C0              <1>     test ax, ax
+   176 000011AC 741E                <1>     jz .id0
+   177 000011AE 66894303            <1>     mov word [rbx + fdiskEntry.wCylinder], ax
+   178 000011B2 668B476E            <1>     mov ax, word [rdi + idCurrHed]
+   179 000011B6 6685C0              <1>     test ax, ax
+   180 000011B9 7411                <1>     jz .id0
+   181 000011BB 66894301            <1>     mov word [rbx + fdiskEntry.wHeads], ax
+   182 000011BF 668B4770            <1>     mov ax, word [rdi + idCurrSecTk]
+   183 000011C3 6685C0              <1>     test ax, ax
+   184 000011C6 7404                <1>     jz .id0
+   185 000011C8 66894305            <1>     mov word [rbx + fdiskEntry.wSecTrc], ax
    186                              <1> .id0:
    187                              <1> ;LBA28
-   188 00001228 8B4778              <1>     mov eax, dword [rdi + idLBASectrs]
-   189 0000122B 85C0                <1>     test eax, eax   ;Is this number 0? Check LBA48 or solely on CHS
-   190 0000122D 740D                <1>     jz .id1
-   191 0000122F A9000000F0          <1>     test eax, 0F0000000h ;Test if we above max LBA 28 number
-   192 00001234 7506                <1>     jnz .id1 ;If above, ignore LBA28
-   193 00001236 800B02              <1>     or byte [rbx + fdiskEntry.signature], fdeLBA28 ;Set LBA28 present bit
-   194 00001239 894307              <1>     mov dword [rbx + fdiskEntry.lbaMax], eax
+   188 000011CC 8B4778              <1>     mov eax, dword [rdi + idLBASectrs]
+   189 000011CF 85C0                <1>     test eax, eax   ;Is this number 0? Check LBA48 or solely on CHS
+   190 000011D1 740D                <1>     jz .id1
+   191 000011D3 A9000000F0          <1>     test eax, 0F0000000h ;Test if we above max LBA 28 number
+   192 000011D8 7506                <1>     jnz .id1 ;If above, ignore LBA28
+   193 000011DA 800B02              <1>     or byte [rbx + fdiskEntry.signature], fdeLBA28 ;Set LBA28 present bit
+   194 000011DD 894307              <1>     mov dword [rbx + fdiskEntry.lbaMax], eax
    195                              <1> .id1:
    196                              <1> ;LBA48
    197                              <1> ;Check LBA48 bit first
-   198 0000123C 66F787A60000000004  <1>     test word [rdi + 83*2], 400h    ;If bit 10 set, LBA48 supported
-   199 00001245 741A                <1>     jz .id2
-   200 00001247 488B87C8000000      <1>     mov rax, qword [rdi + idLBA48Sec]
-   201 0000124E 480FC8              <1>     bswap rax   ;Bring high word low
-   202 00001251 66A9FFFF            <1>     test ax, 0FFFFh ;Test if high word was set
-   203 00001255 480FC8              <1>     bswap rax
-   204 00001258 7507                <1>     jnz .id2    ;If above, ignore LBA 48
-   205 0000125A 4889430B            <1>     mov qword [rbx + fdiskEntry.lbaMax48], rax
-   206 0000125E 800B04              <1>     or byte [rbx + fdiskEntry.signature], fdeLBA48
+   198 000011E0 66F787A60000000004  <1>     test word [rdi + 83*2], 400h    ;If bit 10 set, LBA48 supported
+   199 000011E9 741A                <1>     jz .id2
+   200 000011EB 488B87C8000000      <1>     mov rax, qword [rdi + idLBA48Sec]
+   201 000011F2 480FC8              <1>     bswap rax   ;Bring high word low
+   202 000011F5 66A9FFFF            <1>     test ax, 0FFFFh ;Test if high word was set
+   203 000011F9 480FC8              <1>     bswap rax
+   204 000011FC 7507                <1>     jnz .id2    ;If above, ignore LBA 48
+   205 000011FE 4889430B            <1>     mov qword [rbx + fdiskEntry.lbaMax48], rax
+   206 00001202 800B04              <1>     or byte [rbx + fdiskEntry.signature], fdeLBA48
    207                              <1> .id2:
    208                              <1> ;Now check if either LBA28 or LBA48 are set or CHS is non-zero
-   209 00001261 F60306              <1>     test byte [rbx + fdiskEntry.signature], fdeLBA28 | fdeLBA48
-   210 00001264 755C                <1>     jnz .idDeviceOK ;If either LBA28 or 48 set, confirm device OK!
+   209 00001205 F60306              <1>     test byte [rbx + fdiskEntry.signature], fdeLBA28 | fdeLBA48
+   210 00001208 755C                <1>     jnz .idDeviceOK ;If either LBA28 or 48 set, confirm device OK!
    211                              <1>     ;We arrive here ONLY IF LBA 28 or LBA 48 not set
    212                              <1>     ; That means drive must be small, so floating bus values in CHS
    213                              <1>     ; cannot be valid.
    214                              <1>     ;Check C/H/S values are all non-zero
    215                              <1>     ;If any are zero, then device not configured for use
    216                              <1>     ;If any values dont make sense (such as 7F7Fh FFFFh) then fail those too
-   217 00001266 0FB74303            <1>     movzx eax, word [rbx + fdiskEntry.wCylinder]
-   218 0000126A 85C0                <1>     test eax, eax
-   219 0000126C 7434                <1>     jz .id3 ;If zero, dont confirm device
-   220 0000126E 663DFFFF            <1>     cmp ax, 0FFFFh
-   221 00001272 742E                <1>     je .id3
-   222 00001274 663D7F7F            <1>     cmp ax, 07F7Fh
-   223 00001278 7428                <1>     je .id3
-   224 0000127A 0FB74301            <1>     movzx eax, word [rbx + fdiskEntry.wHeads]
-   225 0000127E 85C0                <1>     test eax, eax
-   226 00001280 7420                <1>     jz .id3 ;If zero, dont confirm device
-   227 00001282 663DFFFF            <1>     cmp ax, 0FFFFh
-   228 00001286 741A                <1>     je .id3
-   229 00001288 663D7F7F            <1>     cmp ax, 07F7Fh
-   230 0000128C 7414                <1>     je .id3
-   231 0000128E 0FB74305            <1>     movzx eax, word [rbx + fdiskEntry.wSecTrc]
-   232 00001292 85C0                <1>     test eax, eax
-   233 00001294 740C                <1>     jz .id3
-   234 00001296 663DFFFF            <1>     cmp ax, 0FFFFh
-   235 0000129A 7406                <1>     je .id3
-   236 0000129C 663D7F7F            <1>     cmp ax, 7F7Fh
-   237 000012A0 7520                <1>     jne .idDeviceOK ;Values are probably sane, all ok
+   217 0000120A 0FB74303            <1>     movzx eax, word [rbx + fdiskEntry.wCylinder]
+   218 0000120E 85C0                <1>     test eax, eax
+   219 00001210 7434                <1>     jz .id3 ;If zero, dont confirm device
+   220 00001212 663DFFFF            <1>     cmp ax, 0FFFFh
+   221 00001216 742E                <1>     je .id3
+   222 00001218 663D7F7F            <1>     cmp ax, 07F7Fh
+   223 0000121C 7428                <1>     je .id3
+   224 0000121E 0FB74301            <1>     movzx eax, word [rbx + fdiskEntry.wHeads]
+   225 00001222 85C0                <1>     test eax, eax
+   226 00001224 7420                <1>     jz .id3 ;If zero, dont confirm device
+   227 00001226 663DFFFF            <1>     cmp ax, 0FFFFh
+   228 0000122A 741A                <1>     je .id3
+   229 0000122C 663D7F7F            <1>     cmp ax, 07F7Fh
+   230 00001230 7414                <1>     je .id3
+   231 00001232 0FB74305            <1>     movzx eax, word [rbx + fdiskEntry.wSecTrc]
+   232 00001236 85C0                <1>     test eax, eax
+   233 00001238 740C                <1>     jz .id3
+   234 0000123A 663DFFFF            <1>     cmp ax, 0FFFFh
+   235 0000123E 7406                <1>     je .id3
+   236 00001240 663D7F7F            <1>     cmp ax, 7F7Fh
+   237 00001244 7520                <1>     jne .idDeviceOK ;Values are probably sane, all ok
    238                              <1> .id3:
    239                              <1> ;Only arrive here if none of CHS, LBA28 or LBA48 were verified as ok
    240                              <1> ;Clean any data that mightve been copied (from Floating Bus reads perhaps)
-   241 000012A2 31C0                <1>     xor eax, eax
-   242 000012A4 8803                <1>     mov byte [rbx + fdiskEntry.signature], al
-   243 000012A6 894307              <1>     mov dword [rbx + fdiskEntry.lbaMax], eax
-   244 000012A9 4889430B            <1>     mov qword [rbx + fdiskEntry.lbaMax48], rax
-   245 000012AD 66894303            <1>     mov word [rbx + fdiskEntry.wCylinder], ax
-   246 000012B1 66894301            <1>     mov word [rbx + fdiskEntry.wHeads], ax
-   247 000012B5 66894305            <1>     mov word [rbx + fdiskEntry.wSecTrc], ax
-   248 000012B9 66894313            <1>     mov word [rbx + fdiskEntry.ioBase], ax
-   249 000012BD 884315              <1>     mov byte [rbx + fdiskEntry.msBit], al
-   250 000012C0 EB0A                <1>     jmp short .idExit
+   241 00001246 31C0                <1>     xor eax, eax
+   242 00001248 8803                <1>     mov byte [rbx + fdiskEntry.signature], al
+   243 0000124A 894307              <1>     mov dword [rbx + fdiskEntry.lbaMax], eax
+   244 0000124D 4889430B            <1>     mov qword [rbx + fdiskEntry.lbaMax48], rax
+   245 00001251 66894303            <1>     mov word [rbx + fdiskEntry.wCylinder], ax
+   246 00001255 66894301            <1>     mov word [rbx + fdiskEntry.wHeads], ax
+   247 00001259 66894305            <1>     mov word [rbx + fdiskEntry.wSecTrc], ax
+   248 0000125D 66894313            <1>     mov word [rbx + fdiskEntry.ioBase], ax
+   249 00001261 884315              <1>     mov byte [rbx + fdiskEntry.msBit], al
+   250 00001264 EB0A                <1>     jmp short .idExit
    251                              <1> .idDeviceOK:
-   252 000012C2 800B01              <1>     or byte [rbx + fdiskEntry.signature], fdePresent
-   253 000012C5 FE0425[AA010000]    <1>     inc byte [fdiskNum] ;Number of usable fixed disks increased
+   252 00001266 800B01              <1>     or byte [rbx + fdiskEntry.signature], fdePresent
+   253 00001269 FE0425[AA010000]    <1>     inc byte [fdiskNum] ;Number of usable fixed disks increased
    254                              <1> .idExit:
-   255 000012CC 5A                  <1>     pop rdx
-   256 000012CD 58                  <1>     pop rax
-   257 000012CE C3                  <1>     ret
+   255 00001270 5A                  <1>     pop rdx
+   256 00001271 58                  <1>     pop rax
+   257 00001272 C3                  <1>     ret
    258                              <1> 
    259                              <1> .addControllerTable:
    260                              <1> ;Adds a PCI IDE controller to the internal data tables, if there is space
@@ -2496,26 +2456,26 @@
    262                              <1> ;Input: eax = BAR5 address
    263                              <1> ;       ebx = PCI IO address
    264                              <1> ;Output: CF=NC, all ok, CF=CY, device not added.
-   265 000012CF 56                  <1>     push rsi
-   266 000012D0 803C25[5A030000]02  <1>     cmp byte [ideNumberOfControllers], 2
-   267 000012D8 7428                <1>     je .actfail ;If it is 2, fail
-   268 000012DA FE0425[5A030000]    <1>     inc byte [ideNumberOfControllers]
-   269 000012E1 48BE-               <1>     mov rsi, ideControllerTable
-   269 000012E3 [5B03000000000000]  <1>
-   270 000012EB 803E00              <1>     cmp byte [rsi], 0   ;Is the first entry empty?
-   271 000012EE 7407                <1>     jz .act0    ;If yes, write entry
-   272 000012F0 4881C610000000      <1>     add rsi, ideTableEntrySize  ;Else, goto second entry space
+   265 00001273 56                  <1>     push rsi
+   266 00001274 803C25[5A030000]02  <1>     cmp byte [ideNumberOfControllers], 2
+   267 0000127C 7428                <1>     je .actfail ;If it is 2, fail
+   268 0000127E FE0425[5A030000]    <1>     inc byte [ideNumberOfControllers]
+   269 00001285 48BE-               <1>     mov rsi, ideControllerTable
+   269 00001287 [5B03000000000000]  <1>
+   270 0000128F 803E00              <1>     cmp byte [rsi], 0   ;Is the first entry empty?
+   271 00001292 7407                <1>     jz .act0    ;If yes, write entry
+   272 00001294 4881C610000000      <1>     add rsi, ideTableEntrySize  ;Else, goto second entry space
    273                              <1> .act0:
-   274 000012F7 891E                <1>     mov dword [rsi], ebx    ;Move first PCI IO addr
-   275 000012F9 C60600              <1>     mov byte [rsi], 0       ;Zero the register index
-   276 000012FC 894604              <1>     mov dword [rsi + 4], eax    ;Move next data
-   277 000012FF F8                  <1>     clc
+   274 0000129B 891E                <1>     mov dword [rsi], ebx    ;Move first PCI IO addr
+   275 0000129D C60600              <1>     mov byte [rsi], 0       ;Zero the register index
+   276 000012A0 894604              <1>     mov dword [rsi + 4], eax    ;Move next data
+   277 000012A3 F8                  <1>     clc
    278                              <1> .actexit:
-   279 00001300 5E                  <1>     pop rsi
-   280 00001301 C3                  <1>     ret
+   279 000012A4 5E                  <1>     pop rsi
+   280 000012A5 C3                  <1>     ret
    281                              <1> .actfail:
-   282 00001302 F9                  <1>     stc
-   283 00001303 EBFB                <1>     jmp short .actexit
+   282 000012A6 F9                  <1>     stc
+   283 000012A7 EBFB                <1>     jmp short .actexit
    284                              <1> 
    285                              <1> ;============================
    286                              <1> ;     Exit target label     :
@@ -2526,157 +2486,157 @@
     67                              <1> ;                   ---- PCI table parse ----
     68                              <1> ;Parse the PCI tables for ehci controllers
     69                              <1> hciParse:
-    70 00001305 C60425[4B020000]00  <1>     mov byte [numMSD], 0
-    71 0000130D 4C0FB70C2500E00000  <1>     movzx r9, word [lousbtablesize]
-    72 00001316 BE02E00000          <1>     mov esi, lousbtablebase
-    73 0000131B BF[15020000]        <1>     mov edi, eControllerList
+    70 000012A9 C60425[4B020000]00  <1>     mov byte [numMSD], 0
+    71 000012B1 4C0FB70C2500E00000  <1>     movzx r9, word [lousbtablesize]
+    72 000012BA BE02E00000          <1>     mov esi, lousbtablebase
+    73 000012BF BF[15020000]        <1>     mov edi, eControllerList
     74                              <1> .hcip1:
-    75 00001320 6667F7064000        <1>     test word [esi], ehcimask    ;check if we at a ehci mask
-    76 00001326 7418                <1>     jz .hcip2   ;If not, skip adding to ehci table
+    75 000012C4 6667F7064000        <1>     test word [esi], ehcimask    ;check if we at a ehci mask
+    76 000012CA 7418                <1>     jz .hcip2   ;If not, skip adding to ehci table
     77                              <1>     ;First catch all clause (temporary for version 1 of BIOS with max 4 
     78                              <1>     ; controllers)
-    79 00001328 803C25[14020000]04  <1>     cmp byte [eControllers], 4
-    80 00001330 7430                <1>     je .pr0    ;escape this whole setup proc if at 4 controllers
-    81 00001332 67488B4602          <1>     mov rax, qword [esi + 2]    ;take pci and mmio address into rax
-    82 00001337 48AB                <1>     stosq                        ;store into rdi and inc rdi by 8 to next entry
-    83 00001339 FE0425[14020000]    <1>     inc byte [eControllers]    ;increase the number of controllers variable
+    79 000012CC 803C25[14020000]04  <1>     cmp byte [eControllers], 4
+    80 000012D4 7430                <1>     je .pr0    ;escape this whole setup proc if at 4 controllers
+    81 000012D6 67488B4602          <1>     mov rax, qword [esi + 2]    ;take pci and mmio address into rax
+    82 000012DB 48AB                <1>     stosq                        ;store into rdi and inc rdi by 8 to next entry
+    83 000012DD FE0425[14020000]    <1>     inc byte [eControllers]    ;increase the number of controllers variable
     84                              <1> .hcip2:
     85                              <1> ;Any additional data saving occurs here
-    86 00001340 81C60A000000        <1>     add esi, 10    ;Goto next table entry
-    87 00001346 41FEC9              <1>     dec r9b     ;Once all table entries exhausted, fall through
-    88 00001349 75D5                <1>     jnz .hcip1
+    86 000012E4 81C60A000000        <1>     add esi, 10    ;Goto next table entry
+    87 000012EA 41FEC9              <1>     dec r9b     ;Once all table entries exhausted, fall through
+    88 000012ED 75D5                <1>     jnz .hcip1
     89                              <1>     
     90                              <1> ;               ---- EHCI controller enumeration ----
     91                              <1> ;Enumerate each ehci ctrlr root hub for valid usb devices (hubs and valid MSD)
-    92 0000134B 8A0C25[14020000]    <1>     mov cl, byte [eControllers]
-    93 00001352 66B80413            <1>     mov ax, 1304h
-    94 00001356 48BD-               <1>     mov rbp, .echiInitMsg
-    94 00001358 [D713000000000000]  <1>
-    95 00001360 CD30                <1>     int 30h
+    92 000012EF 8A0C25[14020000]    <1>     mov cl, byte [eControllers]
+    93 000012F6 66B80413            <1>     mov ax, 1304h
+    94 000012FA 48BD-               <1>     mov rbp, .echiInitMsg
+    94 000012FC [7B13000000000000]  <1>
+    95 00001304 CD30                <1>     int 30h
     96                              <1> .pr0:   ;If ctrlr failure or ports exhausted, ret to here for next ctrlr
-    97 00001362 84C9                <1>     test cl, cl
-    98 00001364 0F8496000000        <1>     jz .noEHCI    ;No EHCI controllers or last controler?
-    99 0000136A FEC9                <1>     dec cl    ;Undo the absolute count from above
-   100 0000136C 88C8                <1>     mov al, cl
-   101 0000136E E8(463A0000)        <1>     call USB.setupEHCIcontroller
-   102 00001373 72ED                <1>     jc .pr0    ;Continue to next controller
-   103 00001375 E8(C13B0000)        <1>     call USB.ehciRunCtrlr       ;Activate online controller
-   104 0000137A 72E6                <1>     jc .pr0
-   105 0000137C E8(223C0000)        <1>     call USB.ehciAdjustAsyncSchedCtrlr ;Start schedule and lock ctrlr as online
-   106 00001381 72DF                <1>     jc .pr0
-   107 00001383 E8(9F3C0000)        <1>     call USB.ehciCtrlrGetNumberOfPorts
-   108 00001388 88C2                <1>     mov dl, al      ;Save the number of ports in dl
-   109 0000138A 8A3425[47020000]    <1>     mov dh, byte [eActiveCtrlr]    ;Save current active ctrlr in dh
-   110 00001391 4D31D2              <1>     xor r10, r10    ;Host hub 0 [ie Root Hub enum only] (for enum)
+    97 00001306 84C9                <1>     test cl, cl
+    98 00001308 0F8496000000        <1>     jz .noEHCI    ;No EHCI controllers or last controler?
+    99 0000130E FEC9                <1>     dec cl    ;Undo the absolute count from above
+   100 00001310 88C8                <1>     mov al, cl
+   101 00001312 E8(463A0000)        <1>     call USB.setupEHCIcontroller
+   102 00001317 72ED                <1>     jc .pr0    ;Continue to next controller
+   103 00001319 E8(C13B0000)        <1>     call USB.ehciRunCtrlr       ;Activate online controller
+   104 0000131E 72E6                <1>     jc .pr0
+   105 00001320 E8(223C0000)        <1>     call USB.ehciAdjustAsyncSchedCtrlr ;Start schedule and lock ctrlr as online
+   106 00001325 72DF                <1>     jc .pr0
+   107 00001327 E8(9F3C0000)        <1>     call USB.ehciCtrlrGetNumberOfPorts
+   108 0000132C 88C2                <1>     mov dl, al      ;Save the number of ports in dl
+   109 0000132E 8A3425[47020000]    <1>     mov dh, byte [eActiveCtrlr]    ;Save current active ctrlr in dh
+   110 00001335 4D31D2              <1>     xor r10, r10    ;Host hub 0 [ie Root Hub enum only] (for enum)
    111                              <1> .pr1:
-   112 00001394 FECA                <1>     dec dl
-   113 00001396 49BC03000000000000- <1>     mov r12, 3      ;Attempt three times to enumerate
-   113 0000139F 00                  <1>
+   112 00001338 FECA                <1>     dec dl
+   113 0000133A 49BC03000000000000- <1>     mov r12, 3      ;Attempt three times to enumerate
+   113 00001343 00                  <1>
    114                              <1> .pr11:
-   115 000013A0 E8(3B400000)        <1>     call USB.ehciEnumerateRootPort
-   116 000013A5 7413                <1>     jz .pr2
-   117 000013A7 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h  ;General Controller Failure
-   118 000013AF 0F84(0B3A0000)      <1>     je USB.ehciCriticalErrorWrapper
-   119 000013B5 49FFCC              <1>     dec r12
-   120 000013B8 75E6                <1>     jnz .pr11
+   115 00001344 E8(3B400000)        <1>     call USB.ehciEnumerateRootPort
+   116 00001349 7413                <1>     jz .pr2
+   117 0000134B 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h  ;General Controller Failure
+   118 00001353 0F84(0B3A0000)      <1>     je USB.ehciCriticalErrorWrapper
+   119 00001359 49FFCC              <1>     dec r12
+   120 0000135C 75E6                <1>     jnz .pr11
    121                              <1> .pr2:
-   122 000013BA 84D2                <1>     test dl, dl
-   123 000013BC 75D6                <1>     jnz .pr1
-   124 000013BE 84C9                <1>     test cl, cl ;Once cl is zero we have gone through all controllers
-   125 000013C0 75A0                <1>     jnz .pr0
+   122 0000135E 84D2                <1>     test dl, dl
+   123 00001360 75D6                <1>     jnz .pr1
+   124 00001362 84C9                <1>     test cl, cl ;Once cl is zero we have gone through all controllers
+   125 00001364 75A0                <1>     jnz .pr0
    126                              <1> 
-   127 000013C2 B804130000          <1>     mov eax, 1304h
-   128 000013C7 48BD-               <1>     mov rbp, remDevInit.ok  ;Reuse the OK from the other proc
-   128 000013C9 [DD14000000000000]  <1>
-   129 000013D1 30FF                <1>     xor bh, bh
-   130 000013D3 CD30                <1>     int 30h
-   131 000013D5 EB2E                <1>     jmp short .exit
-   132 000013D7 0A0D496E697469616C- <1> .echiInitMsg db 0Ah,0Dh,"Initialising USB and EHCI root hubs...",0
-   132 000013E0 6973696E6720555342- <1>
-   132 000013E9 20616E642045484349- <1>
-   132 000013F2 20726F6F7420687562- <1>
-   132 000013FB 732E2E2E00          <1>
+   127 00001366 B804130000          <1>     mov eax, 1304h
+   128 0000136B 48BD-               <1>     mov rbp, remDevInit.ok  ;Reuse the OK from the other proc
+   128 0000136D [8114000000000000]  <1>
+   129 00001375 30FF                <1>     xor bh, bh
+   130 00001377 CD30                <1>     int 30h
+   131 00001379 EB2E                <1>     jmp short .exit
+   132 0000137B 0A0D496E697469616C- <1> .echiInitMsg db 0Ah,0Dh,"Initialising USB and EHCI root hubs...",0
+   132 00001384 6973696E6720555342- <1>
+   132 0000138D 20616E642045484349- <1>
+   132 00001396 20726F6F7420687562- <1>
+   132 0000139F 732E2E2E00          <1>
    133                              <1> .noEHCI:
    134                              <1> ;If no EHCI, skip MSD search on EHCI bus. Goto Int 33h init
-   135 00001400 E95F010000          <1>     jmp int33hinit.i33iend  ;Could go to int33hinit, but this is minutely faster
+   135 000013A4 E95F010000          <1>     jmp int33hinit.i33iend  ;Could go to int33hinit, but this is minutely faster
    136                              <1> .exit:
     66                                  %include "./Source/Init/Hardware/USB/MSD/msdinit.asm"
     67                              <1> remDevInit:
     68                              <1> ;Devices on root hubs have been enumerated, and added to tables,
     69                              <1> ;Now we reset them (in the case of MSD) and enumerate further (on Hubs)
-    70 00001405 66B80413            <1>     mov ax, 1304h
-    71 00001409 80F70B              <1>     xor bh, 0bh
-    72 0000140C 48BD-               <1>     mov rbp, .rmhmsg
-    72 0000140E [C114000000000000]  <1>
-    73 00001416 CD30                <1>     int 30h
+    70 000013A9 66B80413            <1>     mov ax, 1304h
+    71 000013AD 80F70B              <1>     xor bh, 0bh
+    72 000013B0 48BD-               <1>     mov rbp, .rmhmsg
+    72 000013B2 [6514000000000000]  <1>
+    73 000013BA CD30                <1>     int 30h
     74                              <1> .hubs_init:
-    75 00001418 48BE-               <1>     mov rsi, hubDevTbl
-    75 0000141A [6A02000000000000]  <1>
+    75 000013BC 48BE-               <1>     mov rsi, hubDevTbl
+    75 000013BE [6A02000000000000]  <1>
     76                              <1> ;First we scan for hubs only
     77                              <1> .redi1:
-    78 00001422 803E00              <1>     cmp byte [rsi], 0   ;Not an entry
-    79 00001425 7417                <1>     jz .hubnextentry
-    80 00001427 807E0500            <1>     cmp byte [rsi + 5], 0   ;If number of ports on hub is 0, dev uncofigured
-    81 0000142B 7511                <1>     jnz .hubnextentry  ;Device must be already enumerated
+    78 000013C6 803E00              <1>     cmp byte [rsi], 0   ;Not an entry
+    79 000013C9 7417                <1>     jz .hubnextentry
+    80 000013CB 807E0500            <1>     cmp byte [rsi + 5], 0   ;If number of ports on hub is 0, dev uncofigured
+    81 000013CF 7511                <1>     jnz .hubnextentry  ;Device must be already enumerated
     82                              <1> 
-    83 0000142D 8A4601              <1>     mov al, byte [rsi + 1]  ;Get bus number into al
+    83 000013D1 8A4601              <1>     mov al, byte [rsi + 1]  ;Get bus number into al
     84                              <1> 
-    85 00001430 E8(223C0000)        <1>     call USB.ehciAdjustAsyncSchedCtrlr
-    86 00001435 7207                <1>     jc .hubnextentry
+    85 000013D4 E8(223C0000)        <1>     call USB.ehciAdjustAsyncSchedCtrlr
+    86 000013D9 7207                <1>     jc .hubnextentry
     87                              <1> 
-    88 00001437 E8(8A460000)        <1>     call USB.ehciDevSetupHub  ;Only needs a valid device in rsi
-    89 0000143C 7200                <1>     jc .hubnextentry
+    88 000013DB E8(8A460000)        <1>     call USB.ehciDevSetupHub  ;Only needs a valid device in rsi
+    89 000013E0 7200                <1>     jc .hubnextentry
     90                              <1> .hubnextentry:
-    91 0000143E 4881C608000000      <1>     add rsi, hubDevTblEntrySize ;Goto next table entry
-    92 00001445 4881FE[BA020000]    <1>     cmp rsi, hubDevTbl + 10*hubDevTblEntrySize  ;End of table address
-    93 0000144C 72D4                <1>     jb .redi1  ;We are still in table
+    91 000013E2 4881C608000000      <1>     add rsi, hubDevTblEntrySize ;Goto next table entry
+    92 000013E9 4881FE[BA020000]    <1>     cmp rsi, hubDevTbl + 10*hubDevTblEntrySize  ;End of table address
+    93 000013F0 72D4                <1>     jb .redi1  ;We are still in table
     94                              <1> .hub_rescan:
     95                              <1> ;Now we check that all hubs are initialised
-    96 0000144E 48BE-               <1>     mov rsi, hubDevTbl  ;Return to head of table
-    96 00001450 [6A02000000000000]  <1>
+    96 000013F2 48BE-               <1>     mov rsi, hubDevTbl  ;Return to head of table
+    96 000013F4 [6A02000000000000]  <1>
     97                              <1> ;Leave as a stub for now. Dont support deeper than 1 level of devices
     98                              <1> ;The specification allows for a maximum of 7 levels of depth.
     99                              <1> .msds_init:
-   100 00001458 66B80413            <1>     mov ax, 1304h
-   101 0000145C 80F70B              <1>     xor bh, 0bh
-   102 0000145F 48BD-               <1>     mov rbp, .ok
-   102 00001461 [DD14000000000000]  <1>
-   103 00001469 CD30                <1>     int 30h
-   104 0000146B 66B80413            <1>     mov ax, 1304h
-   105 0000146F 80F70B              <1>     xor bh, 0bh
-   106 00001472 48BD-               <1>     mov rbp, .msdmsg
-   106 00001474 [E114000000000000]  <1>
-   107 0000147C CD30                <1>     int 30h
-   108 0000147E 48BE-               <1>     mov rsi, msdDevTbl
-   108 00001480 [BA02000000000000]  <1>
+   100 000013FC 66B80413            <1>     mov ax, 1304h
+   101 00001400 80F70B              <1>     xor bh, 0bh
+   102 00001403 48BD-               <1>     mov rbp, .ok
+   102 00001405 [8114000000000000]  <1>
+   103 0000140D CD30                <1>     int 30h
+   104 0000140F 66B80413            <1>     mov ax, 1304h
+   105 00001413 80F70B              <1>     xor bh, 0bh
+   106 00001416 48BD-               <1>     mov rbp, .msdmsg
+   106 00001418 [8514000000000000]  <1>
+   107 00001420 CD30                <1>     int 30h
+   108 00001422 48BE-               <1>     mov rsi, msdDevTbl
+   108 00001424 [BA02000000000000]  <1>
    109                              <1> .msd1:
-   110 00001488 803E00              <1>     cmp byte [rsi], 0   ;Not an entry
-   111 0000148B 740F                <1>     jz .msdNextEntry
-   112 0000148D E8(194A0000)        <1>     call USB.ehciMsdInitialise
-   113 00001492 7308                <1>     jnc .msdNextEntry
-   114 00001494 FEC8                <1>     dec al
-   115 00001496 0F84(0B3A0000)      <1>     jz USB.ehciCriticalErrorWrapper ;al = 1 => Host error, 
+   110 0000142C 803E00              <1>     cmp byte [rsi], 0   ;Not an entry
+   111 0000142F 740F                <1>     jz .msdNextEntry
+   112 00001431 E8(194A0000)        <1>     call USB.ehciMsdInitialise
+   113 00001436 7308                <1>     jnc .msdNextEntry
+   114 00001438 FEC8                <1>     dec al
+   115 0000143A 0F84(0B3A0000)      <1>     jz USB.ehciCriticalErrorWrapper ;al = 1 => Host error, 
    116                              <1> ;                                    al = 2 => Bad dev, removed from MSD tables
    117                              <1> .msdNextEntry:
-   118 0000149C 4881C610000000      <1>     add rsi, msdDevTblEntrySize ;Goto next entry
-   119 000014A3 4881FE[5A030000]    <1>     cmp rsi, msdDevTbl + 10*msdDevTblEntrySize
-   120 000014AA 75DC                <1>     jne .msd1
+   118 00001440 4881C610000000      <1>     add rsi, msdDevTblEntrySize ;Goto next entry
+   119 00001447 4881FE[5A030000]    <1>     cmp rsi, msdDevTbl + 10*msdDevTblEntrySize
+   120 0000144E 75DC                <1>     jne .msd1
    121                              <1> .rediexit:
-   122 000014AC 66B80413            <1>     mov ax, 1304h
-   123 000014B0 80F70B              <1>     xor bh, 0bh
-   124 000014B3 48BD-               <1>     mov rbp, .ok
-   124 000014B5 [DD14000000000000]  <1>
-   125 000014BD CD30                <1>     int 30h
-   126 000014BF EB3E                <1>     jmp short .exit
-   127 000014C1 0A0D496E697469616C- <1> .rmhmsg db 0Ah,0Dh,"Initialising USB ports...",0
-   127 000014CA 6973696E6720555342- <1>
-   127 000014D3 20706F7274732E2E2E- <1>
-   127 000014DC 00                  <1>
-   128 000014DD 204F4B00            <1> .ok db " OK",0
-   129 000014E1 0A0D496E697469616C- <1> .msdmsg db 0Ah,0Dh,"Initialising MSD devices...",0
-   129 000014EA 6973696E67204D5344- <1>
-   129 000014F3 20646576696365732E- <1>
-   129 000014FC 2E2E00              <1>
+   122 00001450 66B80413            <1>     mov ax, 1304h
+   123 00001454 80F70B              <1>     xor bh, 0bh
+   124 00001457 48BD-               <1>     mov rbp, .ok
+   124 00001459 [8114000000000000]  <1>
+   125 00001461 CD30                <1>     int 30h
+   126 00001463 EB3E                <1>     jmp short .exit
+   127 00001465 0A0D496E697469616C- <1> .rmhmsg db 0Ah,0Dh,"Initialising USB ports...",0
+   127 0000146E 6973696E6720555342- <1>
+   127 00001477 20706F7274732E2E2E- <1>
+   127 00001480 00                  <1>
+   128 00001481 204F4B00            <1> .ok db " OK",0
+   129 00001485 0A0D496E697469616C- <1> .msdmsg db 0Ah,0Dh,"Initialising MSD devices...",0
+   129 0000148E 6973696E67204D5344- <1>
+   129 00001497 20646576696365732E- <1>
+   129 000014A0 2E2E00              <1>
    130                              <1> .exit:
     67                                  %include "./Source/Init/Hardware/MSD/i33init.asm"
     68                              <1> ;----------------------------------------------------------------
@@ -2685,40 +2645,40 @@
     71                              <1> int33hinit:
     72                              <1> ;Create Int 33h data table entry for each MSD/floppy device using steps 1-3.
     73                              <1> ;Go through MSD table and add devices to diskDevices
-    74 000014FF 48BD-               <1>     mov rbp, usbDevTbl
-    74 00001501 [4C02000000000000]  <1>
-    75 00001509 48BF-               <1>     mov rdi, diskDevices
-    75 0000150B [D303000000000000]  <1>
+    74 000014A3 48BD-               <1>     mov rbp, usbDevTbl
+    74 000014A5 [4C02000000000000]  <1>
+    75 000014AD 48BF-               <1>     mov rdi, diskDevices
+    75 000014AF [D303000000000000]  <1>
     76                              <1> .i33i1:
-    77 00001513 807D0208            <1>     cmp byte [rbp + 2], 08h ;MSD USB Class code
-    78 00001517 7525                <1>     jne .i33proceed
+    77 000014B7 807D0208            <1>     cmp byte [rbp + 2], 08h ;MSD USB Class code
+    78 000014BB 7525                <1>     jne .i33proceed
     79                              <1> ;Successfully found a valid MSD device. Talk to it
-    80 00001519 668B4500            <1>     mov ax, word [rbp]  ;Get address/bus pair
-    81 0000151D E8(F3440000)        <1>     call USB.ehciGetDevicePtr    ;Get pointer to MSD dev in rsi
-    82 00001522 E8(F9190000)        <1>     call disk_io.deviceInit
-    83 00001527 3C01                <1>     cmp al, 1   ;Critical error
-    84 00001529 0F84(0B3A0000)      <1>     je USB.ehciCriticalErrorWrapper
-    85 0000152F 3C02                <1>     cmp al, 2   ;Device stopped responding, remove from USB data tables
-    86 00001531 7420                <1>     je .i33ibad 
-    87 00001533 3C03                <1>     cmp al, 3   ;Device not added to data tables
-    88 00001535 7407                <1>     je .i33proceed
+    80 000014BD 668B4500            <1>     mov ax, word [rbp]  ;Get address/bus pair
+    81 000014C1 E8(F3440000)        <1>     call USB.ehciGetDevicePtr    ;Get pointer to MSD dev in rsi
+    82 000014C6 E8(F9190000)        <1>     call disk_io.deviceInit
+    83 000014CB 3C01                <1>     cmp al, 1   ;Critical error
+    84 000014CD 0F84(0B3A0000)      <1>     je USB.ehciCriticalErrorWrapper
+    85 000014D3 3C02                <1>     cmp al, 2   ;Device stopped responding, remove from USB data tables
+    86 000014D5 7420                <1>     je .i33ibad 
+    87 000014D7 3C03                <1>     cmp al, 3   ;Device not added to data tables
+    88 000014D9 7407                <1>     je .i33proceed
     89                              <1> ;Valid device added, increment rdi to next diskDevices table entry
-    90 00001537 4881C710000000      <1>     add rdi, int33TblEntrySize
+    90 000014DB 4881C710000000      <1>     add rdi, int33TblEntrySize
     91                              <1> .i33proceed:
-    92 0000153E 4881FD[6A020000]    <1>     cmp rbp, usbDevTblEnd
-    93 00001545 741D                <1>     je .i33iend
-    94 00001547 4881C503000000      <1>     add rbp, usbDevTblEntrySize
-    95 0000154E E9C0FFFFFF          <1>     jmp .i33i1
+    92 000014E2 4881FD[6A020000]    <1>     cmp rbp, usbDevTblEnd
+    93 000014E9 741D                <1>     je .i33iend
+    94 000014EB 4881C503000000      <1>     add rbp, usbDevTblEntrySize
+    95 000014F2 E9C0FFFFFF          <1>     jmp .i33i1
     96                              <1> .i33ibad:   ;If it goes here, clear table entry
-    97 00001553 48C70700000000      <1>     mov qword [rdi], 0  ;Remove from diskDevice table
-    98 0000155A 668B06              <1>     mov ax, word [rsi]
-    99 0000155D E8(7E430000)        <1>     call USB.ehciRemoveDevFromTables    ;Remove from USB tables
-   100 00001562 EBDA                <1>     jmp short .i33proceed ;Goto next device
+    97 000014F7 48C70700000000      <1>     mov qword [rdi], 0  ;Remove from diskDevice table
+    98 000014FE 668B06              <1>     mov ax, word [rsi]
+    99 00001501 E8(7E430000)        <1>     call USB.ehciRemoveDevFromTables    ;Remove from USB tables
+   100 00001506 EBDA                <1>     jmp short .i33proceed ;Goto next device
    101                              <1> .i33iend:
-   102 00001564 8A0425[4B020000]    <1>     mov al, byte [numMSD]
-   103 0000156B 000425[A8010000]    <1>     add byte [i33Devices], al   ;Add the number of MSD devices to Int 33h total
-   104 00001572 8A0425[AA010000]    <1>     mov al, byte [fdiskNum]
-   105 00001579 000425[A8010000]    <1>     add byte [i33Devices], al   ;Add the number of Fixed Disks to Int 33h total
+   102 00001508 8A0425[4B020000]    <1>     mov al, byte [numMSD]
+   103 0000150F 000425[A8010000]    <1>     add byte [i33Devices], al   ;Add the number of MSD devices to Int 33h total
+   104 00001516 8A0425[AA010000]    <1>     mov al, byte [fdiskNum]
+   105 0000151D 000425[A8010000]    <1>     add byte [i33Devices], al   ;Add the number of Fixed Disks to Int 33h total
     68                                  ;----------------------------------------------------------------
     69                                  ;                         End of Enum                           :
     70                                  ;----------------------------------------------------------------    
@@ -2728,328 +2688,328 @@
     74                              <1> ;----------------------------------------------------------------   
     75                              <1> end:
     76                              <1> ;Finally, unmask all IRQ lines for usage
-    77 00001580 30C0                <1>     xor al, al
-    78 00001582 E6A1                <1>     out pic2data, al
-    79 00001584 E621                <1>     out pic1data, al
+    77 00001524 30C0                <1>     xor al, al
+    78 00001526 E6A1                <1>     out pic2data, al
+    79 00001528 E621                <1>     out pic1data, al
     80                              <1> 
-    81 00001586 66B80413            <1>     mov ax, 1304h
-    82 0000158A 48BD-               <1>     mov rbp, dbgmsg
-    82 0000158C [0D17000000000000]  <1>
-    83 00001594 CD30                <1>     int 30h
-    84 00001596 8A0425[4B020000]    <1>     mov al, byte [numMSD]
-    85 0000159D B404                <1>     mov ah, 04h
-    86 0000159F CD30                <1>     int 30h
+    81 0000152A 66B80413            <1>     mov ax, 1304h
+    82 0000152E 48BD-               <1>     mov rbp, dbgmsg
+    82 00001530 [B116000000000000]  <1>
+    83 00001538 CD30                <1>     int 30h
+    84 0000153A 8A0425[4B020000]    <1>     mov al, byte [numMSD]
+    85 00001541 B404                <1>     mov ah, 04h
+    86 00001543 CD30                <1>     int 30h
     87                              <1> 
-    88 000015A1 66B80413            <1>     mov ax, 1304h
-    89 000015A5 48BD-               <1>     mov rbp, dbgmsg4
-    89 000015A7 [4517000000000000]  <1>
-    90 000015AF CD30                <1>     int 30h
-    91 000015B1 8A0425[AA010000]    <1>     mov al, byte [fdiskNum]
-    92 000015B8 B404                <1>     mov ah, 04h
-    93 000015BA CD30                <1>     int 30h
+    88 00001545 66B80413            <1>     mov ax, 1304h
+    89 00001549 48BD-               <1>     mov rbp, dbgmsg4
+    89 0000154B [E916000000000000]  <1>
+    90 00001553 CD30                <1>     int 30h
+    91 00001555 8A0425[AA010000]    <1>     mov al, byte [fdiskNum]
+    92 0000155C B404                <1>     mov ah, 04h
+    93 0000155E CD30                <1>     int 30h
     94                              <1> 
-    95 000015BC 66B80413            <1>     mov ax, 1304h
-    96 000015C0 48BD-               <1>     mov rbp, dbgmsg2
-    96 000015C2 [2317000000000000]  <1>
-    97 000015CA CD30                <1>     int 30h
-    98 000015CC 8A0425[A8010000]    <1>     mov al, byte [i33Devices]
-    99 000015D3 B404                <1>     mov ah, 04h
-   100 000015D5 CD30                <1>     int 30h
+    95 00001560 66B80413            <1>     mov ax, 1304h
+    96 00001564 48BD-               <1>     mov rbp, dbgmsg2
+    96 00001566 [C716000000000000]  <1>
+    97 0000156E CD30                <1>     int 30h
+    98 00001570 8A0425[A8010000]    <1>     mov al, byte [i33Devices]
+    99 00001577 B404                <1>     mov ah, 04h
+   100 00001579 CD30                <1>     int 30h
    101                              <1> 
-   102 000015D7 66B80413            <1>     mov ax, 1304h
-   103 000015DB 48BD-               <1>     mov rbp, dbgmsg3
-   103 000015DD [3717000000000000]  <1>
-   104 000015E5 CD30                <1>     int 30h
-   105 000015E7 8A0425[66000000]    <1>     mov al, byte [numCOM]
-   106 000015EE B404                <1>     mov ah, 04h
-   107 000015F0 CD30                <1>     int 30h
+   102 0000157B 66B80413            <1>     mov ax, 1304h
+   103 0000157F 48BD-               <1>     mov rbp, dbgmsg3
+   103 00001581 [DB16000000000000]  <1>
+   104 00001589 CD30                <1>     int 30h
+   105 0000158B 8A0425[66000000]    <1>     mov al, byte [numCOM]
+   106 00001592 B404                <1>     mov ah, 04h
+   107 00001594 CD30                <1>     int 30h
    108                              <1> 
-   109 000015F2 803C25[A8010000]00  <1>     cmp byte [i33Devices], 0    ;If there are no i33 devices, skip bootstrap
-   110 000015FA 7402                <1>     jz endNoDevFound
+   109 00001596 803C25[A8010000]00  <1>     cmp byte [i33Devices], 0    ;If there are no i33 devices, skip bootstrap
+   110 0000159E 7402                <1>     jz endNoDevFound
    111                              <1> 
-   112 000015FC CD39                <1>     int 39h             ;Bootstrap loader
+   112 000015A0 CD39                <1>     int 39h             ;Bootstrap loader
    113                              <1> endNoDevFound:
-   114 000015FE 48BD-               <1>     mov rbp, endboot
-   114 00001600 [7D16000000000000]  <1>
-   115 00001608 66B80413            <1>     mov ax, 1304h
-   116 0000160C CD30                <1>     int 30h
+   114 000015A2 48BD-               <1>     mov rbp, endboot
+   114 000015A4 [2116000000000000]  <1>
+   115 000015AC 66B80413            <1>     mov ax, 1304h
+   116 000015B0 CD30                <1>     int 30h
    117                              <1>     
-   118 0000160E 6631C0              <1>     xor ax, ax  ;Pause for any key
-   119 00001611 CD36                <1>     int 36h
+   118 000015B2 6631C0              <1>     xor ax, ax  ;Pause for any key
+   119 000015B5 CD36                <1>     int 36h
    120                              <1> 
-   121 00001613 66BB0700            <1>     mov bx, 0007h    ;cls attribs
-   122 00001617 E8(F7000000)        <1>     call cls
+   121 000015B7 66BB0700            <1>     mov bx, 0007h    ;cls attribs
+   122 000015BB E8(F7000000)        <1>     call cls
    123                              <1> 
-   124 0000161C 6631C9              <1>     xor cx, cx
-   125 0000161F 6631D2              <1>     xor dx, dx
-   126 00001622 B402                <1>     mov ah, 2
-   127 00001624 30FF                <1>     xor bh, bh
-   128 00001626 CD30                <1>     int 30h 
+   124 000015C0 6631C9              <1>     xor cx, cx
+   125 000015C3 6631D2              <1>     xor dx, dx
+   126 000015C6 B402                <1>     mov ah, 2
+   127 000015C8 30FF                <1>     xor bh, bh
+   128 000015CA CD30                <1>     int 30h 
    129                              <1> 
-   130 00001628 66B80413            <1>     mov ax, 1304h
-   131 0000162C 48BD-               <1>     mov rbp, endboot2
-   131 0000162E [ED16000000000000]  <1>
-   132 00001636 CD30                <1>     int 30h
+   130 000015CC 66B80413            <1>     mov ax, 1304h
+   131 000015D0 48BD-               <1>     mov rbp, endboot2
+   131 000015D2 [9116000000000000]  <1>
+   132 000015DA CD30                <1>     int 30h
    133                              <1> 
-   134 00001638 4831C0              <1>     xor rax, rax
-   135 0000163B 4831DB              <1>     xor rbx, rbx
-   136 0000163E 4831C9              <1>     xor rcx, rcx
-   137 00001641 4831D2              <1>     xor rdx, rdx
-   138 00001644 4831F6              <1>     xor rsi, rsi
-   139 00001647 4831FF              <1>     xor rdi, rdi
-   140 0000164A 4831ED              <1>     xor rbp, rbp
-   141 0000164D 4D31C0              <1>     xor r8, r8
-   142 00001650 4D31C9              <1>     xor r9, r9
-   143 00001653 4D31D2              <1>     xor r10, r10
-   144 00001656 4D31DB              <1>     xor r11, r11
-   145 00001659 4D31E4              <1>     xor r12, r12
-   146 0000165C 4D31ED              <1>     xor r13, r13
-   147 0000165F 4D31F6              <1>     xor r14, r14
-   148 00001662 4D31FF              <1>     xor r15, r15
+   134 000015DC 4831C0              <1>     xor rax, rax
+   135 000015DF 4831DB              <1>     xor rbx, rbx
+   136 000015E2 4831C9              <1>     xor rcx, rcx
+   137 000015E5 4831D2              <1>     xor rdx, rdx
+   138 000015E8 4831F6              <1>     xor rsi, rsi
+   139 000015EB 4831FF              <1>     xor rdi, rdi
+   140 000015EE 4831ED              <1>     xor rbp, rbp
+   141 000015F1 4D31C0              <1>     xor r8, r8
+   142 000015F4 4D31C9              <1>     xor r9, r9
+   143 000015F7 4D31D2              <1>     xor r10, r10
+   144 000015FA 4D31DB              <1>     xor r11, r11
+   145 000015FD 4D31E4              <1>     xor r12, r12
+   146 00001600 4D31ED              <1>     xor r13, r13
+   147 00001603 4D31F6              <1>     xor r14, r14
+   148 00001606 4D31FF              <1>     xor r15, r15
    149                              <1> 
-   150 00001665 CD38                <1>     int 38h
+   150 00001609 CD38                <1>     int 38h
    151                              <1> 
    152                              <1> 
-   153 00001667 4C6F6164696E672053- <1> startboot:  db "Loading SCP/BIOS...", 0Ah, 0Dh, 0
-   153 00001670 43502F42494F532E2E- <1>
-   153 00001679 2E0A0D00            <1>
-   154 0000167D 0A0D5343502F42494F- <1> endboot:    db    0Ah,0Dh,"SCP/BIOS system initialisation complete", 0Ah, 0Dh 
-   154 00001686 532073797374656D20- <1>
-   154 0000168F 696E697469616C6973- <1>
-   154 00001698 6174696F6E20636F6D- <1>
-   154 000016A1 706C6574650A0D      <1>
-   155 000016A8 4E6F204F7065726174- <1>         db "No Operating System detected. Strike any key to launch SYSDEBUG."
-   155 000016B1 696E67205379737465- <1>
-   155 000016BA 6D2064657465637465- <1>
-   155 000016C3 642E20537472696B65- <1>
-   155 000016CC 20616E79206B657920- <1>
-   155 000016D5 746F206C61756E6368- <1>
-   155 000016DE 205359534445425547- <1>
-   155 000016E7 2E                  <1>
-   156 000016E8 2E2E0A0D00          <1>             db "..",0Ah, 0Dh,0
-   157 000016ED 5374617274696E6720- <1> endboot2:   db "Starting SCP/BIOS SYSDEBUG...",0Ah,0Dh,0
-   157 000016F6 5343502F42494F5320- <1>
-   157 000016FF 53595344454255472E- <1>
-   157 00001708 2E2E0A0D00          <1>
-   158 0000170D 0A0A0D555342205265- <1> dbgmsg:     db 0Ah,0Ah,0Dh,"USB Rem. Devices: ",0
-   158 00001716 6D2E20446576696365- <1>
-   158 0000171F 733A2000            <1>
-   159 00001723 0A0D496E7420333368- <1> dbgmsg2:    db 0Ah,0Dh,"Int 33h Devices: ",0
-   159 0000172C 20446576696365733A- <1>
-   159 00001735 2000                <1>
-   160 00001737 0A0D434F4D20506F72- <1> dbgmsg3:    db 0Ah,0Dh,"COM Ports: ",0
-   160 00001740 74733A2000          <1>
-   161 00001745 0A0D41544120466978- <1> dbgmsg4:    db 0Ah,0Dh,"ATA Fixed Devices: ", 0
-   161 0000174E 656420446576696365- <1>
-   161 00001757 733A2000            <1>
+   153 0000160B 4C6F6164696E672053- <1> startboot:  db "Loading SCP/BIOS...", 0Ah, 0Dh, 0
+   153 00001614 43502F42494F532E2E- <1>
+   153 0000161D 2E0A0D00            <1>
+   154 00001621 0A0D5343502F42494F- <1> endboot:    db    0Ah,0Dh,"SCP/BIOS system initialisation complete", 0Ah, 0Dh 
+   154 0000162A 532073797374656D20- <1>
+   154 00001633 696E697469616C6973- <1>
+   154 0000163C 6174696F6E20636F6D- <1>
+   154 00001645 706C6574650A0D      <1>
+   155 0000164C 4E6F204F7065726174- <1>         db "No Operating System detected. Strike any key to launch SYSDEBUG."
+   155 00001655 696E67205379737465- <1>
+   155 0000165E 6D2064657465637465- <1>
+   155 00001667 642E20537472696B65- <1>
+   155 00001670 20616E79206B657920- <1>
+   155 00001679 746F206C61756E6368- <1>
+   155 00001682 205359534445425547- <1>
+   155 0000168B 2E                  <1>
+   156 0000168C 2E2E0A0D00          <1>             db "..",0Ah, 0Dh,0
+   157 00001691 5374617274696E6720- <1> endboot2:   db "Starting SCP/BIOS SYSDEBUG...",0Ah,0Dh,0
+   157 0000169A 5343502F42494F5320- <1>
+   157 000016A3 53595344454255472E- <1>
+   157 000016AC 2E2E0A0D00          <1>
+   158 000016B1 0A0A0D555342205265- <1> dbgmsg:     db 0Ah,0Ah,0Dh,"USB Rem. Devices: ",0
+   158 000016BA 6D2E20446576696365- <1>
+   158 000016C3 733A2000            <1>
+   159 000016C7 0A0D496E7420333368- <1> dbgmsg2:    db 0Ah,0Dh,"Int 33h Devices: ",0
+   159 000016D0 20446576696365733A- <1>
+   159 000016D9 2000                <1>
+   160 000016DB 0A0D434F4D20506F72- <1> dbgmsg3:    db 0Ah,0Dh,"COM Ports: ",0
+   160 000016E4 74733A2000          <1>
+   161 000016E9 0A0D41544120466978- <1> dbgmsg4:    db 0Ah,0Dh,"ATA Fixed Devices: ", 0
+   161 000016F2 656420446576696365- <1>
+   161 000016FB 733A2000            <1>
    162                              <1> memprint:
    163                              <1> ;Simple proc to print memory status
-   164 0000175B 6631DB              <1>     xor bx, bx 
-   165 0000175E 48BD-               <1>     mov rbp, .convmemmsg
-   165 00001760 [B418000000000000]  <1>
-   166 00001768 66B80413            <1>     mov ax, 1304h
-   167 0000176C CD30                <1>     int 30h
-   168 0000176E CD32                <1>     int 32h    ;Get conv Size
-   169 00001770 25FFFF0000          <1>     and eax, 0FFFFh ;Clear upper bits
-   170 00001775 E8F4000000          <1>     call .printdecimalword
-   171 0000177A 48BD-               <1>     mov rbp, .kb
-   171 0000177C [2B19000000000000]  <1>
-   172 00001784 66B80413            <1>     mov ax, 1304h
-   173 00001788 CD30                <1>     int 30h
+   164 000016FF 6631DB              <1>     xor bx, bx 
+   165 00001702 48BD-               <1>     mov rbp, .convmemmsg
+   165 00001704 [5818000000000000]  <1>
+   166 0000170C 66B80413            <1>     mov ax, 1304h
+   167 00001710 CD30                <1>     int 30h
+   168 00001712 CD32                <1>     int 32h    ;Get conv Size
+   169 00001714 25FFFF0000          <1>     and eax, 0FFFFh ;Clear upper bits
+   170 00001719 E8F4000000          <1>     call .printdecimalword
+   171 0000171E 48BD-               <1>     mov rbp, .kb
+   171 00001720 [CF18000000000000]  <1>
+   172 00001728 66B80413            <1>     mov ax, 1304h
+   173 0000172C CD30                <1>     int 30h
    174                              <1> 
-   175 0000178A 66B801E8            <1>     mov ax, 0E801h
-   176 0000178E CD35                <1>     int 35h
-   177 00001790 25FFFF0000          <1>     and eax, 0FFFFh
-   178 00001795 81E3FFFF0000        <1>     and ebx, 0FFFFh
-   179 0000179B 81E1FFFF0000        <1>     and ecx, 0FFFFh
-   180 000017A1 81E2FFFF0000        <1>     and edx, 0FFFFh
-   181 000017A7 53                  <1>     push rbx
-   182 000017A8 52                  <1>     push rdx
-   183 000017A9 4839C8              <1>     cmp rax, rcx
-   184 000017AC 740C                <1>     je .sense1    ;Sensible
-   185 000017AE 4885C0              <1>     test rax, rax
-   186 000017B1 480F44C1            <1>     cmovz rax, rcx
-   187 000017B5 4885C0              <1>     test rax, rax
-   188 000017B8 7427                <1>     jz .pt2
+   175 0000172E 66B801E8            <1>     mov ax, 0E801h
+   176 00001732 CD35                <1>     int 35h
+   177 00001734 25FFFF0000          <1>     and eax, 0FFFFh
+   178 00001739 81E3FFFF0000        <1>     and ebx, 0FFFFh
+   179 0000173F 81E1FFFF0000        <1>     and ecx, 0FFFFh
+   180 00001745 81E2FFFF0000        <1>     and edx, 0FFFFh
+   181 0000174B 53                  <1>     push rbx
+   182 0000174C 52                  <1>     push rdx
+   183 0000174D 4839C8              <1>     cmp rax, rcx
+   184 00001750 740C                <1>     je .sense1    ;Sensible
+   185 00001752 4885C0              <1>     test rax, rax
+   186 00001755 480F44C1            <1>     cmovz rax, rcx
+   187 00001759 4885C0              <1>     test rax, rax
+   188 0000175C 7427                <1>     jz .pt2
    189                              <1> .sense1:
-   190 000017BA 50                  <1>     push rax
-   191 000017BB 48BD-               <1>     mov rbp, .extmemmsg
-   191 000017BD [D118000000000000]  <1>
-   192 000017C5 66B80413            <1>     mov ax, 1304h
-   193 000017C9 CD30                <1>     int 30h
-   194 000017CB 58                  <1>     pop rax
-   195 000017CC E89D000000          <1>     call .printdecimalword
-   196 000017D1 48BD-               <1>     mov rbp, .kb
-   196 000017D3 [2B19000000000000]  <1>
-   197 000017DB 66B80413            <1>     mov ax, 1304h
-   198 000017DF CD30                <1>     int 30h
+   190 0000175E 50                  <1>     push rax
+   191 0000175F 48BD-               <1>     mov rbp, .extmemmsg
+   191 00001761 [7518000000000000]  <1>
+   192 00001769 66B80413            <1>     mov ax, 1304h
+   193 0000176D CD30                <1>     int 30h
+   194 0000176F 58                  <1>     pop rax
+   195 00001770 E89D000000          <1>     call .printdecimalword
+   196 00001775 48BD-               <1>     mov rbp, .kb
+   196 00001777 [CF18000000000000]  <1>
+   197 0000177F 66B80413            <1>     mov ax, 1304h
+   198 00001783 CD30                <1>     int 30h
    199                              <1> .pt2:
-   200 000017E1 58                  <1>     pop rax
-   201 000017E2 59                  <1>     pop rcx
-   202 000017E3 4839C8              <1>     cmp rax, rcx
-   203 000017E6 740C                <1>     je .sense2    ;Sensible
-   204 000017E8 4885C0              <1>     test rax, rax
-   205 000017EB 480F44C1            <1>     cmovz rax, rcx
-   206 000017EF 4885C0              <1>     test rax, rax
-   207 000017F2 742B                <1>     jz .pt3
+   200 00001785 58                  <1>     pop rax
+   201 00001786 59                  <1>     pop rcx
+   202 00001787 4839C8              <1>     cmp rax, rcx
+   203 0000178A 740C                <1>     je .sense2    ;Sensible
+   204 0000178C 4885C0              <1>     test rax, rax
+   205 0000178F 480F44C1            <1>     cmovz rax, rcx
+   206 00001793 4885C0              <1>     test rax, rax
+   207 00001796 742B                <1>     jz .pt3
    208                              <1> .sense2:
-   209 000017F4 50                  <1>     push rax
-   210 000017F5 48BD-               <1>     mov rbp, .extmemmsg2
-   210 000017F7 [EF18000000000000]  <1>
-   211 000017FF 66B80413            <1>     mov ax, 1304h
-   212 00001803 CD30                <1>     int 30h
-   213 00001805 58                  <1>     pop rax
+   209 00001798 50                  <1>     push rax
+   210 00001799 48BD-               <1>     mov rbp, .extmemmsg2
+   210 0000179B [9318000000000000]  <1>
+   211 000017A3 66B80413            <1>     mov ax, 1304h
+   212 000017A7 CD30                <1>     int 30h
+   213 000017A9 58                  <1>     pop rax
    214                              <1> 
-   215 00001806 48C1E006            <1>     shl rax, 6    ;Turn 64Kb into Kb
-   216 0000180A E85F000000          <1>     call .printdecimalword
-   217 0000180F 48BD-               <1>     mov rbp, .kb
-   217 00001811 [2B19000000000000]  <1>
-   218 00001819 66B80413            <1>     mov ax, 1304h
-   219 0000181D CD30                <1>     int 30h
+   215 000017AA 48C1E006            <1>     shl rax, 6    ;Turn 64Kb into Kb
+   216 000017AE E85F000000          <1>     call .printdecimalword
+   217 000017B3 48BD-               <1>     mov rbp, .kb
+   217 000017B5 [CF18000000000000]  <1>
+   218 000017BD 66B80413            <1>     mov ax, 1304h
+   219 000017C1 CD30                <1>     int 30h
    220                              <1> .pt3:   ;Read total free size from big map
-   221 0000181F 50                  <1>     push rax
-   222 00001820 48BD-               <1>     mov rbp, .totalmem
-   222 00001822 [0E19000000000000]  <1>
-   223 0000182A B804130000          <1>     mov eax, 1304h
-   224 0000182F CD30                <1>     int 30h
-   225 00001831 58                  <1>     pop rax
-   226 00001832 488B0425[E0010000]  <1>     mov rax, qword [sysMem]
-   227 0000183A 31DB                <1>     xor ebx, ebx
-   228 0000183C 8B1C25[E8010000]    <1>     mov ebx, dword [scpSize]
-   229 00001843 4829D8              <1>     sub rax, rbx
-   230 00001846 48C1E80A            <1>     shr rax, 0Ah                ;Get number of Kb's free
-   231 0000184A E81F000000          <1>     call .printdecimalword  
-   232 0000184F 48BD-               <1>     mov rbp, .kb
-   232 00001851 [2B19000000000000]  <1>
-   233 00001859 66B80413            <1>     mov ax, 1304h
-   234 0000185D CD30                <1>     int 30h
+   221 000017C3 50                  <1>     push rax
+   222 000017C4 48BD-               <1>     mov rbp, .totalmem
+   222 000017C6 [B218000000000000]  <1>
+   223 000017CE B804130000          <1>     mov eax, 1304h
+   224 000017D3 CD30                <1>     int 30h
+   225 000017D5 58                  <1>     pop rax
+   226 000017D6 488B0425[E0010000]  <1>     mov rax, qword [sysMem]
+   227 000017DE 31DB                <1>     xor ebx, ebx
+   228 000017E0 8B1C25[E8010000]    <1>     mov ebx, dword [scpSize]
+   229 000017E7 4829D8              <1>     sub rax, rbx
+   230 000017EA 48C1E80A            <1>     shr rax, 0Ah                ;Get number of Kb's free
+   231 000017EE E81F000000          <1>     call .printdecimalword  
+   232 000017F3 48BD-               <1>     mov rbp, .kb
+   232 000017F5 [CF18000000000000]  <1>
+   233 000017FD 66B80413            <1>     mov ax, 1304h
+   234 00001801 CD30                <1>     int 30h
    235                              <1> 
-   236 0000185F B80A0E0000          <1>     mov eax, 0E0Ah
-   237 00001864 CD30                <1>     int 30h
-   238 00001866 B80D0E0000          <1>     mov eax, 0E0Dh   ;CR/LF
-   239 0000186B CD30                <1>     int 30h
+   236 00001803 B80A0E0000          <1>     mov eax, 0E0Ah
+   237 00001808 CD30                <1>     int 30h
+   238 0000180A B80D0E0000          <1>     mov eax, 0E0Dh   ;CR/LF
+   239 0000180F CD30                <1>     int 30h
    240                              <1> 
-   241 0000186D C3                  <1>     ret
+   241 00001811 C3                  <1>     ret
    242                              <1> 
    243                              <1> .printdecimalword:
    244                              <1> ;Takes the qword in rax and prints its decimal representation
-   245 0000186E 52                  <1>     push rdx
-   246 0000186F 51                  <1>     push rcx
-   247 00001870 53                  <1>     push rbx
-   248 00001871 50                  <1>     push rax
-   249 00001872 55                  <1>     push rbp
-   250 00001873 4831C9              <1>     xor rcx, rcx
-   251 00001876 6631ED              <1>     xor bp, bp    ;Use bp as #of digits counter
-   252 00001879 48BB0A000000000000- <1>     mov rbx, 0Ah  ;Divide by 10
-   252 00001882 00                  <1>
+   245 00001812 52                  <1>     push rdx
+   246 00001813 51                  <1>     push rcx
+   247 00001814 53                  <1>     push rbx
+   248 00001815 50                  <1>     push rax
+   249 00001816 55                  <1>     push rbp
+   250 00001817 4831C9              <1>     xor rcx, rcx
+   251 0000181A 6631ED              <1>     xor bp, bp    ;Use bp as #of digits counter
+   252 0000181D 48BB0A000000000000- <1>     mov rbx, 0Ah  ;Divide by 10
+   252 00001826 00                  <1>
    253                              <1> .pdw0:
-   254 00001883 FFC5                <1>     inc ebp
-   255 00001885 48C1E108            <1>     shl rcx, 8    ;Space for next nybble
-   256 00001889 31D2                <1>     xor edx, edx
-   257 0000188B 48F7F3              <1>     div rbx
-   258 0000188E 80C230              <1>     add dl, '0'
-   259 00001891 80FA39              <1>     cmp dl, '9'
-   260 00001894 7603                <1>     jbe .pdw1
-   261 00001896 80C207              <1>     add dl, 'A'-'0'-10
+   254 00001827 FFC5                <1>     inc ebp
+   255 00001829 48C1E108            <1>     shl rcx, 8    ;Space for next nybble
+   256 0000182D 31D2                <1>     xor edx, edx
+   257 0000182F 48F7F3              <1>     div rbx
+   258 00001832 80C230              <1>     add dl, '0'
+   259 00001835 80FA39              <1>     cmp dl, '9'
+   260 00001838 7603                <1>     jbe .pdw1
+   261 0000183A 80C207              <1>     add dl, 'A'-'0'-10
    262                              <1> .pdw1:
-   263 00001899 88D1                <1>     mov cl, dl    ;Save remainder byte
-   264 0000189B 4885C0              <1>     test rax, rax
-   265 0000189E 75E3                <1>     jnz .pdw0
+   263 0000183D 88D1                <1>     mov cl, dl    ;Save remainder byte
+   264 0000183F 4885C0              <1>     test rax, rax
+   265 00001842 75E3                <1>     jnz .pdw0
    266                              <1> .pdw2:
-   267 000018A0 88C8                <1>     mov al, cl    ;Get most sig digit into al
-   268 000018A2 48C1E908            <1>     shr rcx, 8    ;Get next digit down
-   269 000018A6 B40E                <1>     mov ah, 0Eh
-   270 000018A8 CD30                <1>     int 30h
-   271 000018AA FFCD                <1>     dec ebp
-   272 000018AC 75F2                <1>     jnz .pdw2
+   267 00001844 88C8                <1>     mov al, cl    ;Get most sig digit into al
+   268 00001846 48C1E908            <1>     shr rcx, 8    ;Get next digit down
+   269 0000184A B40E                <1>     mov ah, 0Eh
+   270 0000184C CD30                <1>     int 30h
+   271 0000184E FFCD                <1>     dec ebp
+   272 00001850 75F2                <1>     jnz .pdw2
    273                              <1> 
-   274 000018AE 5D                  <1>     pop rbp
-   275 000018AF 58                  <1>     pop rax
-   276 000018B0 5B                  <1>     pop rbx
-   277 000018B1 59                  <1>     pop rcx
-   278 000018B2 5A                  <1>     pop rdx
-   279 000018B3 C3                  <1>     ret
-   280 000018B4 0A0D4672656520436F- <1> .convmemmsg:        db 0Ah,0Dh,"Free Conventional Memory: ",0
-   280 000018BD 6E76656E74696F6E61- <1>
-   280 000018C6 6C204D656D6F72793A- <1>
-   280 000018CF 2000                <1>
-   281 000018D1 0A0D546F74616C204C- <1> .extmemmsg:         db 0Ah,0Dh,"Total Low Extended Memory: ",0    
-   281 000018DA 6F7720457874656E64- <1>
-   281 000018E3 6564204D656D6F7279- <1>
-   281 000018EC 3A2000              <1>
-   282 000018EF 0A0D546F74616C2048- <1> .extmemmsg2:        db 0Ah,0Dh,"Total High Extended Memory: ",0
-   282 000018F8 69676820457874656E- <1>
-   282 00001901 646564204D656D6F72- <1>
-   282 0000190A 793A2000            <1>
-   283 0000190E 0A0D546F74616C2046- <1> .totalmem:          db 0Ah,0Dh,"Total Free System Memory: ",0
-   283 00001917 726565205379737465- <1>
-   283 00001920 6D204D656D6F72793A- <1>
-   283 00001929 2000                <1>
-   284 0000192B 4B00                <1> .kb:                db "K",0
+   274 00001852 5D                  <1>     pop rbp
+   275 00001853 58                  <1>     pop rax
+   276 00001854 5B                  <1>     pop rbx
+   277 00001855 59                  <1>     pop rcx
+   278 00001856 5A                  <1>     pop rdx
+   279 00001857 C3                  <1>     ret
+   280 00001858 0A0D4672656520436F- <1> .convmemmsg:        db 0Ah,0Dh,"Free Conventional Memory: ",0
+   280 00001861 6E76656E74696F6E61- <1>
+   280 0000186A 6C204D656D6F72793A- <1>
+   280 00001873 2000                <1>
+   281 00001875 0A0D546F74616C204C- <1> .extmemmsg:         db 0Ah,0Dh,"Total Low Extended Memory: ",0    
+   281 0000187E 6F7720457874656E64- <1>
+   281 00001887 6564204D656D6F7279- <1>
+   281 00001890 3A2000              <1>
+   282 00001893 0A0D546F74616C2048- <1> .extmemmsg2:        db 0Ah,0Dh,"Total High Extended Memory: ",0
+   282 0000189C 69676820457874656E- <1>
+   282 000018A5 646564204D656D6F72- <1>
+   282 000018AE 793A2000            <1>
+   283 000018B2 0A0D546F74616C2046- <1> .totalmem:          db 0Ah,0Dh,"Total Free System Memory: ",0
+   283 000018BB 726565205379737465- <1>
+   283 000018C4 6D204D656D6F72793A- <1>
+   283 000018CD 2000                <1>
+   284 000018CF 4B00                <1> .kb:                db "K",0
     72                                  %include "./Source/Init/IntTable.asm"
     73                              <1> ;----------------------Interrupt Tables--------------------------
     74                              <1> IDT_TABLE:
     75                              <1> CPU_IDT:
-    76 0000192D [7F53000000000000]  <1>     dq i0
-    77 00001935 [8753000000000000]  <1>     dq i1
-    78 0000193D [9653000000000000]  <1>     dq i2
-    79 00001945 [A553000000000000]  <1>     dq i3
-    80 0000194D [B453000000000000]  <1>     dq i4
-    81 00001955 [C353000000000000]  <1>     dq i5
-    82 0000195D [D253000000000000]  <1>     dq i6
-    83 00001965 [E153000000000000]  <1>     dq i7
-    84 0000196D [F053000000000000]  <1>     dq i8
-    85 00001975 [FF53000000000000]  <1>     dq i9
-    86 0000197D [0E54000000000000]  <1>     dq i10
-    87 00001985 [1D54000000000000]  <1>     dq i11
-    88 0000198D [2C54000000000000]  <1>     dq i12
-    89 00001995 [3B54000000000000]  <1>     dq i13
-    90 0000199D [4754000000000000]  <1>     dq i14
-    91 000019A5 [5354000000000000]  <1>     dq i15
-    92 000019AD [5F54000000000000]  <1>     dq i16
-    93 000019B5 [6B54000000000000]  <1>     dq i17
-    94 000019BD [7754000000000000]  <1>     dq i18
-    95 000019C5 [8354000000000000]  <1>     dq i19
-    96 000019CD [8F54000000000000]  <1>     dq i20
-    97 000019D5 [9B54000000000000]  <1>     dq i21
-    98 000019DD [9E57000000000000]- <1>     times 0Ah dq dummy_return_64    ;just return, reserved interrupts!
-    98 000019DD <rep Ah>            <1>
+    76 000018D1 [7F53000000000000]  <1>     dq i0
+    77 000018D9 [8753000000000000]  <1>     dq i1
+    78 000018E1 [9653000000000000]  <1>     dq i2
+    79 000018E9 [A553000000000000]  <1>     dq i3
+    80 000018F1 [B453000000000000]  <1>     dq i4
+    81 000018F9 [C353000000000000]  <1>     dq i5
+    82 00001901 [D253000000000000]  <1>     dq i6
+    83 00001909 [E153000000000000]  <1>     dq i7
+    84 00001911 [F053000000000000]  <1>     dq i8
+    85 00001919 [FF53000000000000]  <1>     dq i9
+    86 00001921 [0E54000000000000]  <1>     dq i10
+    87 00001929 [1D54000000000000]  <1>     dq i11
+    88 00001931 [2C54000000000000]  <1>     dq i12
+    89 00001939 [3B54000000000000]  <1>     dq i13
+    90 00001941 [4754000000000000]  <1>     dq i14
+    91 00001949 [5354000000000000]  <1>     dq i15
+    92 00001951 [5F54000000000000]  <1>     dq i16
+    93 00001959 [6B54000000000000]  <1>     dq i17
+    94 00001961 [7754000000000000]  <1>     dq i18
+    95 00001969 [8354000000000000]  <1>     dq i19
+    96 00001971 [8F54000000000000]  <1>     dq i20
+    97 00001979 [9B54000000000000]  <1>     dq i21
+    98 00001981 [9E57000000000000]- <1>     times 0Ah dq dummy_return_64    ;just return, reserved interrupts!
+    98 00001981 <rep Ah>            <1>
     99                              <1> HW_IDT:
    100                              <1> ;--------PIC1--------:    ;Int 20h-27h
-   101 00001A2D [0F01000000000000]  <1>     dq timer_IRQ0
-   102 00001A35 [4F01000000000000]  <1>     dq kb_IRQ1
-   103 00001A3D [9857000000000000]  <1>     dq dummy_interrupt.pic1
-   104 00001A45 [CF09000000000000]  <1>     dq ser_IRQ3
-   105 00001A4D [E109000000000000]  <1>     dq ser_IRQ4
-   106 00001A55 [9857000000000000]  <1>     dq dummy_interrupt.pic1
-   107 00001A5D [AA0A000000000000]  <1>     dq fdd_IRQ6
-   108 00001A65 [7E0B000000000000]  <1>     dq default_IRQ7
+   101 000019D1 [0F01000000000000]  <1>     dq timer_IRQ0
+   102 000019D9 [4F01000000000000]  <1>     dq kb_IRQ1
+   103 000019E1 [9857000000000000]  <1>     dq dummy_interrupt.pic1
+   104 000019E9 [CF09000000000000]  <1>     dq ser_IRQ3
+   105 000019F1 [E109000000000000]  <1>     dq ser_IRQ4
+   106 000019F9 [9857000000000000]  <1>     dq dummy_interrupt.pic1
+   107 00001A01 [AA0A000000000000]  <1>     dq fdd_IRQ6
+   108 00001A09 [7E0B000000000000]  <1>     dq default_IRQ7
    109                              <1> ;--------PIC2--------:    ;Int 28h-2Fh
-   110 00001A6D [B20A000000000000]  <1>     dq rtc_IRQ8
-   111 00001A75 [9157000000000000]  <1>     dq dummy_interrupt.pic2
-   112 00001A7D [9157000000000000]  <1>     dq dummy_interrupt.pic2
-   113 00001A85 [9157000000000000]  <1>     dq dummy_interrupt.pic2
-   114 00001A8D [9157000000000000]  <1>     dq dummy_interrupt.pic2
-   115 00001A95 [9157000000000000]  <1>     dq dummy_interrupt.pic2
-   116 00001A9D [E50A000000000000]  <1>     dq hdd_IRQ14
-   117 00001AA5 [9D0B000000000000]  <1>     dq default_IRQ15
+   110 00001A11 [B20A000000000000]  <1>     dq rtc_IRQ8
+   111 00001A19 [9157000000000000]  <1>     dq dummy_interrupt.pic2
+   112 00001A21 [9157000000000000]  <1>     dq dummy_interrupt.pic2
+   113 00001A29 [9157000000000000]  <1>     dq dummy_interrupt.pic2
+   114 00001A31 [9157000000000000]  <1>     dq dummy_interrupt.pic2
+   115 00001A39 [9157000000000000]  <1>     dq dummy_interrupt.pic2
+   116 00001A41 [E50A000000000000]  <1>     dq hdd_IRQ14
+   117 00001A49 [9D0B000000000000]  <1>     dq default_IRQ15
    118                              <1> SW_IDT:    ;Int 30h onwards!
-   119 00001AAD [770C000000000000]  <1>     dq scr_io            ;Int 30h, VGA Screen drawing/TTY functions
-   120 00001AB5 [0113000000000000]  <1>     dq machineWord_io    ;Int 31h, Give the BIOS hardware bitfield
-   121 00001ABD [3813000000000000]  <1>     dq convRAM_io        ;Int 32h, Give conv memory available
-   122 00001AC5 [5B13000000000000]  <1>     dq disk_io           ;Int 33h, Storage device Functions
-   123 00001ACD [7B1D000000000000]  <1>     dq serial_io         ;Int 34h, Serial Port Functions
-   124 00001AD5 [E91E000000000000]  <1>     dq misc_io           ;Int 35h, Misc functions
-   125 00001ADD [8B22000000000000]  <1>     dq kb_io             ;Int 36h, Keyboard functions
-   126 00001AE5 [0D23000000000000]  <1>     dq printer_io        ;Int 37h, Reserved [Who uses parallel anymore?]
-   127 00001AED [AE23000000000000]  <1>     dq MCP_int           ;Int 38h, launch MCP, and install its "API" handle
-   128 00001AF5 [B531000000000000]  <1>     dq bootstrapInt      ;Int 39h, restart the PC using an interrupt
-   129 00001AFD [4E32000000000000]  <1>     dq timerInt          ;Int 3Ah, Time of day
-   130 00001B05 [B934000000000000]  <1>     dq ctrlbreak_io      ;Int 3Bh, user Break
-   131 00001B0D [9E57000000000000]  <1>     dq dummy_return_64   ;Int 3Ch, user IRQ0 hook
-   132 00001B15 [BB34000000000000]  <1>     dq scr_params_io     ;Int 3Dh, Screen Mode parameters return function
-   133 00001B1D [C734000000000000]  <1>     dq disk_params_io    ;Int 3Eh, disk parameters return function
-   134 00001B25 [D934000000000000]  <1>     dq cga_ret_io        ;Int 3Fh, video extention return function
+   119 00001A51 [770C000000000000]  <1>     dq scr_io            ;Int 30h, VGA Screen drawing/TTY functions
+   120 00001A59 [0113000000000000]  <1>     dq machineWord_io    ;Int 31h, Give the BIOS hardware bitfield
+   121 00001A61 [3813000000000000]  <1>     dq convRAM_io        ;Int 32h, Give conv memory available
+   122 00001A69 [5B13000000000000]  <1>     dq disk_io           ;Int 33h, Storage device Functions
+   123 00001A71 [7B1D000000000000]  <1>     dq serial_io         ;Int 34h, Serial Port Functions
+   124 00001A79 [E91E000000000000]  <1>     dq misc_io           ;Int 35h, Misc functions
+   125 00001A81 [8B22000000000000]  <1>     dq kb_io             ;Int 36h, Keyboard functions
+   126 00001A89 [0D23000000000000]  <1>     dq printer_io        ;Int 37h, Reserved [Who uses parallel anymore?]
+   127 00001A91 [AE23000000000000]  <1>     dq MCP_int           ;Int 38h, launch MCP, and install its "API" handle
+   128 00001A99 [B531000000000000]  <1>     dq bootstrapInt      ;Int 39h, restart the PC using an interrupt
+   129 00001AA1 [4E32000000000000]  <1>     dq timerInt          ;Int 3Ah, Time of day
+   130 00001AA9 [B934000000000000]  <1>     dq ctrlbreak_io      ;Int 3Bh, user Break
+   131 00001AB1 [9E57000000000000]  <1>     dq dummy_return_64   ;Int 3Ch, user IRQ0 hook
+   132 00001AB9 [BB34000000000000]  <1>     dq scr_params_io     ;Int 3Dh, Screen Mode parameters return function
+   133 00001AC1 [C734000000000000]  <1>     dq disk_params_io    ;Int 3Eh, disk parameters return function
+   134 00001AC9 [D934000000000000]  <1>     dq cga_ret_io        ;Int 3Fh, video extention return function
    135                              <1> IDT_TABLE_Length equ $ - IDT_TABLE
     73                                  seg0len equ ($ - $$)
     74                                  

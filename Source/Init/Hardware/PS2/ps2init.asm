@@ -79,80 +79,41 @@ keyb0:
 keyb1:
     dec cl ;timeout counter
     jz ps2error
-    mov al, 0FFh
+    mov al, 0FFh        ;Reset device
     call ps2talk.wDat
 .k1:
     call ps2talk.rDat   ;read from ps2data
     cmp al, 0AAh        ;success
-    je keyb20
+    je keyb2
     cmp al, 0FAh        ;ACK    
     je .k1              ;Loop if ACK recieved, just read ps2data
     jmp keyb1           ;Else, loop whole thing (assume fail recieved)
+    
 ;Step 10
-keyb20:
-    xor ecx, ecx
 keyb2:
-    dec ecx
-    jz ps2error
-.k0:
-    mov al, 0F0h
-    call ps2talk.wDat
-    
-    mov ah, 01h
-    call ps2talk.rDat
-    cmp al, 0FEh    ;Did we recieve an resend?
-    je .k0          ;Resend the data!
-    cmp al, 0FAh    ;Compare to Ack?
-    jne keyb2       ;If not equal, dec one from the loop counter and try again
-    
-    mov al, 01h     ;write 01 to data port (set scan code set 1)
-    call ps2talk.wDat
-.k1:
-    call ps2talk.rDat    ;read data port for ACK or resend response
-    cmp al, 0FAh
-    je keyb3    ;IF ack revieved, scancode set, advance.
-    loop .k1     ;Keep polling port
-    jmp keyb2
-;Step 11
-keyb3:
-    xor ecx, ecx
-.k0:
-    dec cx
-    jz ps2error
-    mov al, 0F4h
-    call ps2talk.wDat
-.k1:
-    call ps2talk.rDat ;read data port for ACK or resend response
-    cmp al, 0FAh
-    je keyb4
-    loop .k1      ;Keep polling port
-    jmp .k0       ;Fail, retry the whole process
-    
-;Step 12
-keyb4:
-    mov al, 0EDh     ;Set lights
+    mov al, 0EDh        ;Set lights
     call ps2talk.wDat
     call ps2talk.rDat  ;get response, remember ps2talk does its own timeout
     cmp al, 0FAh
-    jne keyb4        ;No ack, try again.
+    jne keyb2        ;No ack, try again.
 .k1:
     mov al, 00h        ;No lights on
     call ps2talk.wDat
     call ps2talk.rDat  ;Recieve ACK
 
-keyb5:
+keyb3:
     mov al, 0EEh     ;Echo command
     call ps2talk.wDat
     xor al, al       ;Zero al to ensure that the result is EEh
 .k1:
     call ps2talk.rDat
     cmp al, 0EEh
-    je keyb6           ;If equal, continue
+    je keyb4           ;If equal, continue
     lea rbp, ps2Str.noecho
     mov ax, 1304h
     xor bh, bh
     int 30h
-keyb6:    ;Set typematic rate/delay, 250ms, 30 reports/second
+keyb4:    ;Set typematic rate/delay, 250ms, 30 reports/second
     mov al, 0F3h     ;Set typematic rate
     call ps2talk.wDat
     xor al, al       ;Set rate
@@ -166,16 +127,15 @@ keyb6:    ;Set typematic rate/delay, 250ms, 30 reports/second
     jnz .k1
 
     mov cl, -1
-keyb7:
+keyb5:
 ;Enable the keyboard to transmit scancodes
     dec cl
     jz ps2error
     mov al, 0F4h    ;Enable scanning
-    xchg bx, bx
     call ps2talk.wDat
     call ps2talk.rDat
     cmp al, 0FAh    ;Ack?
-    jne keyb7
+    jne keyb5
 
 scancode_faff:
     ;Set scancode 2
