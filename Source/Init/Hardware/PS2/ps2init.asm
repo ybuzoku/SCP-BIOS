@@ -102,10 +102,11 @@ keyb2:
     mov ax, 1304h
     xor bh, bh
     int 30h
-    
+
 keyb3:    ;Set typematic rate/delay, 250ms, 30 reports/second
     mov al, 0F3h     ;Set typematic rate
     call ps2talk.wDat
+    call ps2talk.rDat
     xor al, al       ;Set rate
     call ps2talk.wDat
     xor cl, cl
@@ -115,8 +116,6 @@ keyb3:    ;Set typematic rate/delay, 250ms, 30 reports/second
     call ps2talk.rDat
     cmp al, 0FAh    ;Ack?
     jnz .k1
-
-    mov cl, -1
 
 keyb4:      ;Set scancode 2
     mov cl, -1
@@ -140,6 +139,7 @@ keyb4:      ;Set scancode 2
     cmp al, 0FAh    ;Ack?   
     jne .k1 ;Restart the whole process
 
+    mov cl, -1
 keyb5:
 ;Enable the keyboard to transmit scancodes
     dec cl
