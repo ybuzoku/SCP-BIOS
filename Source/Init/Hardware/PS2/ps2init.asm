@@ -91,29 +91,19 @@ keyb1:
     
 ;Step 10
 keyb2:
-    mov al, 0EDh        ;Set lights
-    call ps2talk.wDat
-    call ps2talk.rDat  ;get response, remember ps2talk does its own timeout
-    cmp al, 0FAh
-    jne keyb2        ;No ack, try again.
-.k1:
-    mov al, 00h        ;No lights on
-    call ps2talk.wDat
-    call ps2talk.rDat  ;Recieve ACK
-
-keyb3:
     mov al, 0EEh     ;Echo command
     call ps2talk.wDat
     xor al, al       ;Zero al to ensure that the result is EEh
 .k1:
     call ps2talk.rDat
     cmp al, 0EEh
-    je keyb4           ;If equal, continue
+    je keyb3           ;If equal, continue
     lea rbp, ps2Str.noecho
     mov ax, 1304h
     xor bh, bh
     int 30h
-keyb4:    ;Set typematic rate/delay, 250ms, 30 reports/second
+    
+keyb3:    ;Set typematic rate/delay, 250ms, 30 reports/second
     mov al, 0F3h     ;Set typematic rate
     call ps2talk.wDat
     xor al, al       ;Set rate
@@ -127,18 +117,8 @@ keyb4:    ;Set typematic rate/delay, 250ms, 30 reports/second
     jnz .k1
 
     mov cl, -1
-keyb5:
-;Enable the keyboard to transmit scancodes
-    dec cl
-    jz ps2error
-    mov al, 0F4h    ;Enable scanning
-    call ps2talk.wDat
-    call ps2talk.rDat
-    cmp al, 0FAh    ;Ack?
-    jne keyb5
 
-scancode_faff:
-    ;Set scancode 2
+keyb4:      ;Set scancode 2
     mov cl, -1
     mov bl, 2   ;Scancode 2
 .k1:
@@ -159,6 +139,16 @@ scancode_faff:
     call ps2talk.rDat
     cmp al, 0FAh    ;Ack?   
     jne .k1 ;Restart the whole process
+
+keyb5:
+;Enable the keyboard to transmit scancodes
+    dec cl
+    jz ps2error
+    mov al, 0F4h    ;Enable scanning
+    call ps2talk.wDat
+    call ps2talk.rDat
+    cmp al, 0FAh    ;Ack?
+    jne keyb5
 
 keybinitend:
 ;Enable scancode translation and enable Interrupts on port 1
