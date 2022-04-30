@@ -13,23 +13,6 @@ keybsetup:
 ;    .wCmd - Write al into Command port 
 ;    .wDat - Write al into Data port
 ;----------------------------------------------------------------
-; Step 1) Disable ps2 port 1 using command word ADh and port 2 using command 
-;  word A7h.
-; Step 2) Flush buffer and check bit 2 is set (else fail)
-; Step 3) Read controller configuration byte (command word 20h)
-; Step 4) Disable IRQs bits 0,1 (clear bit 0,1) [and manually disable second 
-;  ps2 port (bit 5 set)]
-; Step 5) Write controller config byte back (command word 60h)
-; Step 6) Test controller using AAh command word. Return 55h or fail.
-; Step 7) Test ps2 port 1 using ABh command word. Return 00h or fail.
-; Step 8) Enable ps2 port 1 using AEh command word. Enable IRQ by setting bit 0 
-;  of the config byte.
-; Step 9) Reset ps2 port 1 device using FFh data word. If AAh returned, 
-;  proceed, else if ACK (FAh), await AAh. FCh and FDh indicate fail. FEh = 
-;  resend command.
-; Step 10) Reset scan code set to 2 using F0h data word with 01h data word. 
-; Setp 11) Enable scanning (ie keyboard sends scan codes) using data word F4h.
-;----------------------------------------------------------------
 ;Step 1
     mov al, 0ADh
     call ps2talk.wCmd
