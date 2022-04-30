@@ -19,7 +19,7 @@ keybsetup:
     mov al, 0A7h        ;Cancel second interface if it exists (DO NOT REENABLE)
     call ps2talk.wCmd
 ;Step 2
-    mov cl, -1
+    mov cl, 10h
 initFlush:
     in al, ps2data     ;manually flush ps2data port
     dec cl

@@ -9,11 +9,11 @@ kb_IRQ1:
     push rbx
     push rcx
     push rdi
-    xor rax, rax
+    xor eax, eax
 
 .k0:
     in al, ps2data    ;Get the scancode (Set 1)
-    test rax, rax    ;Check to see if we got an error code from the keyboard.
+    test eax, eax    ;Check to see if we got an error code from the keyboard.
     jz .kb_error
     cmp rax, 80h
     jle .basickey    ;A normal keypress, nothing too magical.
@@ -29,7 +29,7 @@ kb_IRQ1:
     je .alt_shift_released
     cmp rax, 9Dh    ;Ctrl Shift released
     je .ctrl_shift_released
-    cmp rax, 0D2Bh    ;Toggle Insert
+    cmp rax, 0D2h    ;Toggle Insert
     je .insert_released
     jmp short .kb1_exit    ;Just exit if something weird gets sent
 
