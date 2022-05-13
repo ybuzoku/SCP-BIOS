@@ -19,9 +19,9 @@ serial_abt: ;serial port address base table. List of supported addresses!
     dw com4_base
 serial_io:
     push rdx        ;Save upper 7 bytes
-    cmp dx, 4        ;Check to see if the selected com port is within range
+    cmp dl, 4        ;Check to see if the selected com port is within range
     jge .sbadexit1    ;Bad dx value
-    movzx rdx, dx    ;zero the upper 6 bytes of rdx
+    movzx rdx, dl    ;zero the upper 6 bytes of rdx
     mov dx, word [com_addresses + rdx*2]    ;get serial port base addr into dx
     test dx, dx        ;is the address zero?
     jz .sbadexit2    ;com port doesnt exist
@@ -104,9 +104,9 @@ serial_io:
     add dx, 5    ;dx contains base address, point to Line status register
     mov ah, al   ;temp save char to send in ah
     push rcx
-    xor cx, cx
+    xor ecx, ecx
 .t1:
-    dec cx
+    dec ecx
     jz .t2       ;timeout
     in al, dx    ;get the LSR byte in
     and al, 00100000b    ;Check the transmit holding register empty bit
