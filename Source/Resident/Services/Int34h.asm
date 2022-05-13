@@ -79,10 +79,8 @@ serial_io:
     sub dx, 3    ;return point to base
     shr ax, 0Dh  ;0Dh=move hi bits of hi word into low bits of low word
     movzx rax, al    ;zero upper 7 bytes of rax
-    cmp al, 00000111b    ;Check if set to 9600baud (for extension)
-    je .ui2
-.ui1:
-    mov ax, word [serial_baud_table + rax]    ;rax is the offset into the table
+
+    mov ax, word [serial_baud_table + 2*rax]    ;rax is the offset into the table
     out dx, ax    ;dx points to base with dlab on, set divisor! (word out)
 ;Disable DLAB bit now
     add dx, 3
@@ -91,14 +89,6 @@ serial_io:
     out dx, al    ;Clear the bit
 
     jmp short .sioexit    ;exit!
-.ui2:    ;Check r8b to make sure it is 0-4 inclusive.
-    cmp r8b, 4    ;greater than four defaults to 4
-    jg .ui3    ;r8b is greater than four, error!
-    add al, r8b    ;increase the offset into the table
-    jmp short .ui1    ;return to the get value from table
-.ui3:    ;If r8b greater than 4, default to 4
-    mov r8b, 4   ;Error caught, user used a value greater than 4, default to 4
-    jmp short .ui2    ;return to checker
 
 .transmit:
     add dx, 5    ;dx contains base address, point to Line status register
