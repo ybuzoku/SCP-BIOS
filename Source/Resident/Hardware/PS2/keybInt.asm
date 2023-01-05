@@ -231,13 +231,15 @@ kb_IRQ1:
     and al,  kb_flag_ctrl | kb_flag_alt
     cmp al, kb_flag_ctrl | kb_flag_alt    ;Test if Ctrl + Alt is being pressed
     jne .ctrl_alt_del_no_reset
-.ctrl_alt_del_killPC:
-    in al, 64h    ;Check if the input buffer is empty
-    test al, 2    ;Check if clear
-    jne .ctrl_alt_del_killPC    ;keep waiting
-    mov al, 0FEh    ;Pulse kill lines
-    out 64h, al    
-    ;PC dead, time to reboot!
+    ;Nuke IDT and tightloop until the CPU triple faults
+    lidt [.ctrl_alt_del_reset_idt] ;Triple fault the machine
+    jmp short .ctrl_alt_del_to_hell
+.ctrl_alt_del_to_hell:
+    int 00h ;Call div by 0 to trigger reboot if not somehow failed yet
+    jmp short .ctrl_alt_del_to_hell
+.ctrl_alt_del_reset_idt:
+    dw 0
+    dq 0
 .ctrl_alt_del_no_reset:
     pop rax        ;return the OG scancode and proceed as normal
     jmp .keylookup
