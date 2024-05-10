@@ -1058,7 +1058,7 @@
    184 0000050C [0000000000000000]  <1>
    185 00000514 48BF-               <1>     mov rdi, section.codeResident.vstart    ;address for the end of the section
    185 00000516 [0000000000000000]  <1>
-   186 0000051E 48B9FD0A0000000000- <1>     mov rcx, (residentLength/8) + 1
+   186 0000051E 48B9FC0A0000000000- <1>     mov rcx, (residentLength/8) + 1
    186 00000527 00                  <1>
    187 00000528 F348A5              <1>     rep movsq    ;Copy resident portion high
    188                              <1> 
@@ -1237,7 +1237,7 @@
    345 0000078C 48B900010000000000- <1>     mov rcx, 0100h    ;256 entries
    345 00000795 00                  <1>
    346 00000796 48B8-               <1>     mov rax, dummy_return_64
-   346 00000798 [B157000000000000]  <1>
+   346 00000798 [AC57000000000000]  <1>
    347 000007A0 BB08000000          <1>     mov ebx, codedescriptor
    348 000007A5 31F6                <1>     xor esi, esi
    349 000007A7 66BA008F            <1>     mov dx, 8F00h    
@@ -2924,47 +2924,47 @@
      1                              <1> ;----------------------Interrupt Tables--------------------------
      2                              <1> IDT_TABLE:
      3                              <1> CPU_IDT:
-     4 000018BF [9253000000000000]  <1>     dq i0
-     5 000018C7 [9A53000000000000]  <1>     dq i1
-     6 000018CF [A953000000000000]  <1>     dq i2
-     7 000018D7 [B853000000000000]  <1>     dq i3
-     8 000018DF [C753000000000000]  <1>     dq i4
-     9 000018E7 [D653000000000000]  <1>     dq i5
-    10 000018EF [E553000000000000]  <1>     dq i6
-    11 000018F7 [F453000000000000]  <1>     dq i7
-    12 000018FF [0354000000000000]  <1>     dq i8
-    13 00001907 [1254000000000000]  <1>     dq i9
-    14 0000190F [2154000000000000]  <1>     dq i10
-    15 00001917 [3054000000000000]  <1>     dq i11
-    16 0000191F [3F54000000000000]  <1>     dq i12
-    17 00001927 [4E54000000000000]  <1>     dq i13
-    18 0000192F [5A54000000000000]  <1>     dq i14
-    19 00001937 [6654000000000000]  <1>     dq i15
-    20 0000193F [7254000000000000]  <1>     dq i16
-    21 00001947 [7E54000000000000]  <1>     dq i17
-    22 0000194F [8A54000000000000]  <1>     dq i18
-    23 00001957 [9654000000000000]  <1>     dq i19
-    24 0000195F [A254000000000000]  <1>     dq i20
-    25 00001967 [AE54000000000000]  <1>     dq i21
-    26 0000196F [B157000000000000]- <1>     times 0Ah dq dummy_return_64    ;just return, reserved interrupts!
+     4 000018BF [8D53000000000000]  <1>     dq i0
+     5 000018C7 [9553000000000000]  <1>     dq i1
+     6 000018CF [A453000000000000]  <1>     dq i2
+     7 000018D7 [B353000000000000]  <1>     dq i3
+     8 000018DF [C253000000000000]  <1>     dq i4
+     9 000018E7 [D153000000000000]  <1>     dq i5
+    10 000018EF [E053000000000000]  <1>     dq i6
+    11 000018F7 [EF53000000000000]  <1>     dq i7
+    12 000018FF [FE53000000000000]  <1>     dq i8
+    13 00001907 [0D54000000000000]  <1>     dq i9
+    14 0000190F [1C54000000000000]  <1>     dq i10
+    15 00001917 [2B54000000000000]  <1>     dq i11
+    16 0000191F [3A54000000000000]  <1>     dq i12
+    17 00001927 [4954000000000000]  <1>     dq i13
+    18 0000192F [5554000000000000]  <1>     dq i14
+    19 00001937 [6154000000000000]  <1>     dq i15
+    20 0000193F [6D54000000000000]  <1>     dq i16
+    21 00001947 [7954000000000000]  <1>     dq i17
+    22 0000194F [8554000000000000]  <1>     dq i18
+    23 00001957 [9154000000000000]  <1>     dq i19
+    24 0000195F [9D54000000000000]  <1>     dq i20
+    25 00001967 [A954000000000000]  <1>     dq i21
+    26 0000196F [AC57000000000000]- <1>     times 0Ah dq dummy_return_64    ;just return, reserved interrupts!
     26 0000196F <rep Ah>            <1>
     27                              <1> HW_IDT:
     28                              <1> ;--------PIC1--------:    ;Int 20h-27h
     29 000019BF [0F01000000000000]  <1>     dq timer_IRQ0
     30 000019C7 [4F01000000000000]  <1>     dq kb_IRQ1
-    31 000019CF [AB57000000000000]  <1>     dq dummy_interrupt.pic1
+    31 000019CF [A657000000000000]  <1>     dq dummy_interrupt.pic1
     32 000019D7 [DB09000000000000]  <1>     dq ser_IRQ3
     33 000019DF [ED09000000000000]  <1>     dq ser_IRQ4
-    34 000019E7 [AB57000000000000]  <1>     dq dummy_interrupt.pic1
+    34 000019E7 [A657000000000000]  <1>     dq dummy_interrupt.pic1
     35 000019EF [B60A000000000000]  <1>     dq fdd_IRQ6
     36 000019F7 [8A0B000000000000]  <1>     dq default_IRQ7
     37                              <1> ;--------PIC2--------:    ;Int 28h-2Fh
     38 000019FF [BE0A000000000000]  <1>     dq rtc_IRQ8
-    39 00001A07 [A457000000000000]  <1>     dq dummy_interrupt.pic2
-    40 00001A0F [A457000000000000]  <1>     dq dummy_interrupt.pic2
-    41 00001A17 [A457000000000000]  <1>     dq dummy_interrupt.pic2
-    42 00001A1F [A457000000000000]  <1>     dq dummy_interrupt.pic2
-    43 00001A27 [A457000000000000]  <1>     dq dummy_interrupt.pic2
+    39 00001A07 [9F57000000000000]  <1>     dq dummy_interrupt.pic2
+    40 00001A0F [9F57000000000000]  <1>     dq dummy_interrupt.pic2
+    41 00001A17 [9F57000000000000]  <1>     dq dummy_interrupt.pic2
+    42 00001A1F [9F57000000000000]  <1>     dq dummy_interrupt.pic2
+    43 00001A27 [9F57000000000000]  <1>     dq dummy_interrupt.pic2
     44 00001A2F [F10A000000000000]  <1>     dq hdd_IRQ14
     45 00001A37 [A90B000000000000]  <1>     dq default_IRQ15
     46                              <1> SW_IDT:    ;Int 30h onwards!
@@ -2980,7 +2980,7 @@
     56 00001A87 [A631000000000000]  <1>     dq bootstrapInt      ;Int 39h, restart the PC using an interrupt
     57 00001A8F [3F32000000000000]  <1>     dq timerInt          ;Int 3Ah, Time of day
     58 00001A97 [AA34000000000000]  <1>     dq ctrlbreak_io      ;Int 3Bh, user Break
-    59 00001A9F [B157000000000000]  <1>     dq dummy_return_64   ;Int 3Ch, user IRQ0 hook
+    59 00001A9F [AC57000000000000]  <1>     dq dummy_return_64   ;Int 3Ch, user IRQ0 hook
     60 00001AA7 [AC34000000000000]  <1>     dq scr_params_io     ;Int 3Dh, Screen Mode parameters return function
     61 00001AAF [B834000000000000]  <1>     dq disk_params_io    ;Int 3Eh, disk parameters return function
     62 00001AB7 [CA34000000000000]  <1>     dq cga_ret_io        ;Int 3Fh, video extention return function
@@ -3842,10 +3842,10 @@
      8                              <1> ; Schedule. This value is nominally zero.
      9                              <1> ;----------------------------------------------------------------
     10                              <1> ehci_IRQ:
-    11 00000B08 68[A4570000]        <1>     push qword dummy_interrupt.pic2
+    11 00000B08 68[9F570000]        <1>     push qword dummy_interrupt.pic2
     12 00000B0D EB05                <1>     jmp short .intr
     13                              <1> .pic1:
-    14 00000B0F 68[AB570000]        <1>     push qword dummy_interrupt.pic1
+    14 00000B0F 68[A6570000]        <1>     push qword dummy_interrupt.pic1
     15                              <1> .intr:
     16                              <1> ;EHCI Interrupt Handler 
     17 00000B14 53                  <1>     push rbx
@@ -3855,7 +3855,7 @@
     21 00000B1D 3CFF                <1>     cmp al, -1    ;Spurious case, replace with manual poll then discard proc
     22 00000B1F 743F                <1>     je .spur
     23                              <1> 
-    24 00000B21 E851480000          <1>     call USB.ehciGetOpBase    ;returns opreg base in rax
+    24 00000B21 E84C480000          <1>     call USB.ehciGetOpBase    ;returns opreg base in rax
     25                              <1> .nonIRQmain:
     26 00000B26 678B5804            <1>     mov ebx, dword [eax + ehcists]  ;save USBSTS and clear usb interrupt
     27 00000B2A 67095804            <1>     or dword [eax + ehcists], ebx   ;WC all interrupt status
@@ -3887,7 +3887,7 @@
     53                              <1> .spur:
     54 00000B60 30C0                <1>     xor al, al
     55                              <1> .s1:
-    56 00000B62 E810480000          <1>     call USB.ehciGetOpBase
+    56 00000B62 E80B480000          <1>     call USB.ehciGetOpBase
     57 00000B67 678B5804            <1>     mov ebx, dword [eax + ehcists] ;save USBSTS and clear usb interrupt 
     58 00000B6B 67095804            <1>     or dword [eax + ehcists], ebx    ;WC all interrupt status
     59 00000B6F FEC0                <1>     inc al    ;Clear all interrupts on all controllers
@@ -4891,7 +4891,7 @@
     67 00001427 52                  <1>     push rdx
     68 00001428 E8F2020000          <1>     call .i33ehciGetDevicePtr
     69 0000142D E8E1270000          <1>     call USB.ehciAdjustAsyncSchedCtrlr
-    70 00001432 E8D7360000          <1>     call USB.ehciMsdBOTResetRecovery
+    70 00001432 E8D2360000          <1>     call USB.ehciMsdBOTResetRecovery
     71                              <1> .rrexit:
     72 00001437 5A                  <1>     pop rdx
     73 00001438 5E                  <1>     pop rsi
@@ -4923,8 +4923,8 @@
     99 0000147F E89B020000          <1>     call .i33ehciGetDevicePtr
    100 00001484 E88A270000          <1>     call USB.ehciAdjustAsyncSchedCtrlr
    101 00001489 7241                <1>     jc .srexitbad1
-   102 0000148B E84A3C0000          <1>     call USB.ehciMsdBOTRequestSense
-   103 00001490 E859370000          <1>     call USB.ehciMsdBOTCheckTransaction
+   102 0000148B E8453C0000          <1>     call USB.ehciMsdBOTRequestSense
+   103 00001490 E854370000          <1>     call USB.ehciMsdBOTCheckTransaction
    104 00001495 6685C0              <1>     test ax, ax
    105 00001498 58                  <1>     pop rax         ;Get back original error code
    106 00001499 752D                <1>     jnz .srexitbad2
@@ -4952,7 +4952,7 @@
    127                              <1> .readsectors:
    128 000014D8 57                  <1>     push rdi
    129 000014D9 48BF-               <1>     mov rdi, USB.ehciMsdBOTInSector512
-   129 000014DB [FE51000000000000]  <1>
+   129 000014DB [F951000000000000]  <1>
    130 000014E3 E8EB010000          <1>     call .sectorsEHCI
    131 000014E8 5F                  <1>     pop rdi
    132 000014E9 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]    ;Return Error code in ah
@@ -4966,7 +4966,7 @@
    140                              <1> .writesectors:
    141 00001500 57                  <1>     push rdi
    142 00001501 48BF-               <1>     mov rdi, USB.ehciMsdBOTOutSector512
-   142 00001503 [B351000000000000]  <1>
+   142 00001503 [AE51000000000000]  <1>
    143 0000150B E8C3010000          <1>     call .sectorsEHCI
    144 00001510 5F                  <1>     pop rdi
    145 00001511 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]
@@ -4977,7 +4977,7 @@
    150                              <1> .verify:
    151 00001521 57                  <1>     push rdi
    152 00001522 48BF-               <1>     mov rdi, USB.ehciMsdBOTVerify
-   152 00001524 [8B50000000000000]  <1>
+   152 00001524 [8650000000000000]  <1>
    153 0000152C E8A2010000          <1>     call .sectorsEHCI   ;Verify sector by sector
    154 00001531 5F                  <1>     pop rdi
    155 00001532 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]
@@ -5022,7 +5022,7 @@
    193 00001588 48BB-               <1>     mov rbx, sectorbuffer
    193 0000158A [C003000000000000]  <1>
    194                              <1> .f0:
-   195 00001592 E81C3C0000          <1>     call USB.ehciMsdBOTOutSector512
+   195 00001592 E8173C0000          <1>     call USB.ehciMsdBOTOutSector512
    196 00001597 0F8277010000        <1>     jc .sebadBB
    197 0000159D FFC2                <1>     inc edx ;Inc LBA
    198 0000159F FFCD                <1>     dec ebp ;Dec number of sectors to act on
@@ -5047,7 +5047,7 @@
    217                              <1> .lbaread:
    218 000015C9 57                  <1>     push rdi
    219 000015CA 48BF-               <1>     mov rdi, USB.ehciMsdBOTInSector512
-   219 000015CC [FE51000000000000]  <1>
+   219 000015CC [F951000000000000]  <1>
    220 000015D4 E88D000000          <1>     call .lbaCommon
    221 000015D9 5F                  <1>     pop rdi
    222 000015DA 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]    ;Return Error code in ah
@@ -5057,7 +5057,7 @@
    226                              <1> .lbawrite:
    227 000015EE 57                  <1>     push rdi
    228 000015EF 48BF-               <1>     mov rdi, USB.ehciMsdBOTOutSector512
-   228 000015F1 [B351000000000000]  <1>
+   228 000015F1 [AE51000000000000]  <1>
    229 000015F9 E868000000          <1>     call .lbaCommon
    230 000015FE 5F                  <1>     pop rdi
    231 000015FF 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]    ;Return Error code in ah
@@ -5067,7 +5067,7 @@
    235                              <1> .lbaverify:
    236 00001613 57                  <1>     push rdi
    237 00001614 48BF-               <1>     mov rdi, USB.ehciMsdBOTVerify
-   237 00001616 [8B50000000000000]  <1>
+   237 00001616 [8650000000000000]  <1>
    238 0000161E E843000000          <1>     call .lbaCommon
    239 00001623 5F                  <1>     pop rdi
    240 00001624 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]    ;Return Error code in ah
@@ -5111,7 +5111,7 @@
    277 0000167C 56                  <1>     push rsi
    278 0000167D 50                  <1>     push rax
    279 0000167E E89C000000          <1>     call .i33ehciGetDevicePtr   ;al = bus num, rsi = ehci device structure ptr
-   280 00001683 E899390000          <1>     call USB.ehciMsdBOTFormatUnit
+   280 00001683 E894390000          <1>     call USB.ehciMsdBOTFormatUnit
    281 00001688 58                  <1>     pop rax
    282 00001689 5E                  <1>     pop rsi
    283 0000168A 8A2425[A9010000]    <1>     mov ah, byte [msdStatus]
@@ -5319,7 +5319,7 @@
    479                              <1> .dcRoot:
    480                              <1> ;Root hub procedure.
    481 0000182B E8E3230000          <1>     call USB.ehciAdjustAsyncSchedCtrlr  ;Reset the bus if needed
-   482 00001830 E8423B0000          <1>     call USB.ehciGetOpBase      ;Get opbase into rax
+   482 00001830 E83D3B0000          <1>     call USB.ehciGetOpBase      ;Get opbase into rax
    483 00001835 0FB65E03            <1>     movzx ebx, byte [rsi + 3]   ;Get MSD port number into dl
    484 00001839 FFCB                <1>     dec ebx                     ;Reduce by one
    485 0000183B 678B549844          <1>     mov edx, dword [eax + 4*ebx + ehciportsc]  ;Get port status into eax
@@ -5426,7 +5426,7 @@
    579                              <1> .bsRoot:
    580                              <1> ;Root hub procedure.
    581 0000193F E8CF220000          <1>     call USB.ehciAdjustAsyncSchedCtrlr  ;Reset the bus if needed
-   582 00001944 E82E3A0000          <1>     call USB.ehciGetOpBase      ;Get opbase into rax
+   582 00001944 E8293A0000          <1>     call USB.ehciGetOpBase      ;Get opbase into rax
    583 00001949 0FB65E03            <1>     movzx ebx, byte [rsi + 3]   ;Get MSD port number into dl
    584 0000194D FFCB                <1>     dec ebx                     ;Reduce by one
    585 0000194F 678B549844          <1>     mov edx, dword [eax + 4*ebx + ehciportsc]  ;Get port status into eax
@@ -5513,13 +5513,13 @@
    664 00001A22 725F                <1>     jc .deviceInitExit
    665 00001A24 B90A000000          <1>     mov ecx, 10
    666                              <1> .deviceInitReadCaps:
-   667 00001A29 E8A2350000          <1>     call USB.ehciMsdBOTReadCapacity10   ;Preserve al error code
+   667 00001A29 E89D350000          <1>     call USB.ehciMsdBOTReadCapacity10   ;Preserve al error code
    668 00001A2E 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h   ;General Controller Failure
    669 00001A36 744B                <1>     je .deviceInitExit
-   670 00001A38 E8B1310000          <1>     call USB.ehciMsdBOTCheckTransaction
+   670 00001A38 E8AC310000          <1>     call USB.ehciMsdBOTCheckTransaction
    671 00001A3D 6685C0              <1>     test ax, ax     ;Clears CF
    672 00001A40 7418                <1>     jz .deviceInitWriteTableEntry   ;Success, write table entry
-   673 00001A42 E8C7300000          <1>     call USB.ehciMsdBOTResetRecovery    ;Just force a device reset
+   673 00001A42 E8C2300000          <1>     call USB.ehciMsdBOTResetRecovery    ;Just force a device reset
    674 00001A47 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h   ;General Controller Failure
    675 00001A4F 7432                <1>     je .deviceInitExit
    676 00001A51 FFC9                <1>     dec ecx
@@ -6212,12 +6212,12 @@
    148 00002018 BA008F0000          <1>     mov edx, 8F00h
    149 0000201D BB08000000          <1>     mov ebx, codedescriptor
    150 00002022 48B8-               <1>     mov rax, i1  ;Pointer
-   150 00002024 [9A53000000000000]  <1>
+   150 00002024 [9553000000000000]  <1>
    151 0000202C 48BE01000000000000- <1>     mov rsi, 01 ;Interrupt number, Single Step
    151 00002035 00                  <1>
    152 00002036 E890E0FFFF          <1>     call idtWriteEntry
    153 0000203B 48B8-               <1>     mov rax, i3  ;Pointer
-   153 0000203D [B853000000000000]  <1>
+   153 0000203D [B353000000000000]  <1>
    154 00002045 48BE03000000000000- <1>     mov rsi, 03 ;Interrupt number, Software Breakpoint
    154 0000204E 00                  <1>
    155 0000204F E877E0FFFF          <1>     call idtWriteEntry
@@ -6668,7 +6668,7 @@
    131 00002542 [6225000000000000]  <1>
    132 0000254A CD30                <1>     int 30h
    133 0000254C 48BE-               <1>     mov rsi, signature + 1    ;Point to BIOS signature string (skip the v char)
-   133 0000254E [B457000000000000]  <1>
+   133 0000254E [AF57000000000000]  <1>
    134                              <1> .v1:
    135 00002556 AC                  <1>     lodsb
    136 00002557 3C20                <1>     cmp al, 20h            ;Check space
@@ -9086,7 +9086,7 @@
    183                              <1>     ;cmp byte [eActiveCtrlr], -1
    184                              <1>     ;jne .erc2    ;A controller already active, exit fail (ec=0)
    185                              <1>     ;mov byte [eActiveCtrlr], al    ;For added security (may be removed later)
-   186 00003B50 E822180000          <1>     call .ehciGetOpBase
+   186 00003B50 E81D180000          <1>     call .ehciGetOpBase
    187 00003B55 67C7400800000000    <1>     mov dword [eax + ehciintr], 0h    ;No interrupts
    188 00003B5D 67C740043F000000    <1>     mov dword [eax + ehcists], 3Fh    ;Clear any outstanding interrupts
    189                              <1>     ;Set the reset bit, check to see if run bit has cleared first!
@@ -9134,7 +9134,7 @@
    231                              <1> ; CF = CY if failed, CF = NC if success
    232 00003BB2 50                  <1>     push rax
    233 00003BB3 51                  <1>     push rcx
-   234 00003BB4 E8BE170000          <1>     call .ehciGetOpBase
+   234 00003BB4 E8B9170000          <1>     call .ehciGetOpBase
    235 00003BB9 67F7400400100000    <1>     test dword [eax + ehcists], 1000h    ;bit 12 must be set to write 1 in cmd
    236 00003BC1 741E                <1>     jz .esc2
    237 00003BC3 67810801000000      <1>     or dword [eax + ehcicmd], 1h ;Set bit 0 to run
@@ -9164,7 +9164,7 @@
    261 00003BE5 51                  <1>     push rcx
    262 00003BE6 480FB60425-         <1>     movzx rax, byte [eActiveCtrlr]
    262 00003BEB [47020000]          <1>
-   263 00003BEF E883170000          <1>     call .ehciGetOpBase
+   263 00003BEF E87E170000          <1>     call .ehciGetOpBase
    264 00003BF4 678120FEFFFFFF      <1>     and dword [eax + ehcicmd], 0FFFFFFFEh    ;Stop controller
    265 00003BFB 31C9                <1>     xor ecx, ecx
    266                              <1> .estc0:
@@ -9224,7 +9224,7 @@
    320 00003C41 53                  <1>     push rbx
    321 00003C42 51                  <1>     push rcx
    322 00003C43 53                  <1>     push rbx
-   323 00003C44 E82E170000          <1>     call .ehciGetOpBase    ;Get opbase 
+   323 00003C44 E829170000          <1>     call .ehciGetOpBase    ;Get opbase 
    324 00003C49 0FB7DB              <1>     movzx ebx, bx
    325 00003C4C 67C7400800000000    <1>     mov dword [eax + ehciintr], 0
    326 00003C54 6789480C            <1>     mov dword [eax + ehcifrindex], ecx
@@ -9325,7 +9325,7 @@
    416 00003D3C 814F0400800000      <1>     or dword [rdi + 4], 8000h   ;Set H bit on
    417 00003D43 50                  <1>     push rax
    418 00003D44 8A0425[47020000]    <1>     mov al, byte [eActiveCtrlr]
-   419 00003D4B E827160000          <1>     call .ehciGetOpBase
+   419 00003D4B E822160000          <1>     call .ehciGetOpBase
    420 00003D50 67897818            <1>     mov dword [eax + ehciasyncaddr], edi ;Set the address in the ctrlr register
    421 00003D54 58                  <1>     pop rax
    422 00003D55 E87D010000          <1>     call .ehciStartAsyncSchedule    ;Start schedule
@@ -9485,7 +9485,7 @@
    565 00003ED8 51                  <1>     push rcx
    566                              <1> 
    567 00003ED9 8A0425[47020000]    <1>     mov al, byte [eActiveCtrlr]    ;Deals with current active controller
-   568 00003EE0 E892140000          <1>     call .ehciGetOpBase            ;Return opregs ADDRESS in eax
+   568 00003EE0 E88D140000          <1>     call .ehciGetOpBase            ;Return opregs ADDRESS in eax
    569 00003EE5 67810820000000      <1>     or dword [eax + ehcicmd], 20h    ;Process asyncschedule
    570 00003EEC 31C9                <1>     xor ecx, ecx
    571                              <1> .esas0:
@@ -9509,7 +9509,7 @@
    589 00003F03 50                  <1>     push rax
    590 00003F04 51                  <1>     push rcx
    591 00003F05 8A0425[47020000]    <1>     mov al, byte [eActiveCtrlr]    ;Deals with current active controller
-   592 00003F0C E866140000          <1>     call .ehciGetOpBase            ;Return opregs ADDRESS in eax
+   592 00003F0C E861140000          <1>     call .ehciGetOpBase            ;Return opregs ADDRESS in eax
    593 00003F11 6631C9              <1>     xor cx, cx
    594 00003F14 678120DFFFFFFF      <1>     and dword [eax + ehcicmd], 0FFFFFFDFh ;Stop processing async
    595                              <1> .espc0:
@@ -9542,7 +9542,7 @@
    622                              <1> 
    623 00003F36 880C25[49020000]    <1>     mov byte [eAsyncMutex], cl  ;Set mutex
    624 00003F3D 8A0425[47020000]    <1>     mov al, byte [eActiveCtrlr]    ;Deals with current active controller
-   625 00003F44 E82E140000          <1>     call .ehciGetOpBase            ;Return opregs ADDRESS in eax
+   625 00003F44 E829140000          <1>     call .ehciGetOpBase            ;Return opregs ADDRESS in eax
    626 00003F49 4889C3              <1>     mov rbx, rax
    627 00003F4C 66BF8813            <1>     mov di, 5000
    628 00003F50 E8B9FDFFFF          <1>     call .ehciLinkNewQHead
@@ -10415,7 +10415,7 @@
   1476 000046CC 49B810000000000000- <1>     mov r8, 10h ;Loop counter setup
   1476 000046D5 00                  <1>
   1477                              <1> .edsm1:
-  1478 000046D6 E8DF030000          <1>     call .ehciMsdDeviceReset
+  1478 000046D6 E8DA030000          <1>     call .ehciMsdDeviceReset
   1479 000046DB 0F8281000000        <1>     jc .edsexit
   1480                              <1> ;Check eActiveInterrupt for confirmation if we need to handle error
   1481 000046E1 F60425[48020000]02  <1>     test byte [eActiveInt], 2   ;If this is set, handle error
@@ -10431,7 +10431,7 @@
   1491                              <1> .edsms2:
   1492 00004701 66FFC5              <1>     inc bp  ;Error Stage 1
   1493                              <1> .edsms3:
-  1494 00004704 E8DB030000          <1>     call .ehciMsdGetMaxLun  ;If stall, clear endpoint and proceed. No loop
+  1494 00004704 E8D6030000          <1>     call .ehciMsdGetMaxLun  ;If stall, clear endpoint and proceed. No loop
   1495 00004709 7257                <1>     jc .edsexit
   1496 0000470B F60425[48020000]02  <1>     test byte [eActiveInt], 2   ;If this is set, handle error
   1497 00004713 740F                <1>     jz .edsms4
@@ -10446,7 +10446,7 @@
   1506 00004727 49B810000000000000- <1>     mov r8, 10h ;Loop counter setup
   1506 00004730 00                  <1>
   1507                              <1> .edsms5:
-  1508 00004731 E884030000          <1>     call .ehciMsdDeviceReset  ;Reset once again to clear issues
+  1508 00004731 E87F030000          <1>     call .ehciMsdDeviceReset  ;Reset once again to clear issues
   1509 00004736 722A                <1>     jc .edsexit
   1510 00004738 F60425[48020000]02  <1>     test byte [eActiveInt], 2   ;If this is set, handle error
   1511 00004740 7416                <1>     jz .edsms6
@@ -10735,57 +10735,57 @@
   1776 00004A0B 8A4601              <1>     mov al, byte [rsi + 1]  ;Get the bus number into al
   1777 00004A0E E800F2FFFF          <1>     call .ehciAdjustAsyncSchedCtrlr
   1778 00004A13 B001                <1>     mov al, 1
-  1779 00004A15 7267                <1>     jc .ehciMsdInitFail
+  1779 00004A15 7262                <1>     jc .ehciMsdInitFail
   1780 00004A17 E8A9FCFFFF          <1>     call .ehciDeviceSetupMsd
   1781 00004A1C B002                <1>     mov al, 2
-  1782 00004A1E 725E                <1>     jc .ehciMsdInitFail
-  1783 00004A20 E80D050000          <1>     call .ehciMsdBOTInquiry
-  1784 00004A25 7257                <1>     jc .ehciMsdInitFail
+  1782 00004A1E 7259                <1>     jc .ehciMsdInitFail
+  1783 00004A20 E808050000          <1>     call .ehciMsdBOTInquiry
+  1784 00004A25 7252                <1>     jc .ehciMsdInitFail
   1785                              <1>     ;VV Earmark for removal. Necessary for windows-like behaviour VV
-  1786 00004A27 E853050000          <1>     call .ehciMsdBOTReadFormatCapacities    ;Ignore if this fails
+  1786                              <1>     ;call .ehciMsdBOTReadFormatCapacities    ;Ignore if this fails
   1787                              <1>     ;^^ Earmark for removal. Necessary for windows-like behaviour ^^
-  1788 00004A2C B905000000          <1>     mov ecx, 5
+  1788 00004A27 B905000000          <1>     mov ecx, 5
   1789                              <1> .emi0:
-  1790 00004A31 E8FC040000          <1>     call .ehciMsdBOTInquiry
-  1791 00004A36 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h   ;Host error
-  1792 00004A3E 7452                <1>     je .ehciMsdInitialisePfail  ;Protocol fail
-  1793 00004A40 E8A9010000          <1>     call .ehciMsdBOTCheckTransaction
-  1794 00004A45 6685C0              <1>     test ax, ax
-  1795 00004A48 7551                <1>     jnz .emipf0
-  1796 00004A4A E881050000          <1>     call .ehciMsdBOTReadCapacity10
-  1797 00004A4F 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h   ;Host error
-  1798 00004A57 7439                <1>     je .ehciMsdInitialisePfail  ;Protocol fail
-  1799 00004A59 E890010000          <1>     call .ehciMsdBOTCheckTransaction
-  1800 00004A5E 6685C0              <1>     test ax, ax
-  1801 00004A61 7538                <1>     jnz .emipf0
-  1802 00004A63 E8FA060000          <1>     call .ehciMsdBOTModeSense6
-  1803 00004A68 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h   ;Host error
-  1804 00004A70 7420                <1>     je .ehciMsdInitialisePfail  ;Protocol fail
-  1805 00004A72 E877010000          <1>     call .ehciMsdBOTCheckTransaction
-  1806 00004A77 6685C0              <1>     test ax, ax     ;Also clears CF if zero
-  1807 00004A7A 751F                <1>     jnz .emipf0
+  1790 00004A2C E8FC040000          <1>     call .ehciMsdBOTInquiry
+  1791 00004A31 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h   ;Host error
+  1792 00004A39 7452                <1>     je .ehciMsdInitialisePfail  ;Protocol fail
+  1793 00004A3B E8A9010000          <1>     call .ehciMsdBOTCheckTransaction
+  1794 00004A40 6685C0              <1>     test ax, ax
+  1795 00004A43 7551                <1>     jnz .emipf0
+  1796 00004A45 E881050000          <1>     call .ehciMsdBOTReadCapacity10
+  1797 00004A4A 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h   ;Host error
+  1798 00004A52 7439                <1>     je .ehciMsdInitialisePfail  ;Protocol fail
+  1799 00004A54 E890010000          <1>     call .ehciMsdBOTCheckTransaction
+  1800 00004A59 6685C0              <1>     test ax, ax
+  1801 00004A5C 7538                <1>     jnz .emipf0
+  1802 00004A5E E8FA060000          <1>     call .ehciMsdBOTModeSense6
+  1803 00004A63 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h   ;Host error
+  1804 00004A6B 7420                <1>     je .ehciMsdInitialisePfail  ;Protocol fail
+  1805 00004A6D E877010000          <1>     call .ehciMsdBOTCheckTransaction
+  1806 00004A72 6685C0              <1>     test ax, ax     ;Also clears CF if zero
+  1807 00004A75 751F                <1>     jnz .emipf0
   1808                              <1> .ehciMsdInitExit:
-  1809 00004A7C 59                  <1>     pop rcx
-  1810 00004A7D C3                  <1>     ret
+  1809 00004A77 59                  <1>     pop rcx
+  1810 00004A78 C3                  <1>     ret
   1811                              <1> .ehciMsdInitFail:
-  1812 00004A7E 668B06              <1>     mov ax, word [rsi]
-  1813 00004A81 E8E9F8FFFF          <1>     call .ehciRemoveDevFromTables
-  1814 00004A86 FE0C25[4B020000]    <1>     dec byte [numMSD]   ;Device was removed from tables, decrement
-  1815 00004A8D F9                  <1>     stc
-  1816 00004A8E B002                <1>     mov al, 2
-  1817 00004A90 EBEA                <1>     jmp short .ehciMsdInitExit
+  1812 00004A79 668B06              <1>     mov ax, word [rsi]
+  1813 00004A7C E8EEF8FFFF          <1>     call .ehciRemoveDevFromTables
+  1814 00004A81 FE0C25[4B020000]    <1>     dec byte [numMSD]   ;Device was removed from tables, decrement
+  1815 00004A88 F9                  <1>     stc
+  1816 00004A89 B002                <1>     mov al, 2
+  1817 00004A8B EBEA                <1>     jmp short .ehciMsdInitExit
   1818                              <1> .ehciMsdInitialisePfail:
-  1819 00004A92 E877000000          <1>     call .ehciMsdBOTResetRecovery
-  1820 00004A97 FFC9                <1>     dec ecx
-  1821 00004A99 74E3                <1>     jz .ehciMsdInitFail
+  1819 00004A8D E877000000          <1>     call .ehciMsdBOTResetRecovery
+  1820 00004A92 FFC9                <1>     dec ecx
+  1821 00004A94 74E3                <1>     jz .ehciMsdInitFail
   1822                              <1> .emipf0:
-  1823 00004A9B E83A060000          <1>     call .ehciMsdBOTRequestSense
-  1824 00004AA0 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h
-  1825 00004AA8 74E8                <1>     je .ehciMsdInitialisePfail
-  1826 00004AAA E83F010000          <1>     call .ehciMsdBOTCheckTransaction
-  1827 00004AAF 6685C0              <1>     test ax, ax
-  1828 00004AB2 0F8479FFFFFF        <1>     jz .emi0
-  1829 00004AB8 EBD8                <1>     jmp short .ehciMsdInitialisePfail
+  1823 00004A96 E83A060000          <1>     call .ehciMsdBOTRequestSense
+  1824 00004A9B 803C25[A9010000]20  <1>     cmp byte [msdStatus], 20h
+  1825 00004AA3 74E8                <1>     je .ehciMsdInitialisePfail
+  1826 00004AA5 E83F010000          <1>     call .ehciMsdBOTCheckTransaction
+  1827 00004AAA 6685C0              <1>     test ax, ax
+  1828 00004AAD 0F8479FFFFFF        <1>     jz .emi0
+  1829 00004AB3 EBD8                <1>     jmp short .ehciMsdInitialisePfail
   1830                              <1> 
   1831                              <1> .ehciMsdDeviceReset:
   1832                              <1> ;Reset an MSD device on current active EHCI bus
@@ -10794,25 +10794,25 @@
   1835                              <1> ;   CF=CY: Host error, Reset host system
   1836                              <1> ;   CF=NC: Transaction succeeded, check reset occurred successfully 
   1837                              <1> ;          (If eActiveIntr AND 2 != 0, then error in transfer)
-  1838 00004ABA 51                  <1>     push rcx
-  1839 00004ABB 52                  <1>     push rdx
-  1840 00004ABC 53                  <1>     push rbx
-  1841 00004ABD 50                  <1>     push rax
+  1838 00004AB5 51                  <1>     push rcx
+  1839 00004AB6 52                  <1>     push rdx
+  1840 00004AB7 53                  <1>     push rbx
+  1841 00004AB8 50                  <1>     push rax
   1842                              <1> 
-  1843 00004ABE 0FB64E07            <1>     movzx ecx, byte [rsi + 7]  ;Get bMaxPacketSize0
-  1844 00004AC2 480FB65604          <1>     movzx rdx, byte [rsi + 4]  ;Get Interface Number
-  1845 00004AC7 48C1E228            <1>     shl rdx, 5*8 ;Send to 5th byte
-  1846 00004ACB 48BB21FF0000000000- <1>     mov rbx, 0FF21h            ;MSD Reset
-  1846 00004AD4 00                  <1>
-  1847 00004AD5 4809D3              <1>     or rbx, rdx                ;And those bytes
-  1848 00004AD8 8A06                <1>     mov al, byte [rsi]
-  1849 00004ADA E88BF2FFFF          <1>     call .ehciSetNoData
+  1843 00004AB9 0FB64E07            <1>     movzx ecx, byte [rsi + 7]  ;Get bMaxPacketSize0
+  1844 00004ABD 480FB65604          <1>     movzx rdx, byte [rsi + 4]  ;Get Interface Number
+  1845 00004AC2 48C1E228            <1>     shl rdx, 5*8 ;Send to 5th byte
+  1846 00004AC6 48BB21FF0000000000- <1>     mov rbx, 0FF21h            ;MSD Reset
+  1846 00004ACF 00                  <1>
+  1847 00004AD0 4809D3              <1>     or rbx, rdx                ;And those bytes
+  1848 00004AD3 8A06                <1>     mov al, byte [rsi]
+  1849 00004AD5 E890F2FFFF          <1>     call .ehciSetNoData
   1850                              <1> 
-  1851 00004ADF 58                  <1>     pop rax
-  1852 00004AE0 5B                  <1>     pop rbx
-  1853 00004AE1 5A                  <1>     pop rdx
-  1854 00004AE2 59                  <1>     pop rcx
-  1855 00004AE3 C3                  <1>     ret
+  1851 00004ADA 58                  <1>     pop rax
+  1852 00004ADB 5B                  <1>     pop rbx
+  1853 00004ADC 5A                  <1>     pop rdx
+  1854 00004ADD 59                  <1>     pop rcx
+  1855 00004ADE C3                  <1>     ret
   1856                              <1> 
   1857                              <1> .ehciMsdGetMaxLun:
   1858                              <1> ;Get max LUN of an MSD device on current active EHCI bus
@@ -10823,25 +10823,25 @@
   1863                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
   1864                              <1> ;   Max Lun saved at DataIn Buffer (first byte)
   1865                              <1> ;   Check this was transferred, by checking total data transferred value
-  1866 00004AE4 51                  <1>     push rcx
-  1867 00004AE5 52                  <1>     push rdx
-  1868 00004AE6 53                  <1>     push rbx
-  1869 00004AE7 50                  <1>     push rax
+  1866 00004ADF 51                  <1>     push rcx
+  1867 00004AE0 52                  <1>     push rdx
+  1868 00004AE1 53                  <1>     push rbx
+  1869 00004AE2 50                  <1>     push rax
   1870                              <1> 
-  1871 00004AE8 0FB64E07            <1>     movzx ecx, byte [rsi + 7]  ;Get bMaxPacketSize0
-  1872 00004AEC 480FB65604          <1>     movzx rdx, byte [rsi + 4]  ;Get Interface Number
-  1873 00004AF1 48C1E228            <1>     shl rdx, 5*8 ;Send to 5th byte
-  1874 00004AF5 48BBA1FE0000000001- <1>     mov rbx, 000100000000FEA1h            ;MSD Get Max LUN
-  1874 00004AFE 00                  <1>
-  1875 00004AFF 4809D3              <1>     or rbx, rdx                ;And those bytes
-  1876 00004B02 8A06                <1>     mov al, byte [rsi]
-  1877 00004B04 E800F3FFFF          <1>     call .ehciGetRequest
+  1871 00004AE3 0FB64E07            <1>     movzx ecx, byte [rsi + 7]  ;Get bMaxPacketSize0
+  1872 00004AE7 480FB65604          <1>     movzx rdx, byte [rsi + 4]  ;Get Interface Number
+  1873 00004AEC 48C1E228            <1>     shl rdx, 5*8 ;Send to 5th byte
+  1874 00004AF0 48BBA1FE0000000001- <1>     mov rbx, 000100000000FEA1h            ;MSD Get Max LUN
+  1874 00004AF9 00                  <1>
+  1875 00004AFA 4809D3              <1>     or rbx, rdx                ;And those bytes
+  1876 00004AFD 8A06                <1>     mov al, byte [rsi]
+  1877 00004AFF E805F3FFFF          <1>     call .ehciGetRequest
   1878                              <1> 
-  1879 00004B09 58                  <1>     pop rax
-  1880 00004B0A 5B                  <1>     pop rbx
-  1881 00004B0B 5A                  <1>     pop rdx
-  1882 00004B0C 59                  <1>     pop rcx
-  1883 00004B0D C3                  <1>     ret
+  1879 00004B04 58                  <1>     pop rax
+  1880 00004B05 5B                  <1>     pop rbx
+  1881 00004B06 5A                  <1>     pop rdx
+  1882 00004B07 59                  <1>     pop rcx
+  1883 00004B08 C3                  <1>     ret
   1884                              <1> 
   1885                              <1> .ehciMsdBOTResetRecovery:
   1886                              <1> ;----------------------------------------------------------------
@@ -10852,29 +10852,29 @@
   1891                              <1> ;Calls an MSDBBB reset then calls StandardErrorHandler AFTER    : 
   1892                              <1> ; writing the Qhead for each Bulk EP.                           :
   1893                              <1> ;----------------------------------------------------------------
-  1894 00004B0E 50                  <1>     push rax
-  1895 00004B0F 53                  <1>     push rbx
-  1896 00004B10 51                  <1>     push rcx
-  1897 00004B11 66C7460E0000        <1>     mov word [rsi + 14], 00h    ;Reset clear both endpoint dt bits 
+  1894 00004B09 50                  <1>     push rax
+  1895 00004B0A 53                  <1>     push rbx
+  1896 00004B0B 51                  <1>     push rcx
+  1897 00004B0C 66C7460E0000        <1>     mov word [rsi + 14], 00h    ;Reset clear both endpoint dt bits 
   1898                              <1> 
-  1899 00004B17 E89EFFFFFF          <1>     call .ehciMsdDeviceReset    ;Call the device reset
-  1900 00004B1C 721E                <1>     jc .embrrexit
+  1899 00004B12 E89EFFFFFF          <1>     call .ehciMsdDeviceReset    ;Call the device reset
+  1900 00004B17 721E                <1>     jc .embrrexit
   1901                              <1> ;Now clear stall on IN EP
-  1902 00004B1E 8A06                <1>     mov al, byte [rsi]          ;Get the address
-  1903 00004B20 8A5E08              <1>     mov bl, byte [rsi + 8]      ;Get the 4 byte EP address
-  1904 00004B23 0FB64E07            <1>     movzx ecx, byte [rsi + 7]   ;Get the Max packet size for the ctrl EP
-  1905 00004B27 E897FAFFFF          <1>     call .ehciClearEpStallHalt
-  1906 00004B2C 720E                <1>     jc .embrrexit
+  1902 00004B19 8A06                <1>     mov al, byte [rsi]          ;Get the address
+  1903 00004B1B 8A5E08              <1>     mov bl, byte [rsi + 8]      ;Get the 4 byte EP address
+  1904 00004B1E 0FB64E07            <1>     movzx ecx, byte [rsi + 7]   ;Get the Max packet size for the ctrl EP
+  1905 00004B22 E89CFAFFFF          <1>     call .ehciClearEpStallHalt
+  1906 00004B27 720E                <1>     jc .embrrexit
   1907                              <1> ;Now clear stall on OUT EP
-  1908 00004B2E 8A06                <1>     mov al, byte [rsi]          ;Get the address
-  1909 00004B30 8A5E0B              <1>     mov bl, byte [rsi + 11]     ;Get the 4 byte EP address
-  1910 00004B33 0FB64E07            <1>     movzx ecx, byte [rsi + 7]   ;Get the Max packet size for the ctrl EP
-  1911 00004B37 E887FAFFFF          <1>     call .ehciClearEpStallHalt
+  1908 00004B29 8A06                <1>     mov al, byte [rsi]          ;Get the address
+  1909 00004B2B 8A5E0B              <1>     mov bl, byte [rsi + 11]     ;Get the 4 byte EP address
+  1910 00004B2E 0FB64E07            <1>     movzx ecx, byte [rsi + 7]   ;Get the Max packet size for the ctrl EP
+  1911 00004B32 E88CFAFFFF          <1>     call .ehciClearEpStallHalt
   1912                              <1> .embrrexit:
-  1913 00004B3C 59                  <1>     pop rcx
-  1914 00004B3D 5B                  <1>     pop rbx
-  1915 00004B3E 58                  <1>     pop rax
-  1916 00004B3F C3                  <1>     ret
+  1913 00004B37 59                  <1>     pop rcx
+  1914 00004B38 5B                  <1>     pop rbx
+  1915 00004B39 58                  <1>     pop rax
+  1916 00004B3A C3                  <1>     ret
   1917                              <1> .ehciMsdBOTCheckValidCSW:
   1918                              <1> ; This function checks that the recieved CSW was valid.
   1919                              <1> ; If this function returns a non-zero value in al, 
@@ -10886,32 +10886,32 @@
   1925                              <1> ;         al = 4h   : dCSWTag does not match the dCBWTag
   1926                              <1> ;         al = 0F8h : Reserved
   1927                              <1> ;   rax destroyed
-  1928 00004B40 53                  <1>     push rbx
-  1929 00004B41 51                  <1>     push rcx
-  1930 00004B42 31C0                <1>     xor eax, eax
-  1931 00004B44 66B90100            <1>     mov cx, 1
-  1932 00004B48 668B1C25[8A010000]  <1>     mov bx, word [ehciTDSpace + 2*ehciSizeOfTD + 0Ah]   
+  1928 00004B3B 53                  <1>     push rbx
+  1929 00004B3C 51                  <1>     push rcx
+  1930 00004B3D 31C0                <1>     xor eax, eax
+  1931 00004B3F 66B90100            <1>     mov cx, 1
+  1932 00004B43 668B1C25[8A010000]  <1>     mov bx, word [ehciTDSpace + 2*ehciSizeOfTD + 0Ah]   
   1933                              <1> ;Get total bytes to transfer from third QHeadTD to see if 13h bytes were 
   1934                              <1> ; transferred
-  1935 00004B50 6681E3FF7F          <1>     and bx, 7FFFh   ;Clear upper bit
-  1936 00004B55 660F45C1            <1>     cmovnz ax, cx   ;If the result for the and is not zero, <>13 bytes were sent
+  1935 00004B4B 6681E3FF7F          <1>     and bx, 7FFFh   ;Clear upper bit
+  1936 00004B50 660F45C1            <1>     cmovnz ax, cx   ;If the result for the and is not zero, <>13 bytes were sent
   1937                              <1> 
-  1938 00004B59 66D1E1              <1>     shl cx, 1     
-  1939 00004B5C 6609C1              <1>     or cx, ax
-  1940 00004B5F 813C25[C0050000]55- <1>     cmp dword [msdCSW], CSWSig
-  1940 00004B67 534253              <1>
-  1941 00004B6A 660F45C1            <1>     cmovne ax, cx
+  1938 00004B54 66D1E1              <1>     shl cx, 1     
+  1939 00004B57 6609C1              <1>     or cx, ax
+  1940 00004B5A 813C25[C0050000]55- <1>     cmp dword [msdCSW], CSWSig
+  1940 00004B62 534253              <1>
+  1941 00004B65 660F45C1            <1>     cmovne ax, cx
   1942                              <1> 
-  1943 00004B6E 66B90400            <1>     mov cx, 4h
-  1944 00004B72 6609C1              <1>     or cx, ax
-  1945 00004B75 0FB61C25[4A020000]  <1>     movzx ebx, byte [cbwTag]
-  1946 00004B7D FECB                <1>     dec bl
-  1947 00004B7F 3A1C25[C4050000]    <1>     cmp bl, byte [msdCSW + 4h]
-  1948 00004B86 660F45C1            <1>     cmovne ax, cx
+  1943 00004B69 66B90400            <1>     mov cx, 4h
+  1944 00004B6D 6609C1              <1>     or cx, ax
+  1945 00004B70 0FB61C25[4A020000]  <1>     movzx ebx, byte [cbwTag]
+  1946 00004B78 FECB                <1>     dec bl
+  1947 00004B7A 3A1C25[C4050000]    <1>     cmp bl, byte [msdCSW + 4h]
+  1948 00004B81 660F45C1            <1>     cmovne ax, cx
   1949                              <1> 
-  1950 00004B8A 59                  <1>     pop rcx
-  1951 00004B8B 5B                  <1>     pop rbx
-  1952 00004B8C C3                  <1>     ret
+  1950 00004B85 59                  <1>     pop rcx
+  1951 00004B86 5B                  <1>     pop rbx
+  1952 00004B87 C3                  <1>     ret
   1953                              <1> 
   1954                              <1> .ehciMsdBOTCheckMeaningfulCSW:
   1955                              <1> ; This function checks if the CSW was meaningful.
@@ -10929,47 +10929,47 @@
   1967                              <1> ;           al = 40h : dCSWDataResidue > dCBWDataTransferLength
   1968                              <1> ;           al = 80h : Reserved
   1969                              <1> ;   rax destroyed
-  1970 00004B8D 53                  <1>     push rbx
-  1971 00004B8E 51                  <1>     push rcx
+  1970 00004B88 53                  <1>     push rbx
+  1971 00004B89 51                  <1>     push rcx
   1972                              <1> 
-  1973 00004B8F 31C0                <1>     xor eax, eax  ;In the event that things go completely wrong
-  1974 00004B91 66BB0800            <1>     mov bx, 8h
-  1975 00004B95 8A0C25[CC050000]    <1>     mov cl, byte [msdCSW + 0Ch]
+  1973 00004B8A 31C0                <1>     xor eax, eax  ;In the event that things go completely wrong
+  1974 00004B8C 66BB0800            <1>     mov bx, 8h
+  1975 00004B90 8A0C25[CC050000]    <1>     mov cl, byte [msdCSW + 0Ch]
   1976                              <1> 
-  1977 00004B9C 80F902              <1>     cmp cl, 2
-  1978 00004B9F 660F47C3            <1>     cmova ax, bx
-  1979 00004BA3 7718                <1>     ja .embcmcResidueCheck
+  1977 00004B97 80F902              <1>     cmp cl, 2
+  1978 00004B9A 660F47C3            <1>     cmova ax, bx
+  1979 00004B9E 7718                <1>     ja .embcmcResidueCheck
   1980                              <1> 
-  1981 00004BA5 66D1EB              <1>     shr bx, 1       ;Shift it down to 4
-  1982 00004BA8 660F44C3            <1>     cmove ax, bx    ;If bCSWStatus = 2, move it in
-  1983 00004BAC 740F                <1>     je .embcmcResidueCheck
+  1981 00004BA0 66D1EB              <1>     shr bx, 1       ;Shift it down to 4
+  1982 00004BA3 660F44C3            <1>     cmove ax, bx    ;If bCSWStatus = 2, move it in
+  1983 00004BA7 740F                <1>     je .embcmcResidueCheck
   1984                              <1> 
-  1985 00004BAE 66D1EB              <1>     shr bx, 1       ;Shift down to 2
-  1986 00004BB1 80F901              <1>     cmp cl, 1
-  1987 00004BB4 660F44C3            <1>     cmove ax, bx    ;If bCSWStatus = 1, move bx into ax
-  1988 00004BB8 7403                <1>     je .embcmcResidueCheck
+  1985 00004BA9 66D1EB              <1>     shr bx, 1       ;Shift down to 2
+  1986 00004BAC 80F901              <1>     cmp cl, 1
+  1987 00004BAF 660F44C3            <1>     cmove ax, bx    ;If bCSWStatus = 1, move bx into ax
+  1988 00004BB3 7403                <1>     je .embcmcResidueCheck
   1989                              <1> 
-  1990 00004BBA 66FFC0              <1>     inc ax          ;Otherwise bCSWStatus = 0
+  1990 00004BB5 66FFC0              <1>     inc ax          ;Otherwise bCSWStatus = 0
   1991                              <1> .embcmcResidueCheck:
-  1992 00004BBD 8B0C25[C8050000]    <1>     mov ecx, dword [msdCSW + 8] ;Get dCSWDataResidue
+  1992 00004BB8 8B0C25[C8050000]    <1>     mov ecx, dword [msdCSW + 8] ;Get dCSWDataResidue
   1993                              <1> 
-  1994 00004BC4 66BB1000            <1>     mov bx, 10h
-  1995 00004BC8 6609C3              <1>     or bx, ax   
-  1996 00004BCB 85C9                <1>     test ecx, ecx
-  1997 00004BCD 660F44C3            <1>     cmovz ax, bx    ;If its zero, move bx with added bit from ax into ax
-  1998 00004BD1 7418                <1>     jz .embcmcExit
+  1994 00004BBF 66BB1000            <1>     mov bx, 10h
+  1995 00004BC3 6609C3              <1>     or bx, ax   
+  1996 00004BC6 85C9                <1>     test ecx, ecx
+  1997 00004BC8 660F44C3            <1>     cmovz ax, bx    ;If its zero, move bx with added bit from ax into ax
+  1998 00004BCC 7418                <1>     jz .embcmcExit
   1999                              <1> 
-  2000 00004BD3 66BB2000            <1>     mov bx, 20h
-  2001 00004BD7 6609C3              <1>     or bx, ax 
-  2002 00004BDA 3B0C25[88030000]    <1>     cmp ecx, dword [ehciDataOut + 8];ehciDataOut + 8 = dCBWDataTransferLength
-  2003 00004BE1 660F42C3            <1>     cmovb ax, bx
-  2004 00004BE5 7204                <1>     jb .embcmcExit
+  2000 00004BCE 66BB2000            <1>     mov bx, 20h
+  2001 00004BD2 6609C3              <1>     or bx, ax 
+  2002 00004BD5 3B0C25[88030000]    <1>     cmp ecx, dword [ehciDataOut + 8];ehciDataOut + 8 = dCBWDataTransferLength
+  2003 00004BDC 660F42C3            <1>     cmovb ax, bx
+  2004 00004BE0 7204                <1>     jb .embcmcExit
   2005                              <1> 
-  2006 00004BE7 660D4000            <1>     or ax, 40h  ;Else, it must be above, fail
+  2006 00004BE2 660D4000            <1>     or ax, 40h  ;Else, it must be above, fail
   2007                              <1> .embcmcExit:
-  2008 00004BEB 59                  <1>     pop rcx
-  2009 00004BEC 5B                  <1>     pop rbx
-  2010 00004BED C3                  <1>     ret
+  2008 00004BE6 59                  <1>     pop rcx
+  2009 00004BE7 5B                  <1>     pop rbx
+  2010 00004BE8 C3                  <1>     ret
   2011                              <1> 
   2012                              <1> .ehciMsdBOTCheckTransaction:
   2013                              <1> ;Check successful return data here
@@ -10977,23 +10977,23 @@
   2015                              <1> ;        ah = 1, al = CSW Validity bitfield     : CSW NOT valid
   2016                              <1> ;        ah = 2, al = CSW Meaningful bitfield   : CSW NOT meaningful
   2017                              <1> ;   rax destroyed
-  2018 00004BEE 30E4                <1>     xor ah, ah
-  2019 00004BF0 E84BFFFFFF          <1>     call .ehciMsdBOTCheckValidCSW
-  2020 00004BF5 84C0                <1>     test al, al
-  2021 00004BF7 7407                <1>     jz .embhiehcswmeaningful
-  2022 00004BF9 B401                <1>     mov ah, 1       ; CSW Not Valid signature
-  2023 00004BFB E90B000000          <1>     jmp .embhiehexit
+  2018 00004BE9 30E4                <1>     xor ah, ah
+  2019 00004BEB E84BFFFFFF          <1>     call .ehciMsdBOTCheckValidCSW
+  2020 00004BF0 84C0                <1>     test al, al
+  2021 00004BF2 7407                <1>     jz .embhiehcswmeaningful
+  2022 00004BF4 B401                <1>     mov ah, 1       ; CSW Not Valid signature
+  2023 00004BF6 E90B000000          <1>     jmp .embhiehexit
   2024                              <1> .embhiehcswmeaningful:
-  2025 00004C00 E888FFFFFF          <1>     call .ehciMsdBOTCheckMeaningfulCSW
-  2026 00004C05 244C                <1>     and al, 4Ch     ;Check bad bits first and bCSWStatus=02 40h|08h|04h
-  2027 00004C07 7402                <1>     jz .embhiehexit
-  2028 00004C09 B402                <1>     mov ah, 2       ; CSW Not Meaningful signature
+  2025 00004BFB E888FFFFFF          <1>     call .ehciMsdBOTCheckMeaningfulCSW
+  2026 00004C00 244C                <1>     and al, 4Ch     ;Check bad bits first and bCSWStatus=02 40h|08h|04h
+  2027 00004C02 7402                <1>     jz .embhiehexit
+  2028 00004C04 B402                <1>     mov ah, 2       ; CSW Not Meaningful signature
   2029                              <1> .embhiehexit:
-  2030 00004C0B C3                  <1>     ret
+  2030 00004C06 C3                  <1>     ret
   2031                              <1> .ehciMsdBOTOO64I:   ;For devices with 64 byte max packet size
   2032                              <1> .ehciMsdBOTOI64I:   ;For devices with 64 byte max packet size
-  2033 00004C0C C60425[A9010000]BB  <1>     mov byte [msdStatus], 0BBh   ;Undefined error
-  2034 00004C14 C3                  <1>     ret
+  2033 00004C07 C60425[A9010000]BB  <1>     mov byte [msdStatus], 0BBh   ;Undefined error
+  2034 00004C0F C3                  <1>     ret
   2035                              <1> .ehciMsdBOTOOI:     ;Out Out In transfer
   2036                              <1> ;Input - rsi = MSD device parameter block
   2037                              <1> ;        rbx = Input buffer for Data In
@@ -11001,72 +11001,72 @@
   2039                              <1> ;        r8  = Number of bytes to be transferred (for the DATA phase)
   2040                              <1> ;        r10 = LUN Value
   2041                              <1> ;        r11 = Length of CBW command block
-  2042 00004C15 57                  <1>     push rdi
-  2043 00004C16 4150                <1>     push r8
-  2044 00004C18 4151                <1>     push r9
-  2045 00004C1A 4152                <1>     push r10
-  2046 00004C1C 4153                <1>     push r11
-  2047 00004C1E 4154                <1>     push r12
-  2048 00004C20 51                  <1>     push rcx
-  2049 00004C21 FC                  <1>     cld
+  2042 00004C10 57                  <1>     push rdi
+  2043 00004C11 4150                <1>     push r8
+  2044 00004C13 4151                <1>     push r9
+  2045 00004C15 4152                <1>     push r10
+  2046 00004C17 4153                <1>     push r11
+  2047 00004C19 4154                <1>     push r12
+  2048 00004C1B 51                  <1>     push rcx
+  2049 00004C1C FC                  <1>     cld
   2050                              <1> 
-  2051 00004C22 4D89C4              <1>     mov r12, r8     ;Save number of bytes to transfer to MSD device
-  2052 00004C25 51                  <1>     push rcx
+  2051 00004C1D 4D89C4              <1>     mov r12, r8     ;Save number of bytes to transfer to MSD device
+  2052 00004C20 51                  <1>     push rcx
   2053                              <1> ;Write QHead for CBW
-  2054 00004C26 49BB-               <1>     mov r11, ehciTDSpace ;First TD is the head of the Out buffer
-  2054 00004C28 [0001000000000000]  <1>
-  2055 00004C30 E840020000          <1>     call .ehciMsdWriteOutQHead
+  2054 00004C21 49BB-               <1>     mov r11, ehciTDSpace ;First TD is the head of the Out buffer
+  2054 00004C23 [0001000000000000]  <1>
+  2055 00004C2B E840020000          <1>     call .ehciMsdWriteOutQHead
   2056                              <1> ;Write TD for CBW send
-  2057 00004C35 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
-  2058 00004C38 49B801000000000000- <1>     mov r8, 1
-  2058 00004C41 00                  <1>
-  2059 00004C42 4D89C1              <1>     mov r9, r8
-  2060 00004C45 440FB6560F          <1>     movzx r10d, byte [rsi + 15]   ;Get Out EP dt bit
-  2061 00004C4A 80760F01            <1>     xor byte [rsi + 15], 1  ;Toggle bit
-  2062 00004C4E 41D1CA              <1>     ror r10d, 1 ;Roll dt bit to upper bit of dword
-  2063 00004C51 4181CA808C1F00      <1>     or r10d, 001F8C80h 
+  2057 00004C30 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
+  2058 00004C33 49B801000000000000- <1>     mov r8, 1
+  2058 00004C3C 00                  <1>
+  2059 00004C3D 4D89C1              <1>     mov r9, r8
+  2060 00004C40 440FB6560F          <1>     movzx r10d, byte [rsi + 15]   ;Get Out EP dt bit
+  2061 00004C45 80760F01            <1>     xor byte [rsi + 15], 1  ;Toggle bit
+  2062 00004C49 41D1CA              <1>     ror r10d, 1 ;Roll dt bit to upper bit of dword
+  2063 00004C4C 4181CA808C1F00      <1>     or r10d, 001F8C80h 
   2064                              <1> ; Active TD, OUT EP, Error ctr = 3, 01Fh = 31 byte transfer
-  2065 00004C58 49BB-               <1>     mov r11, ehciDataOut ; Data out buffer
-  2065 00004C5A [8003000000000000]  <1>
-  2066 00004C62 E898F9FFFF          <1>     call .ehciWriteQHeadTD
+  2065 00004C53 49BB-               <1>     mov r11, ehciDataOut ; Data out buffer
+  2065 00004C55 [8003000000000000]  <1>
+  2066 00004C5D E89DF9FFFF          <1>     call .ehciWriteQHeadTD
   2067                              <1> 
-  2068 00004C67 B103                <1>     mov cl, 11b    ;Lock out internal buffer
-  2069 00004C69 E8C4F2FFFF          <1>     call .ehciProcessCommand        ;Run controller
-  2070 00004C6E 59                  <1>     pop rcx    ;Wait ecx ms for "motors to spin up"
-  2071 00004C6F 0F824B010000        <1>     jc .emboexit    ;If catastrophic Host system error, exit!
+  2068 00004C62 B103                <1>     mov cl, 11b    ;Lock out internal buffer
+  2069 00004C64 E8C9F2FFFF          <1>     call .ehciProcessCommand        ;Run controller
+  2070 00004C69 59                  <1>     pop rcx    ;Wait ecx ms for "motors to spin up"
+  2071 00004C6A 0F824B010000        <1>     jc .emboexit    ;If catastrophic Host system error, exit!
   2072                              <1> 
-  2073 00004C75 50                  <1>     push rax
-  2074 00004C76 B486                <1>     mov ah, 86h
-  2075 00004C78 CD35                <1>     int 35h
-  2076 00004C7A 58                  <1>     pop rax
+  2073 00004C70 50                  <1>     push rax
+  2074 00004C71 B486                <1>     mov ah, 86h
+  2075 00004C73 CD35                <1>     int 35h
+  2076 00004C75 58                  <1>     pop rax
   2077                              <1> ;Write Qhead to Send data
-  2078 00004C7B 49BB80000000000000- <1>     mov r11, ehciSizeOfTD + ehciSizeOfTD
-  2078 00004C84 00                  <1>
-  2079 00004C85 E8EB010000          <1>     call .ehciMsdWriteOutQHead
+  2078 00004C76 49BB80000000000000- <1>     mov r11, ehciSizeOfTD + ehciSizeOfTD
+  2078 00004C7F 00                  <1>
+  2079 00004C80 E8EB010000          <1>     call .ehciMsdWriteOutQHead
   2080                              <1> ;Write TD for data send
-  2081 00004C8A 4C89DF              <1>     mov rdi, r11
-  2082 00004C8D 49B801000000000000- <1>     mov r8, 1
-  2082 00004C96 00                  <1>
-  2083 00004C97 4D89C1              <1>     mov r9, r8
-  2084 00004C9A 4D89E2              <1>     mov r10, r12     ;Get back number of bytes to transfer
-  2085 00004C9D 49C1E210            <1>     shl r10, 8*2    ;Shift into 3rd byte
-  2086 00004CA1 4181CA808C0000      <1>     or r10d, 00008C80h ;Add control bits: Active TD, OUT EP, Error ctr = 3
-  2087 00004CA8 0FB64E0F            <1>     movzx ecx, byte [rsi + 15]  ;Get Out EP dt bit in r9d
-  2088 00004CAC 80760F01            <1>     xor byte [rsi + 15], 1  ;Toggle bit
-  2089 00004CB0 D1C9                <1>     ror ecx, 1 ;Roll dt bit to upper bit of dword
-  2090 00004CB2 4109CA              <1>     or r10d, ecx    ;Add dt bit to r10d
-  2091 00004CB5 4989DB              <1>     mov r11, rbx    ;Get the address of Data buffer
-  2092 00004CB8 E842F9FFFF          <1>     call .ehciWriteQHeadTD
+  2081 00004C85 4C89DF              <1>     mov rdi, r11
+  2082 00004C88 49B801000000000000- <1>     mov r8, 1
+  2082 00004C91 00                  <1>
+  2083 00004C92 4D89C1              <1>     mov r9, r8
+  2084 00004C95 4D89E2              <1>     mov r10, r12     ;Get back number of bytes to transfer
+  2085 00004C98 49C1E210            <1>     shl r10, 8*2    ;Shift into 3rd byte
+  2086 00004C9C 4181CA808C0000      <1>     or r10d, 00008C80h ;Add control bits: Active TD, OUT EP, Error ctr = 3
+  2087 00004CA3 0FB64E0F            <1>     movzx ecx, byte [rsi + 15]  ;Get Out EP dt bit in r9d
+  2088 00004CA7 80760F01            <1>     xor byte [rsi + 15], 1  ;Toggle bit
+  2089 00004CAB D1C9                <1>     ror ecx, 1 ;Roll dt bit to upper bit of dword
+  2090 00004CAD 4109CA              <1>     or r10d, ecx    ;Add dt bit to r10d
+  2091 00004CB0 4989DB              <1>     mov r11, rbx    ;Get the address of Data buffer
+  2092 00004CB3 E847F9FFFF          <1>     call .ehciWriteQHeadTD
   2093                              <1> 
-  2094 00004CBD B103                <1>     mov cl, 11b    ;Lock out internal buffer
-  2095 00004CBF E86EF2FFFF          <1>     call .ehciProcessCommand        ;Run controller
-  2096 00004CC4 0F82F6000000        <1>     jc .emboexit    ;If catastrophic Host system error, exit!
+  2094 00004CB8 B103                <1>     mov cl, 11b    ;Lock out internal buffer
+  2095 00004CBA E873F2FFFF          <1>     call .ehciProcessCommand        ;Run controller
+  2096 00004CBF 0F82F6000000        <1>     jc .emboexit    ;If catastrophic Host system error, exit!
   2097                              <1> ;Write Qhead for CSW
-  2098 00004CCA 49BB-               <1>     mov r11, ehciTDSpace + 2*ehciSizeOfTD ;Third TD
-  2098 00004CCC [8001000000000000]  <1>
-  2099 00004CD4 E8DB010000          <1>     call .ehciMsdWriteInQHead
-  2100 00004CD9 4C89DF              <1>     mov rdi, r11
-  2101 00004CDC E9A9000000          <1>     jmp .emboiicommonep
+  2098 00004CC5 49BB-               <1>     mov r11, ehciTDSpace + 2*ehciSizeOfTD ;Third TD
+  2098 00004CC7 [8001000000000000]  <1>
+  2099 00004CCF E8DB010000          <1>     call .ehciMsdWriteInQHead
+  2100 00004CD4 4C89DF              <1>     mov rdi, r11
+  2101 00004CD7 E9A9000000          <1>     jmp .emboiicommonep
   2102                              <1> .ehciMsdBOTOII: ;Out In In transfer
   2103                              <1> ;Input - rsi = MSD device parameter block
   2104                              <1> ;        rbx = Input buffer for Data In
@@ -11075,89 +11075,89 @@
   2107                              <1> ;        r10 = LUN Value
   2108                              <1> ;        r11 = Length of CBW command block
   2109                              <1> 
-  2110 00004CE1 57                  <1>     push rdi
-  2111 00004CE2 4150                <1>     push r8
-  2112 00004CE4 4151                <1>     push r9
-  2113 00004CE6 4152                <1>     push r10
-  2114 00004CE8 4153                <1>     push r11
-  2115 00004CEA 4154                <1>     push r12
-  2116 00004CEC 51                  <1>     push rcx
-  2117 00004CED FC                  <1>     cld
+  2110 00004CDC 57                  <1>     push rdi
+  2111 00004CDD 4150                <1>     push r8
+  2112 00004CDF 4151                <1>     push r9
+  2113 00004CE1 4152                <1>     push r10
+  2114 00004CE3 4153                <1>     push r11
+  2115 00004CE5 4154                <1>     push r12
+  2116 00004CE7 51                  <1>     push rcx
+  2117 00004CE8 FC                  <1>     cld
   2118                              <1> 
-  2119 00004CEE 4D89C4              <1>     mov r12, r8 ;Save the number of bytes to be transferred
-  2120 00004CF1 51                  <1>     push rcx
+  2119 00004CE9 4D89C4              <1>     mov r12, r8 ;Save the number of bytes to be transferred
+  2120 00004CEC 51                  <1>     push rcx
   2121                              <1> 
   2122                              <1> ;Write the OUT Queue Head
-  2123 00004CF2 49BB-               <1>     mov r11, ehciTDSpace ;First TD is the head of the Out buffer
-  2123 00004CF4 [0001000000000000]  <1>
-  2124 00004CFC E874010000          <1>     call .ehciMsdWriteOutQHead
+  2123 00004CED 49BB-               <1>     mov r11, ehciTDSpace ;First TD is the head of the Out buffer
+  2123 00004CEF [0001000000000000]  <1>
+  2124 00004CF7 E874010000          <1>     call .ehciMsdWriteOutQHead
   2125                              <1> 
-  2126 00004D01 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
-  2127 00004D04 49B801000000000000- <1>     mov r8, 1
-  2127 00004D0D 00                  <1>
-  2128 00004D0E 4D89C1              <1>     mov r9, r8
-  2129 00004D11 440FB6560F          <1>     movzx r10d, byte [rsi + 15]   ;Get Out EP dt bit
-  2130 00004D16 80760F01            <1>     xor byte [rsi + 15], 1  ;Toggle bit
-  2131 00004D1A 41D1CA              <1>     ror r10d, 1 ;Roll dt bit to upper bit of dword
-  2132 00004D1D 4181CA808C1F00      <1>     or r10d, 001F8C80h 
+  2126 00004CFC 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
+  2127 00004CFF 49B801000000000000- <1>     mov r8, 1
+  2127 00004D08 00                  <1>
+  2128 00004D09 4D89C1              <1>     mov r9, r8
+  2129 00004D0C 440FB6560F          <1>     movzx r10d, byte [rsi + 15]   ;Get Out EP dt bit
+  2130 00004D11 80760F01            <1>     xor byte [rsi + 15], 1  ;Toggle bit
+  2131 00004D15 41D1CA              <1>     ror r10d, 1 ;Roll dt bit to upper bit of dword
+  2132 00004D18 4181CA808C1F00      <1>     or r10d, 001F8C80h 
   2133                              <1> ; Active TD, OUT EP, Error ctr = 3, 01Fh = 31 byte transfer
-  2134 00004D24 49BB-               <1>     mov r11, ehciDataOut ; Data out buffer
-  2134 00004D26 [8003000000000000]  <1>
-  2135 00004D2E E8CCF8FFFF          <1>     call .ehciWriteQHeadTD
+  2134 00004D1F 49BB-               <1>     mov r11, ehciDataOut ; Data out buffer
+  2134 00004D21 [8003000000000000]  <1>
+  2135 00004D29 E8D1F8FFFF          <1>     call .ehciWriteQHeadTD
   2136                              <1> 
-  2137 00004D33 B103                <1>     mov cl, 11b    ;Lock out internal buffer
-  2138 00004D35 E8F8F1FFFF          <1>     call .ehciProcessCommand        ;Run controller
-  2139 00004D3A 59                  <1>     pop rcx    ;Wait ecx ms for "motors to spin up"
-  2140 00004D3B 0F827F000000        <1>     jc .emboexit    ;If catastrophic Host system error, exit!
+  2137 00004D2E B103                <1>     mov cl, 11b    ;Lock out internal buffer
+  2138 00004D30 E8FDF1FFFF          <1>     call .ehciProcessCommand        ;Run controller
+  2139 00004D35 59                  <1>     pop rcx    ;Wait ecx ms for "motors to spin up"
+  2140 00004D36 0F827F000000        <1>     jc .emboexit    ;If catastrophic Host system error, exit!
   2141                              <1>          
-  2142 00004D41 50                  <1>     push rax
-  2143 00004D42 B486                <1>     mov ah, 86h
-  2144 00004D44 CD35                <1>     int 35h
-  2145 00004D46 58                  <1>     pop rax
+  2142 00004D3C 50                  <1>     push rax
+  2143 00004D3D B486                <1>     mov ah, 86h
+  2144 00004D3F CD35                <1>     int 35h
+  2145 00004D41 58                  <1>     pop rax
   2146                              <1> ;Write the IN Queue Head
-  2147 00004D47 49BB-               <1>     mov r11, ehciTDSpace + ehciSizeOfTD ;Move to position 2 to preserve OUT TD
-  2147 00004D49 [4001000000000000]  <1>
-  2148 00004D51 E85E010000          <1>     call .ehciMsdWriteInQHead
+  2147 00004D42 49BB-               <1>     mov r11, ehciTDSpace + ehciSizeOfTD ;Move to position 2 to preserve OUT TD
+  2147 00004D44 [4001000000000000]  <1>
+  2148 00004D4C E85E010000          <1>     call .ehciMsdWriteInQHead
   2149                              <1> 
-  2150 00004D56 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
-  2151 00004D59 4C8D4740            <1>     lea r8, qword [rdi + ehciSizeOfTD]  ;Point to next TD
-  2152 00004D5D 4D89C1              <1>     mov r9, r8
-  2153 00004D60 4D89E2              <1>     mov r10, r12     ;Get back number of bytes to transfer from the stack
-  2154 00004D63 49C1E210            <1>     shl r10, 8*2    ;Shift into 3rd byte
-  2155 00004D67 4181CA800D0000      <1>     or r10d, 00000D80h ;Add control bits: Active TD, IN EP, Error ctr = 3
-  2156 00004D6E 0FB64E0E            <1>     movzx ecx, byte [rsi + 14]  ;Get IN EP dt bit in r9d
-  2157 00004D72 80760E01            <1>     xor byte [rsi + 14], 1  ;Toggle bit
-  2158 00004D76 D1C9                <1>     ror ecx, 1 ;Roll dt bit to upper bit of dword
-  2159 00004D78 4109CA              <1>     or r10d, ecx    ;Add dt bit to r10d
-  2160 00004D7B 4989DB              <1>     mov r11, rbx ; Data out buffer, default ehciDataIn
-  2161 00004D7E E87CF8FFFF          <1>     call .ehciWriteQHeadTD
+  2150 00004D51 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
+  2151 00004D54 4C8D4740            <1>     lea r8, qword [rdi + ehciSizeOfTD]  ;Point to next TD
+  2152 00004D58 4D89C1              <1>     mov r9, r8
+  2153 00004D5B 4D89E2              <1>     mov r10, r12     ;Get back number of bytes to transfer from the stack
+  2154 00004D5E 49C1E210            <1>     shl r10, 8*2    ;Shift into 3rd byte
+  2155 00004D62 4181CA800D0000      <1>     or r10d, 00000D80h ;Add control bits: Active TD, IN EP, Error ctr = 3
+  2156 00004D69 0FB64E0E            <1>     movzx ecx, byte [rsi + 14]  ;Get IN EP dt bit in r9d
+  2157 00004D6D 80760E01            <1>     xor byte [rsi + 14], 1  ;Toggle bit
+  2158 00004D71 D1C9                <1>     ror ecx, 1 ;Roll dt bit to upper bit of dword
+  2159 00004D73 4109CA              <1>     or r10d, ecx    ;Add dt bit to r10d
+  2160 00004D76 4989DB              <1>     mov r11, rbx ; Data out buffer, default ehciDataIn
+  2161 00004D79 E881F8FFFF          <1>     call .ehciWriteQHeadTD
   2162                              <1> 
-  2163 00004D83 4881C740000000      <1>     add rdi, ehciSizeOfTD     ;Go to next TD space
+  2163 00004D7E 4881C740000000      <1>     add rdi, ehciSizeOfTD     ;Go to next TD space
   2164                              <1> .emboiicommonep:
-  2165 00004D8A 49B801000000000000- <1>     mov r8, 1
-  2165 00004D93 00                  <1>
-  2166 00004D94 4D89C1              <1>     mov r9, r8
-  2167 00004D97 41BA808D0D00        <1>     mov r10d, 000D8D80h     ;Active TD, IN EP, Error ctr = 3, 0Dh = 13 byte CSW
-  2168 00004D9D 0FB64E0E            <1>     movzx ecx, byte [rsi + 14]  ;Get IN EP dt bit in r9d
-  2169 00004DA1 80760E01            <1>     xor byte [rsi + 14], 1  ;Toggle bit
-  2170 00004DA5 D1C9                <1>     ror ecx, 1 ;Roll dt bit to upper bit of dword
-  2171 00004DA7 4109CA              <1>     or r10d, ecx    ;Add dt bit to r10d
-  2172 00004DAA 49BB-               <1>     mov r11, msdCSW
-  2172 00004DAC [C005000000000000]  <1>
+  2165 00004D85 49B801000000000000- <1>     mov r8, 1
+  2165 00004D8E 00                  <1>
+  2166 00004D8F 4D89C1              <1>     mov r9, r8
+  2167 00004D92 41BA808D0D00        <1>     mov r10d, 000D8D80h     ;Active TD, IN EP, Error ctr = 3, 0Dh = 13 byte CSW
+  2168 00004D98 0FB64E0E            <1>     movzx ecx, byte [rsi + 14]  ;Get IN EP dt bit in r9d
+  2169 00004D9C 80760E01            <1>     xor byte [rsi + 14], 1  ;Toggle bit
+  2170 00004DA0 D1C9                <1>     ror ecx, 1 ;Roll dt bit to upper bit of dword
+  2171 00004DA2 4109CA              <1>     or r10d, ecx    ;Add dt bit to r10d
+  2172 00004DA5 49BB-               <1>     mov r11, msdCSW
+  2172 00004DA7 [C005000000000000]  <1>
   2173                              <1> 
-  2174 00004DB4 E846F8FFFF          <1>     call .ehciWriteQHeadTD
+  2174 00004DAF E84BF8FFFF          <1>     call .ehciWriteQHeadTD
   2175                              <1> 
-  2176 00004DB9 B103                <1>     mov cl, 11b    ;Lock out internal buffer
-  2177 00004DBB E872F1FFFF          <1>     call .ehciProcessCommand        ;Run controller
+  2176 00004DB4 B103                <1>     mov cl, 11b    ;Lock out internal buffer
+  2177 00004DB6 E877F1FFFF          <1>     call .ehciProcessCommand        ;Run controller
   2178                              <1> .emboexit:
-  2179 00004DC0 59                  <1>     pop rcx
-  2180 00004DC1 415C                <1>     pop r12
-  2181 00004DC3 415B                <1>     pop r11
-  2182 00004DC5 415A                <1>     pop r10
-  2183 00004DC7 4159                <1>     pop r9
-  2184 00004DC9 4158                <1>     pop r8
-  2185 00004DCB 5F                  <1>     pop rdi
-  2186 00004DCC C3                  <1>     ret
+  2179 00004DBB 59                  <1>     pop rcx
+  2180 00004DBC 415C                <1>     pop r12
+  2181 00004DBE 415B                <1>     pop r11
+  2182 00004DC0 415A                <1>     pop r10
+  2183 00004DC2 4159                <1>     pop r9
+  2184 00004DC4 4158                <1>     pop r8
+  2185 00004DC6 5F                  <1>     pop rdi
+  2186 00004DC7 C3                  <1>     ret
   2187                              <1> .ehciMsdBOTOI: ;Out In transfer
   2188                              <1> ;Input - rsi = MSD device parameter block
   2189                              <1> ;        rbx = Input buffer for Data In
@@ -11166,104 +11166,104 @@
   2192                              <1> ;        r10 = LUN Value
   2193                              <1> ;        r11 = Length of CBW command block
   2194                              <1> 
-  2195 00004DCD 57                  <1>     push rdi
-  2196 00004DCE 4150                <1>     push r8
-  2197 00004DD0 4151                <1>     push r9
-  2198 00004DD2 4152                <1>     push r10
-  2199 00004DD4 4153                <1>     push r11
-  2200 00004DD6 51                  <1>     push rcx
-  2201 00004DD7 FC                  <1>     cld
+  2195 00004DC8 57                  <1>     push rdi
+  2196 00004DC9 4150                <1>     push r8
+  2197 00004DCB 4151                <1>     push r9
+  2198 00004DCD 4152                <1>     push r10
+  2199 00004DCF 4153                <1>     push r11
+  2200 00004DD1 51                  <1>     push rcx
+  2201 00004DD2 FC                  <1>     cld
   2202                              <1> 
   2203                              <1> 
   2204                              <1> ;Write the OUT Queue Head
-  2205 00004DD8 49BB-               <1>     mov r11, ehciTDSpace ;First TD is the head of the Out buffer
-  2205 00004DDA [0001000000000000]  <1>
-  2206 00004DE2 E88E000000          <1>     call .ehciMsdWriteOutQHead
+  2205 00004DD3 49BB-               <1>     mov r11, ehciTDSpace ;First TD is the head of the Out buffer
+  2205 00004DD5 [0001000000000000]  <1>
+  2206 00004DDD E88E000000          <1>     call .ehciMsdWriteOutQHead
   2207                              <1> 
-  2208 00004DE7 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
-  2209 00004DEA 49B801000000000000- <1>     mov r8, 1
-  2209 00004DF3 00                  <1>
-  2210 00004DF4 4D89C1              <1>     mov r9, r8
-  2211 00004DF7 440FB6560F          <1>     movzx r10d, byte [rsi + 15]   ;Get Out EP dt bit
-  2212 00004DFC 80760F01            <1>     xor byte [rsi + 15], 1  ;Toggle bit
-  2213 00004E00 41D1CA              <1>     ror r10d, 1 ;Roll dt bit to upper bit of dword
-  2214 00004E03 4181CA808C1F00      <1>     or r10d, 001F8C80h 
+  2208 00004DE2 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
+  2209 00004DE5 49B801000000000000- <1>     mov r8, 1
+  2209 00004DEE 00                  <1>
+  2210 00004DEF 4D89C1              <1>     mov r9, r8
+  2211 00004DF2 440FB6560F          <1>     movzx r10d, byte [rsi + 15]   ;Get Out EP dt bit
+  2212 00004DF7 80760F01            <1>     xor byte [rsi + 15], 1  ;Toggle bit
+  2213 00004DFB 41D1CA              <1>     ror r10d, 1 ;Roll dt bit to upper bit of dword
+  2214 00004DFE 4181CA808C1F00      <1>     or r10d, 001F8C80h 
   2215                              <1> ; Active TD, OUT EP, Error ctr = 3, 01Fh = 31 byte transfer
-  2216 00004E0A 49BB-               <1>     mov r11, ehciDataOut ; Data out buffer
-  2216 00004E0C [8003000000000000]  <1>
-  2217 00004E14 E8E6F7FFFF          <1>     call .ehciWriteQHeadTD
+  2216 00004E05 49BB-               <1>     mov r11, ehciDataOut ; Data out buffer
+  2216 00004E07 [8003000000000000]  <1>
+  2217 00004E0F E8EBF7FFFF          <1>     call .ehciWriteQHeadTD
   2218                              <1> 
-  2219 00004E19 B103                <1>     mov cl, 11b    ;Lock out internal buffer
-  2220 00004E1B E812F1FFFF          <1>     call .ehciProcessCommand        ;Run controller
-  2221 00004E20 7248                <1>     jc .emboiexit    ;If catastrophic Host system error, exit!
+  2219 00004E14 B103                <1>     mov cl, 11b    ;Lock out internal buffer
+  2220 00004E16 E817F1FFFF          <1>     call .ehciProcessCommand        ;Run controller
+  2221 00004E1B 7248                <1>     jc .emboiexit    ;If catastrophic Host system error, exit!
   2222                              <1>          
   2223                              <1> ;Write the IN Queue Head
-  2224 00004E22 49BB-               <1>     mov r11, ehciTDSpace + ehciSizeOfTD ;Move to position 2 to preserve OUT TD
-  2224 00004E24 [4001000000000000]  <1>
-  2225 00004E2C E883000000          <1>     call .ehciMsdWriteInQHead
+  2224 00004E1D 49BB-               <1>     mov r11, ehciTDSpace + ehciSizeOfTD ;Move to position 2 to preserve OUT TD
+  2224 00004E1F [4001000000000000]  <1>
+  2225 00004E27 E883000000          <1>     call .ehciMsdWriteInQHead
   2226                              <1> 
-  2227 00004E31 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
-  2228 00004E34 49B801000000000000- <1>     mov r8, 1
-  2228 00004E3D 00                  <1>
-  2229 00004E3E 4D89C1              <1>     mov r9, r8
-  2230 00004E41 41BA808D0D00        <1>     mov r10d, 000D8D80h     ;Active TD, IN EP, Error ctr = 3, 0Dh = 13 byte CSW
-  2231 00004E47 0FB64E0E            <1>     movzx ecx, byte [rsi + 14]  ;Get IN EP dt bit in r9d
-  2232 00004E4B 80760E01            <1>     xor byte [rsi + 14], 1  ;Toggle bit
-  2233 00004E4F D1C9                <1>     ror ecx, 1 ;Roll dt bit to upper bit of dword
-  2234 00004E51 4109CA              <1>     or r10d, ecx    ;Add dt bit to r10d
-  2235 00004E54 49BB-               <1>     mov r11, msdCSW
-  2235 00004E56 [C005000000000000]  <1>
+  2227 00004E2C 4C89DF              <1>     mov rdi, r11    ;Move pointer to TD buffer head
+  2228 00004E2F 49B801000000000000- <1>     mov r8, 1
+  2228 00004E38 00                  <1>
+  2229 00004E39 4D89C1              <1>     mov r9, r8
+  2230 00004E3C 41BA808D0D00        <1>     mov r10d, 000D8D80h     ;Active TD, IN EP, Error ctr = 3, 0Dh = 13 byte CSW
+  2231 00004E42 0FB64E0E            <1>     movzx ecx, byte [rsi + 14]  ;Get IN EP dt bit in r9d
+  2232 00004E46 80760E01            <1>     xor byte [rsi + 14], 1  ;Toggle bit
+  2233 00004E4A D1C9                <1>     ror ecx, 1 ;Roll dt bit to upper bit of dword
+  2234 00004E4C 4109CA              <1>     or r10d, ecx    ;Add dt bit to r10d
+  2235 00004E4F 49BB-               <1>     mov r11, msdCSW
+  2235 00004E51 [C005000000000000]  <1>
   2236                              <1> 
-  2237 00004E5E E89CF7FFFF          <1>     call .ehciWriteQHeadTD
+  2237 00004E59 E8A1F7FFFF          <1>     call .ehciWriteQHeadTD
   2238                              <1> 
-  2239 00004E63 B103                <1>     mov cl, 11b    ;Lock out internal buffer
-  2240 00004E65 E8C8F0FFFF          <1>     call .ehciProcessCommand        ;Run controller
+  2239 00004E5E B103                <1>     mov cl, 11b    ;Lock out internal buffer
+  2240 00004E60 E8CDF0FFFF          <1>     call .ehciProcessCommand        ;Run controller
   2241                              <1> .emboiexit:
-  2242 00004E6A 59                  <1>     pop rcx
-  2243 00004E6B 415B                <1>     pop r11
-  2244 00004E6D 415A                <1>     pop r10
-  2245 00004E6F 4159                <1>     pop r9
-  2246 00004E71 4158                <1>     pop r8
-  2247 00004E73 5F                  <1>     pop rdi
-  2248 00004E74 C3                  <1>     ret
+  2242 00004E65 59                  <1>     pop rcx
+  2243 00004E66 415B                <1>     pop r11
+  2244 00004E68 415A                <1>     pop r10
+  2245 00004E6A 4159                <1>     pop r9
+  2246 00004E6C 4158                <1>     pop r8
+  2247 00004E6E 5F                  <1>     pop rdi
+  2248 00004E6F C3                  <1>     ret
   2249                              <1> .ehciMsdWriteOutQHead:
   2250                              <1> ;Input: rsi = Valid MSD device
   2251                              <1> ;       r11 = Ptr to First QHTD
-  2252 00004E75 E82AEEFFFF          <1>     call .ehciGetNewQHeadAddr
-  2253 00004E7A 4181C802000000      <1>     or r8d, 2    ;Process QHs
-  2254 00004E81 41B900600000        <1>     mov r9d, 00006000h  ;Default mask, no nak counter
-  2255 00004E87 0FB74E0C            <1>     movzx ecx, word [rsi + 12]  ;wMaxPacketSizeOut
-  2256 00004E8B C1E110              <1>     shl ecx, 8*2
-  2257 00004E8E 4109C9              <1>     or r9d, ecx
-  2258 00004E91 0FB64E0B            <1>     movzx ecx, byte [rsi + 11]  ;EP address
-  2259 00004E95 81E10F000000        <1>     and ecx, 0Fh
-  2260 00004E9B C1E108              <1>     shl ecx, 8  ;Shift to second byte 
-  2261 00004E9E 4109C9              <1>     or r9d, ecx ;Add bits
-  2262 00004EA1 8A06                <1>     mov al, byte [rsi]  ;Get device address
-  2263 00004EA3 247F                <1>     and al, 7Fh    ;Force clear upper bit of al
-  2264 00004EA5 4108C1              <1>     or r9b, al    ;Set lower 8 bits of r9 correctly
-  2265 00004EA8 41BA00000040        <1>     mov r10d, 40000000h    ;1 transaction/ms
-  2266 00004EAE E827F7FFFF          <1>     call .ehciWriteQHead
-  2267 00004EB3 C3                  <1>     ret
+  2252 00004E70 E82FEEFFFF          <1>     call .ehciGetNewQHeadAddr
+  2253 00004E75 4181C802000000      <1>     or r8d, 2    ;Process QHs
+  2254 00004E7C 41B900600000        <1>     mov r9d, 00006000h  ;Default mask, no nak counter
+  2255 00004E82 0FB74E0C            <1>     movzx ecx, word [rsi + 12]  ;wMaxPacketSizeOut
+  2256 00004E86 C1E110              <1>     shl ecx, 8*2
+  2257 00004E89 4109C9              <1>     or r9d, ecx
+  2258 00004E8C 0FB64E0B            <1>     movzx ecx, byte [rsi + 11]  ;EP address
+  2259 00004E90 81E10F000000        <1>     and ecx, 0Fh
+  2260 00004E96 C1E108              <1>     shl ecx, 8  ;Shift to second byte 
+  2261 00004E99 4109C9              <1>     or r9d, ecx ;Add bits
+  2262 00004E9C 8A06                <1>     mov al, byte [rsi]  ;Get device address
+  2263 00004E9E 247F                <1>     and al, 7Fh    ;Force clear upper bit of al
+  2264 00004EA0 4108C1              <1>     or r9b, al    ;Set lower 8 bits of r9 correctly
+  2265 00004EA3 41BA00000040        <1>     mov r10d, 40000000h    ;1 transaction/ms
+  2266 00004EA9 E82CF7FFFF          <1>     call .ehciWriteQHead
+  2267 00004EAE C3                  <1>     ret
   2268                              <1> .ehciMsdWriteInQHead:
   2269                              <1> ;Input: rsi = Valid MSD device
   2270                              <1> ;       r11 = Ptr to First QHTD
-  2271 00004EB4 E8EBEDFFFF          <1>     call .ehciGetNewQHeadAddr
-  2272 00004EB9 4981C802000000      <1>     or r8, 2
-  2273 00004EC0 41B900600000        <1>     mov r9d, 00006000h  ;Default mask
-  2274 00004EC6 0FB74E09            <1>     movzx ecx, word [rsi + 9]  ;wMaxPacketSizeIn
-  2275 00004ECA C1E110              <1>     shl ecx, 8*2
-  2276 00004ECD 4109C9              <1>     or r9d, ecx
-  2277 00004ED0 0FB64E08            <1>     movzx ecx, byte [rsi + 8]  ;EP address
-  2278 00004ED4 81E10F000000        <1>     and ecx, 0Fh
-  2279 00004EDA C1E108              <1>     shl ecx, 8  ;Shift to second byte 
-  2280 00004EDD 4109C9              <1>     or r9d, ecx ;Add bits
-  2281 00004EE0 8A06                <1>     mov al, byte [rsi]  ;Get device address
-  2282 00004EE2 247F                <1>     and al, 7Fh    ;Force clear upper bit of al
-  2283 00004EE4 4108C1              <1>     or r9b, al    ;Set lower 8 bits of r9 correctly
-  2284 00004EE7 41BA00000040        <1>     mov r10d, 40000000h    ;1 transaction/ms
-  2285 00004EED E8E8F6FFFF          <1>     call .ehciWriteQHead
-  2286 00004EF2 C3                  <1>     ret
+  2271 00004EAF E8F0EDFFFF          <1>     call .ehciGetNewQHeadAddr
+  2272 00004EB4 4981C802000000      <1>     or r8, 2
+  2273 00004EBB 41B900600000        <1>     mov r9d, 00006000h  ;Default mask
+  2274 00004EC1 0FB74E09            <1>     movzx ecx, word [rsi + 9]  ;wMaxPacketSizeIn
+  2275 00004EC5 C1E110              <1>     shl ecx, 8*2
+  2276 00004EC8 4109C9              <1>     or r9d, ecx
+  2277 00004ECB 0FB64E08            <1>     movzx ecx, byte [rsi + 8]  ;EP address
+  2278 00004ECF 81E10F000000        <1>     and ecx, 0Fh
+  2279 00004ED5 C1E108              <1>     shl ecx, 8  ;Shift to second byte 
+  2280 00004ED8 4109C9              <1>     or r9d, ecx ;Add bits
+  2281 00004EDB 8A06                <1>     mov al, byte [rsi]  ;Get device address
+  2282 00004EDD 247F                <1>     and al, 7Fh    ;Force clear upper bit of al
+  2283 00004EDF 4108C1              <1>     or r9b, al    ;Set lower 8 bits of r9 correctly
+  2284 00004EE2 41BA00000040        <1>     mov r10d, 40000000h    ;1 transaction/ms
+  2285 00004EE8 E8EDF6FFFF          <1>     call .ehciWriteQHead
+  2286 00004EED C3                  <1>     ret
   2287                              <1> .ehciMsdBOTRequest:
   2288                              <1> ;Input: ecx = Number of miliseconds to wait between Out and In requests
   2289                              <1> ;       rbx = Data in Buffer
@@ -11274,36 +11274,36 @@
   2294                              <1> ;Output:
   2295                              <1> ;   CF=CY: Host error, Reset host system
   2296                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2297 00004EF3 50                  <1>     push rax
-  2298 00004EF4 51                  <1>     push rcx
-  2299 00004EF5 57                  <1>     push rdi
-  2300 00004EF6 4151                <1>     push r9
-  2301 00004EF8 4152                <1>     push r10
+  2297 00004EEE 50                  <1>     push rax
+  2298 00004EEF 51                  <1>     push rcx
+  2299 00004EF0 57                  <1>     push rdi
+  2300 00004EF1 4151                <1>     push r9
+  2301 00004EF3 4152                <1>     push r10
   2302                              <1> ;Clear the previous CSW
-  2303 00004EFA 48BF-               <1>     mov rdi, msdCSW
-  2303 00004EFC [C005000000000000]  <1>
-  2304 00004F04 30C0                <1>     xor al, al
-  2305 00004F06 B90D000000          <1>     mov ecx, 13
-  2306 00004F0B F3AA                <1>     rep stosb
+  2303 00004EF5 48BF-               <1>     mov rdi, msdCSW
+  2303 00004EF7 [C005000000000000]  <1>
+  2304 00004EFF 30C0                <1>     xor al, al
+  2305 00004F01 B90D000000          <1>     mov ecx, 13
+  2306 00004F06 F3AA                <1>     rep stosb
   2307                              <1> ;Write the CBW
-  2308 00004F0D 48BF-               <1>     mov rdi, ehciDataOut    ;Write the CBW at the data out point
-  2308 00004F0F [8003000000000000]  <1>
+  2308 00004F08 48BF-               <1>     mov rdi, ehciDataOut    ;Write the CBW at the data out point
+  2308 00004F0A [8003000000000000]  <1>
   2309                              <1> 
-  2310 00004F17 41B180              <1>     mov r9b, 80h            ;Recieve an IN packet
-  2311 00004F1A 4D31D2              <1>     xor r10, r10            ;LUN 0
-  2312 00004F1D E865030000          <1>     call .msdWriteCBW       ;Write the 15 byte CBW
+  2310 00004F12 41B180              <1>     mov r9b, 80h            ;Recieve an IN packet
+  2311 00004F15 4D31D2              <1>     xor r10, r10            ;LUN 0
+  2312 00004F18 E865030000          <1>     call .msdWriteCBW       ;Write the 15 byte CBW
   2313                              <1> ;Append the Command Block to the CBW
-  2314 00004F22 30C0                <1>     xor al, al              ;LUN 0 device
-  2315 00004F24 41FFD7              <1>     call r15                ;Write the valid CBW Command block
+  2314 00004F1D 30C0                <1>     xor al, al              ;LUN 0 device
+  2315 00004F1F 41FFD7              <1>     call r15                ;Write the valid CBW Command block
   2316                              <1> ;Enact transaction
-  2317 00004F27 41FFD6              <1>     call r14
+  2317 00004F22 41FFD6              <1>     call r14
   2318                              <1> 
-  2319 00004F2A 415A                <1>     pop r10
-  2320 00004F2C 4159                <1>     pop r9
-  2321 00004F2E 5F                  <1>     pop rdi
-  2322 00004F2F 59                  <1>     pop rcx
-  2323 00004F30 58                  <1>     pop rax
-  2324 00004F31 C3                  <1>     ret
+  2319 00004F25 415A                <1>     pop r10
+  2320 00004F27 4159                <1>     pop r9
+  2321 00004F29 5F                  <1>     pop rdi
+  2322 00004F2A 59                  <1>     pop rcx
+  2323 00004F2B 58                  <1>     pop rax
+  2324 00004F2C C3                  <1>     ret
   2325                              <1> 
   2326                              <1> .ehciMsdBOTInquiry:
   2327                              <1> ;Input: 
@@ -11311,30 +11311,30 @@
   2329                              <1> ;Output:
   2330                              <1> ;   CF=CY: Host error, Reset host system
   2331                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2332 00004F32 53                  <1>     push rbx
-  2333 00004F33 51                  <1>     push rcx
-  2334 00004F34 4150                <1>     push r8
-  2335 00004F36 4153                <1>     push r11
-  2336 00004F38 4156                <1>     push r14
-  2337 00004F3A 4157                <1>     push r15
-  2338 00004F3C 48BB-               <1>     mov rbx, ehciDataIn
-  2338 00004F3E [C003000000000000]  <1>
-  2339 00004F46 B900000000          <1>     mov ecx, 0
-  2340 00004F4B 41B824000000        <1>     mov r8d, 024h           ;36 bytes to be returned
-  2341 00004F51 49BB0C000000000000- <1>     mov r11, 0Ch            ;The command block is 12 bytes (As per Bootability)
-  2341 00004F5A 00                  <1>
-  2342 00004F5B 49BF-               <1>     mov r15, .scsiInquiry
-  2342 00004F5D [B852000000000000]  <1>
-  2343 00004F65 49BE-               <1>     mov r14, .ehciMsdBOTOII
-  2343 00004F67 [E14C000000000000]  <1>
-  2344 00004F6F E87FFFFFFF          <1>     call .ehciMsdBOTRequest
-  2345 00004F74 415F                <1>     pop r15
-  2346 00004F76 415E                <1>     pop r14
-  2347 00004F78 415B                <1>     pop r11
-  2348 00004F7A 4158                <1>     pop r8
-  2349 00004F7C 59                  <1>     pop rcx
-  2350 00004F7D 5B                  <1>     pop rbx
-  2351 00004F7E C3                  <1>     ret
+  2332 00004F2D 53                  <1>     push rbx
+  2333 00004F2E 51                  <1>     push rcx
+  2334 00004F2F 4150                <1>     push r8
+  2335 00004F31 4153                <1>     push r11
+  2336 00004F33 4156                <1>     push r14
+  2337 00004F35 4157                <1>     push r15
+  2338 00004F37 48BB-               <1>     mov rbx, ehciDataIn
+  2338 00004F39 [C003000000000000]  <1>
+  2339 00004F41 B900000000          <1>     mov ecx, 0
+  2340 00004F46 41B824000000        <1>     mov r8d, 024h           ;36 bytes to be returned
+  2341 00004F4C 49BB0C000000000000- <1>     mov r11, 0Ch            ;The command block is 12 bytes (As per Bootability)
+  2341 00004F55 00                  <1>
+  2342 00004F56 49BF-               <1>     mov r15, .scsiInquiry
+  2342 00004F58 [B352000000000000]  <1>
+  2343 00004F60 49BE-               <1>     mov r14, .ehciMsdBOTOII
+  2343 00004F62 [DC4C000000000000]  <1>
+  2344 00004F6A E87FFFFFFF          <1>     call .ehciMsdBOTRequest
+  2345 00004F6F 415F                <1>     pop r15
+  2346 00004F71 415E                <1>     pop r14
+  2347 00004F73 415B                <1>     pop r11
+  2348 00004F75 4158                <1>     pop r8
+  2349 00004F77 59                  <1>     pop rcx
+  2350 00004F78 5B                  <1>     pop rbx
+  2351 00004F79 C3                  <1>     ret
   2352                              <1> 
   2353                              <1> .ehciMsdBOTReadFormatCapacities:
   2354                              <1> ;Input: 
@@ -11342,31 +11342,31 @@
   2356                              <1> ;Output:
   2357                              <1> ;   CF=CY: Host error, Reset host system
   2358                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2359 00004F7F 53                  <1>     push rbx
-  2360 00004F80 51                  <1>     push rcx
-  2361 00004F81 4150                <1>     push r8
-  2362 00004F83 4153                <1>     push r11
-  2363 00004F85 4156                <1>     push r14
-  2364 00004F87 4157                <1>     push r15
-  2365 00004F89 48BB-               <1>     mov rbx, ehciDataIn
-  2365 00004F8B [C003000000000000]  <1>
-  2366 00004F93 B900000000          <1>     mov ecx, 0
-  2367 00004F98 49B8FC000000000000- <1>     mov r8, 0FCh            ;Return 252 bytes
-  2367 00004FA1 00                  <1>
-  2368 00004FA2 49BB0A000000000000- <1>     mov r11, 0Ah            ;The command block is 10 bytes
-  2368 00004FAB 00                  <1>
-  2369 00004FAC 49BF-               <1>     mov r15, .scsiReadFormatCapacities
-  2369 00004FAE [1753000000000000]  <1>
-  2370 00004FB6 49BE-               <1>     mov r14, .ehciMsdBOTOII
-  2370 00004FB8 [E14C000000000000]  <1>
-  2371 00004FC0 E82EFFFFFF          <1>     call .ehciMsdBOTRequest
-  2372 00004FC5 415F                <1>     pop r15
-  2373 00004FC7 415E                <1>     pop r14
-  2374 00004FC9 415B                <1>     pop r11
-  2375 00004FCB 4158                <1>     pop r8
-  2376 00004FCD 59                  <1>     pop rcx
-  2377 00004FCE 5B                  <1>     pop rbx
-  2378 00004FCF C3                  <1>     ret
+  2359 00004F7A 53                  <1>     push rbx
+  2360 00004F7B 51                  <1>     push rcx
+  2361 00004F7C 4150                <1>     push r8
+  2362 00004F7E 4153                <1>     push r11
+  2363 00004F80 4156                <1>     push r14
+  2364 00004F82 4157                <1>     push r15
+  2365 00004F84 48BB-               <1>     mov rbx, ehciDataIn
+  2365 00004F86 [C003000000000000]  <1>
+  2366 00004F8E B900000000          <1>     mov ecx, 0
+  2367 00004F93 49B8FC000000000000- <1>     mov r8, 0FCh            ;Return 252 bytes
+  2367 00004F9C 00                  <1>
+  2368 00004F9D 49BB0A000000000000- <1>     mov r11, 0Ah            ;The command block is 10 bytes
+  2368 00004FA6 00                  <1>
+  2369 00004FA7 49BF-               <1>     mov r15, .scsiReadFormatCapacities
+  2369 00004FA9 [1253000000000000]  <1>
+  2370 00004FB1 49BE-               <1>     mov r14, .ehciMsdBOTOII
+  2370 00004FB3 [DC4C000000000000]  <1>
+  2371 00004FBB E82EFFFFFF          <1>     call .ehciMsdBOTRequest
+  2372 00004FC0 415F                <1>     pop r15
+  2373 00004FC2 415E                <1>     pop r14
+  2374 00004FC4 415B                <1>     pop r11
+  2375 00004FC6 4158                <1>     pop r8
+  2376 00004FC8 59                  <1>     pop rcx
+  2377 00004FC9 5B                  <1>     pop rbx
+  2378 00004FCA C3                  <1>     ret
   2379                              <1> 
   2380                              <1> .ehciMsdBOTReadCapacity10:
   2381                              <1> ;Input: 
@@ -11374,75 +11374,75 @@
   2383                              <1> ;Output:
   2384                              <1> ;   CF=CY: Host error, Reset host system
   2385                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2386 00004FD0 53                  <1>     push rbx
-  2387 00004FD1 51                  <1>     push rcx
-  2388 00004FD2 4150                <1>     push r8
-  2389 00004FD4 4153                <1>     push r11
-  2390 00004FD6 4156                <1>     push r14
-  2391 00004FD8 4157                <1>     push r15
-  2392 00004FDA 48BB-               <1>     mov rbx, ehciDataIn
-  2392 00004FDC [C003000000000000]  <1>
-  2393 00004FE4 B900000000          <1>     mov ecx, 0
-  2394 00004FE9 49B808000000000000- <1>     mov r8, 8
-  2394 00004FF2 00                  <1>
-  2395 00004FF3 49BB0A000000000000- <1>     mov r11, 0Ah
-  2395 00004FFC 00                  <1>
-  2396 00004FFD 49BF-               <1>     mov r15, .scsiReadCap10
-  2396 00004FFF [2753000000000000]  <1>
-  2397 00005007 49BE-               <1>     mov r14, .ehciMsdBOTOII
-  2397 00005009 [E14C000000000000]  <1>
-  2398 00005011 E8DDFEFFFF          <1>     call .ehciMsdBOTRequest
-  2399 00005016 415F                <1>     pop r15
-  2400 00005018 415E                <1>     pop r14
-  2401 0000501A 415B                <1>     pop r11
-  2402 0000501C 4158                <1>     pop r8
-  2403 0000501E 59                  <1>     pop rcx
-  2404 0000501F 5B                  <1>     pop rbx
-  2405 00005020 C3                  <1>     ret
+  2386 00004FCB 53                  <1>     push rbx
+  2387 00004FCC 51                  <1>     push rcx
+  2388 00004FCD 4150                <1>     push r8
+  2389 00004FCF 4153                <1>     push r11
+  2390 00004FD1 4156                <1>     push r14
+  2391 00004FD3 4157                <1>     push r15
+  2392 00004FD5 48BB-               <1>     mov rbx, ehciDataIn
+  2392 00004FD7 [C003000000000000]  <1>
+  2393 00004FDF B900000000          <1>     mov ecx, 0
+  2394 00004FE4 49B808000000000000- <1>     mov r8, 8
+  2394 00004FED 00                  <1>
+  2395 00004FEE 49BB0A000000000000- <1>     mov r11, 0Ah
+  2395 00004FF7 00                  <1>
+  2396 00004FF8 49BF-               <1>     mov r15, .scsiReadCap10
+  2396 00004FFA [2253000000000000]  <1>
+  2397 00005002 49BE-               <1>     mov r14, .ehciMsdBOTOII
+  2397 00005004 [DC4C000000000000]  <1>
+  2398 0000500C E8DDFEFFFF          <1>     call .ehciMsdBOTRequest
+  2399 00005011 415F                <1>     pop r15
+  2400 00005013 415E                <1>     pop r14
+  2401 00005015 415B                <1>     pop r11
+  2402 00005017 4158                <1>     pop r8
+  2403 00005019 59                  <1>     pop rcx
+  2404 0000501A 5B                  <1>     pop rbx
+  2405 0000501B C3                  <1>     ret
   2406                              <1> .ehciMsdBOTFormatUnit:
   2407                              <1> ;Input: 
   2408                              <1> ; rsi = Pointer to MSD table data structure that we want to Format
   2409                              <1> ;Output:
   2410                              <1> ;   CF=CY: Host error, Reset host system
   2411                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2412 00005021 50                  <1>     push rax
-  2413 00005022 4150                <1>     push r8
-  2414 00005024 4153                <1>     push r11
-  2415 00005026 4156                <1>     push r14
-  2416 00005028 4157                <1>     push r15
-  2417 0000502A 4D31C0              <1>     xor r8, r8  ;Request no data
-  2418 0000502D 49BB06000000000000- <1>     mov r11, 06h  ;Command length is 6 bytes
-  2418 00005036 00                  <1>
-  2419 00005037 49BE-               <1>     mov r14, .ehciMsdBOTOI
-  2419 00005039 [CD4D000000000000]  <1>
-  2420 00005041 49BF-               <1>     mov r15, .scsiFormatUnit
-  2420 00005043 [3153000000000000]  <1>
-  2421 0000504B E8A3FEFFFF          <1>     call .ehciMsdBOTRequest
-  2422 00005050 7236                <1>     jc .embfuerror
-  2423 00005052 E897FBFFFF          <1>     call .ehciMsdBOTCheckTransaction
-  2424 00005057 6685C0              <1>     test ax, ax
-  2425 0000505A 752C                <1>     jnz .embfuerror
+  2412 0000501C 50                  <1>     push rax
+  2413 0000501D 4150                <1>     push r8
+  2414 0000501F 4153                <1>     push r11
+  2415 00005021 4156                <1>     push r14
+  2416 00005023 4157                <1>     push r15
+  2417 00005025 4D31C0              <1>     xor r8, r8  ;Request no data
+  2418 00005028 49BB06000000000000- <1>     mov r11, 06h  ;Command length is 6 bytes
+  2418 00005031 00                  <1>
+  2419 00005032 49BE-               <1>     mov r14, .ehciMsdBOTOI
+  2419 00005034 [C84D000000000000]  <1>
+  2420 0000503C 49BF-               <1>     mov r15, .scsiFormatUnit
+  2420 0000503E [2C53000000000000]  <1>
+  2421 00005046 E8A3FEFFFF          <1>     call .ehciMsdBOTRequest
+  2422 0000504B 7236                <1>     jc .embfuerror
+  2423 0000504D E897FBFFFF          <1>     call .ehciMsdBOTCheckTransaction
+  2424 00005052 6685C0              <1>     test ax, ax
+  2425 00005055 752C                <1>     jnz .embfuerror
   2426                              <1> .embfu0:
-  2427 0000505C E8CA000000          <1>     call .ehciMsdBOTTestReady
-  2428 00005061 7225                <1>     jc .embfuerror
-  2429 00005063 E886FBFFFF          <1>     call .ehciMsdBOTCheckTransaction
-  2430 00005068 6685C0              <1>     test ax, ax
-  2431 0000506B 7411                <1>     jz .embfuexit
-  2432 0000506D E868000000          <1>     call .ehciMsdBOTRequestSense
-  2433 00005072 7214                <1>     jc .embfuerror
-  2434 00005074 E875FBFFFF          <1>     call .ehciMsdBOTCheckTransaction
-  2435 00005079 6685C0              <1>     test ax, ax
-  2436 0000507C 75DE                <1>     jnz .embfu0
+  2427 00005057 E8CA000000          <1>     call .ehciMsdBOTTestReady
+  2428 0000505C 7225                <1>     jc .embfuerror
+  2429 0000505E E886FBFFFF          <1>     call .ehciMsdBOTCheckTransaction
+  2430 00005063 6685C0              <1>     test ax, ax
+  2431 00005066 7411                <1>     jz .embfuexit
+  2432 00005068 E868000000          <1>     call .ehciMsdBOTRequestSense
+  2433 0000506D 7214                <1>     jc .embfuerror
+  2434 0000506F E875FBFFFF          <1>     call .ehciMsdBOTCheckTransaction
+  2435 00005074 6685C0              <1>     test ax, ax
+  2436 00005077 75DE                <1>     jnz .embfu0
   2437                              <1> .embfuexit:
-  2438 0000507E 415F                <1>     pop r15
-  2439 00005080 415E                <1>     pop r14
-  2440 00005082 415B                <1>     pop r11
-  2441 00005084 4158                <1>     pop r8
-  2442 00005086 58                  <1>     pop rax
-  2443 00005087 C3                  <1>     ret
+  2438 00005079 415F                <1>     pop r15
+  2439 0000507B 415E                <1>     pop r14
+  2440 0000507D 415B                <1>     pop r11
+  2441 0000507F 4158                <1>     pop r8
+  2442 00005081 58                  <1>     pop rax
+  2443 00005082 C3                  <1>     ret
   2444                              <1> .embfuerror:
-  2445 00005088 F9                  <1>     stc
-  2446 00005089 EBF3                <1>     jmp short .embfuexit
+  2445 00005083 F9                  <1>     stc
+  2446 00005084 EBF3                <1>     jmp short .embfuexit
   2447                              <1> .ehciMsdBOTVerify:
   2448                              <1> ;Input: 
   2449                              <1> ; rsi = Pointer to MSD table data structure that we want to Verify Sectors
@@ -11450,67 +11450,67 @@
   2451                              <1> ;Output:
   2452                              <1> ;   CF=CY: Host error, Reset host system
   2453                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2454 0000508B 50                  <1>     push rax
-  2455 0000508C 4150                <1>     push r8
-  2456 0000508E 4153                <1>     push r11
-  2457 00005090 4154                <1>     push r12
-  2458 00005092 4156                <1>     push r14
-  2459 00005094 4157                <1>     push r15
-  2460 00005096 4D31C0              <1>     xor r8, r8  ;Request no data
-  2461 00005099 49BB0A000000000000- <1>     mov r11, 0Ah  ;Command length is 10 bytes
-  2461 000050A2 00                  <1>
-  2462 000050A3 4189D4              <1>     mov r12d, edx
-  2463 000050A6 49BE-               <1>     mov r14, .ehciMsdBOTOI
-  2463 000050A8 [CD4D000000000000]  <1>
-  2464 000050B0 49BF-               <1>     mov r15, .scsiVerify
-  2464 000050B2 [4653000000000000]  <1>
-  2465 000050BA E834FEFFFF          <1>     call .ehciMsdBOTRequest
-  2466 000050BF 7216                <1>     jc .embvbad
-  2467 000050C1 E828FBFFFF          <1>     call .ehciMsdBOTCheckTransaction
-  2468 000050C6 6685C0              <1>     test ax, ax
-  2469 000050C9 750C                <1>     jnz .embvbad
+  2454 00005086 50                  <1>     push rax
+  2455 00005087 4150                <1>     push r8
+  2456 00005089 4153                <1>     push r11
+  2457 0000508B 4154                <1>     push r12
+  2458 0000508D 4156                <1>     push r14
+  2459 0000508F 4157                <1>     push r15
+  2460 00005091 4D31C0              <1>     xor r8, r8  ;Request no data
+  2461 00005094 49BB0A000000000000- <1>     mov r11, 0Ah  ;Command length is 10 bytes
+  2461 0000509D 00                  <1>
+  2462 0000509E 4189D4              <1>     mov r12d, edx
+  2463 000050A1 49BE-               <1>     mov r14, .ehciMsdBOTOI
+  2463 000050A3 [C84D000000000000]  <1>
+  2464 000050AB 49BF-               <1>     mov r15, .scsiVerify
+  2464 000050AD [4153000000000000]  <1>
+  2465 000050B5 E834FEFFFF          <1>     call .ehciMsdBOTRequest
+  2466 000050BA 7216                <1>     jc .embvbad
+  2467 000050BC E828FBFFFF          <1>     call .ehciMsdBOTCheckTransaction
+  2468 000050C1 6685C0              <1>     test ax, ax
+  2469 000050C4 750C                <1>     jnz .embvbad
   2470                              <1> .embvexit:
-  2471 000050CB 415F                <1>     pop r15
-  2472 000050CD 415E                <1>     pop r14
-  2473 000050CF 415C                <1>     pop r12
-  2474 000050D1 415B                <1>     pop r11
-  2475 000050D3 4158                <1>     pop r8
-  2476 000050D5 59                  <1>     pop rcx
-  2477 000050D6 C3                  <1>     ret
+  2471 000050C6 415F                <1>     pop r15
+  2472 000050C8 415E                <1>     pop r14
+  2473 000050CA 415C                <1>     pop r12
+  2474 000050CC 415B                <1>     pop r11
+  2475 000050CE 4158                <1>     pop r8
+  2476 000050D0 59                  <1>     pop rcx
+  2477 000050D1 C3                  <1>     ret
   2478                              <1> .embvbad:
-  2479 000050D7 F9                  <1>     stc
-  2480 000050D8 EBF1                <1>     jmp short .embvexit
+  2479 000050D2 F9                  <1>     stc
+  2480 000050D3 EBF1                <1>     jmp short .embvexit
   2481                              <1> .ehciMsdBOTRequestSense:
   2482                              <1> ;Input: 
   2483                              <1> ; rsi = Pointer to device MSD table data structure
   2484                              <1> ;Output:
   2485                              <1> ;   CF=CY: Host error, Reset host system
   2486                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2487 000050DA 53                  <1>     push rbx
-  2488 000050DB 51                  <1>     push rcx
-  2489 000050DC 4150                <1>     push r8
-  2490 000050DE 4153                <1>     push r11
-  2491 000050E0 4156                <1>     push r14
-  2492 000050E2 4157                <1>     push r15
-  2493 000050E4 48BB-               <1>     mov rbx, ehciDataIn
-  2493 000050E6 [C003000000000000]  <1>
-  2494 000050EE B900000000          <1>     mov ecx, 0
-  2495 000050F3 49B812000000000000- <1>     mov r8, 12h         ;Request 18 bytes
-  2495 000050FC 00                  <1>
-  2496 000050FD 49BB06000000000000- <1>     mov r11, 6          ;Command length is 6
-  2496 00005106 00                  <1>
-  2497 00005107 49BF-               <1>     mov r15, .scsiRequestSense
-  2497 00005109 [FA52000000000000]  <1>
-  2498 00005111 49BE-               <1>     mov r14, .ehciMsdBOTOII
-  2498 00005113 [E14C000000000000]  <1>
-  2499 0000511B E8D3FDFFFF          <1>     call .ehciMsdBOTRequest
-  2500 00005120 415F                <1>     pop r15
-  2501 00005122 415E                <1>     pop r14
-  2502 00005124 415B                <1>     pop r11
-  2503 00005126 4158                <1>     pop r8
-  2504 00005128 59                  <1>     pop rcx
-  2505 00005129 5B                  <1>     pop rbx
-  2506 0000512A C3                  <1>     ret
+  2487 000050D5 53                  <1>     push rbx
+  2488 000050D6 51                  <1>     push rcx
+  2489 000050D7 4150                <1>     push r8
+  2490 000050D9 4153                <1>     push r11
+  2491 000050DB 4156                <1>     push r14
+  2492 000050DD 4157                <1>     push r15
+  2493 000050DF 48BB-               <1>     mov rbx, ehciDataIn
+  2493 000050E1 [C003000000000000]  <1>
+  2494 000050E9 B900000000          <1>     mov ecx, 0
+  2495 000050EE 49B812000000000000- <1>     mov r8, 12h         ;Request 18 bytes
+  2495 000050F7 00                  <1>
+  2496 000050F8 49BB06000000000000- <1>     mov r11, 6          ;Command length is 6
+  2496 00005101 00                  <1>
+  2497 00005102 49BF-               <1>     mov r15, .scsiRequestSense
+  2497 00005104 [F552000000000000]  <1>
+  2498 0000510C 49BE-               <1>     mov r14, .ehciMsdBOTOII
+  2498 0000510E [DC4C000000000000]  <1>
+  2499 00005116 E8D3FDFFFF          <1>     call .ehciMsdBOTRequest
+  2500 0000511B 415F                <1>     pop r15
+  2501 0000511D 415E                <1>     pop r14
+  2502 0000511F 415B                <1>     pop r11
+  2503 00005121 4158                <1>     pop r8
+  2504 00005123 59                  <1>     pop rcx
+  2505 00005124 5B                  <1>     pop rbx
+  2506 00005125 C3                  <1>     ret
   2507                              <1> 
   2508                              <1> .ehciMsdBOTTestReady:
   2509                              <1> ;Input: 
@@ -11518,54 +11518,54 @@
   2511                              <1> ;Output:
   2512                              <1> ;   CF=CY: Host error, Reset host system
   2513                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2514 0000512B 4150                <1>     push r8
-  2515 0000512D 4153                <1>     push r11
-  2516 0000512F 4156                <1>     push r14
-  2517 00005131 4157                <1>     push r15
-  2518 00005133 4D31C0              <1>     xor r8, r8  ;Request no data
-  2519 00005136 49BB06000000000000- <1>     mov r11, 6  ;Command length is 6
-  2519 0000513F 00                  <1>
-  2520 00005140 49BE-               <1>     mov r14, .ehciMsdBOTOI
-  2520 00005142 [CD4D000000000000]  <1>
-  2521 0000514A 49BF-               <1>     mov r15, .scsiTestUnitReady
-  2521 0000514C [0D53000000000000]  <1>
-  2522 00005154 E89AFDFFFF          <1>     call .ehciMsdBOTRequest
-  2523 00005159 415F                <1>     pop r15
-  2524 0000515B 415E                <1>     pop r14
-  2525 0000515D 415B                <1>     pop r11
-  2526 0000515F 4158                <1>     pop r8
-  2527 00005161 C3                  <1>     ret
+  2514 00005126 4150                <1>     push r8
+  2515 00005128 4153                <1>     push r11
+  2516 0000512A 4156                <1>     push r14
+  2517 0000512C 4157                <1>     push r15
+  2518 0000512E 4D31C0              <1>     xor r8, r8  ;Request no data
+  2519 00005131 49BB06000000000000- <1>     mov r11, 6  ;Command length is 6
+  2519 0000513A 00                  <1>
+  2520 0000513B 49BE-               <1>     mov r14, .ehciMsdBOTOI
+  2520 0000513D [C84D000000000000]  <1>
+  2521 00005145 49BF-               <1>     mov r15, .scsiTestUnitReady
+  2521 00005147 [0853000000000000]  <1>
+  2522 0000514F E89AFDFFFF          <1>     call .ehciMsdBOTRequest
+  2523 00005154 415F                <1>     pop r15
+  2524 00005156 415E                <1>     pop r14
+  2525 00005158 415B                <1>     pop r11
+  2526 0000515A 4158                <1>     pop r8
+  2527 0000515C C3                  <1>     ret
   2528                              <1> .ehciMsdBOTModeSense6:
   2529                              <1> ;Input: 
   2530                              <1> ; rsi = Pointer to MSD table data structure that we want to Test Ready
   2531                              <1> ;Output:
   2532                              <1> ;   CF=CY: Host error, Reset host system
   2533                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2534 00005162 53                  <1>     push rbx
-  2535 00005163 51                  <1>     push rcx
-  2536 00005164 4150                <1>     push r8
-  2537 00005166 4153                <1>     push r11
-  2538 00005168 4156                <1>     push r14
-  2539 0000516A 4157                <1>     push r15
-  2540 0000516C 48BB-               <1>     mov rbx, ehciDataIn
-  2540 0000516E [C003000000000000]  <1>
-  2541 00005176 B900000000          <1>     mov ecx, 0
-  2542 0000517B 49B8C0000000000000- <1>     mov r8, 0C0h        ;Request 192 bytes
-  2542 00005184 00                  <1>
-  2543 00005185 49BB06000000000000- <1>     mov r11, 6          ;Command length is 6
-  2543 0000518E 00                  <1>
-  2544 0000518F 49BF-               <1>     mov r15, .scsiModeSense6
-  2544 00005191 [6753000000000000]  <1>
-  2545 00005199 49BE-               <1>     mov r14, .ehciMsdBOTOII
-  2545 0000519B [E14C000000000000]  <1>
-  2546 000051A3 E84BFDFFFF          <1>     call .ehciMsdBOTRequest
-  2547 000051A8 415F                <1>     pop r15
-  2548 000051AA 415E                <1>     pop r14
-  2549 000051AC 415B                <1>     pop r11
-  2550 000051AE 4158                <1>     pop r8
-  2551 000051B0 59                  <1>     pop rcx
-  2552 000051B1 5B                  <1>     pop rbx
-  2553 000051B2 C3                  <1>     ret
+  2534 0000515D 53                  <1>     push rbx
+  2535 0000515E 51                  <1>     push rcx
+  2536 0000515F 4150                <1>     push r8
+  2537 00005161 4153                <1>     push r11
+  2538 00005163 4156                <1>     push r14
+  2539 00005165 4157                <1>     push r15
+  2540 00005167 48BB-               <1>     mov rbx, ehciDataIn
+  2540 00005169 [C003000000000000]  <1>
+  2541 00005171 B900000000          <1>     mov ecx, 0
+  2542 00005176 49B8C0000000000000- <1>     mov r8, 0C0h        ;Request 192 bytes
+  2542 0000517F 00                  <1>
+  2543 00005180 49BB06000000000000- <1>     mov r11, 6          ;Command length is 6
+  2543 00005189 00                  <1>
+  2544 0000518A 49BF-               <1>     mov r15, .scsiModeSense6
+  2544 0000518C [6253000000000000]  <1>
+  2545 00005194 49BE-               <1>     mov r14, .ehciMsdBOTOII
+  2545 00005196 [DC4C000000000000]  <1>
+  2546 0000519E E84BFDFFFF          <1>     call .ehciMsdBOTRequest
+  2547 000051A3 415F                <1>     pop r15
+  2548 000051A5 415E                <1>     pop r14
+  2549 000051A7 415B                <1>     pop r11
+  2550 000051A9 4158                <1>     pop r8
+  2551 000051AB 59                  <1>     pop rcx
+  2552 000051AC 5B                  <1>     pop rbx
+  2553 000051AD C3                  <1>     ret
   2554                              <1> 
   2555                              <1> ;.ehciMsdBOTOutSector64:
   2556                              <1> .ehciMsdBOTOutSector512:
@@ -11576,34 +11576,34 @@
   2561                              <1> ;Output:
   2562                              <1> ;   CF=CY: Host error, Reset host system
   2563                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2564 000051B3 4151                <1>     push r9
-  2565 000051B5 4156                <1>     push r14
-  2566 000051B7 4157                <1>     push r15
-  2567 000051B9 50                  <1>     push rax
-  2568 000051BA 4D31C9              <1>     xor r9, r9 ;Send an OUT packet
-  2569 000051BD 49BE-               <1>     mov r14, .ehciMsdBOTOOI
-  2569 000051BF [154C000000000000]  <1>
-  2570 000051C7 49BF-               <1>     mov r15, .scsiWrite10
-  2570 000051C9 [D352000000000000]  <1>
-  2571 000051D1 E860000000          <1>     call .ehciMsdBOTSector512
-  2572 000051D6 7223                <1>     jc .emboseerror
-  2573 000051D8 E811FAFFFF          <1>     call .ehciMsdBOTCheckTransaction
-  2574 000051DD 6685C0              <1>     test ax, ax
-  2575 000051E0 7519                <1>     jnz .emboseerror
-  2576 000051E2 E844FFFFFF          <1>     call .ehciMsdBOTTestReady   ;Seems to flush data onto disk
-  2577 000051E7 7212                <1>     jc .emboseerror
-  2578 000051E9 E800FAFFFF          <1>     call .ehciMsdBOTCheckTransaction
-  2579 000051EE 6685C0              <1>     test ax, ax
-  2580 000051F1 7508                <1>     jnz .emboseerror
+  2564 000051AE 4151                <1>     push r9
+  2565 000051B0 4156                <1>     push r14
+  2566 000051B2 4157                <1>     push r15
+  2567 000051B4 50                  <1>     push rax
+  2568 000051B5 4D31C9              <1>     xor r9, r9 ;Send an OUT packet
+  2569 000051B8 49BE-               <1>     mov r14, .ehciMsdBOTOOI
+  2569 000051BA [104C000000000000]  <1>
+  2570 000051C2 49BF-               <1>     mov r15, .scsiWrite10
+  2570 000051C4 [CE52000000000000]  <1>
+  2571 000051CC E860000000          <1>     call .ehciMsdBOTSector512
+  2572 000051D1 7223                <1>     jc .emboseerror
+  2573 000051D3 E811FAFFFF          <1>     call .ehciMsdBOTCheckTransaction
+  2574 000051D8 6685C0              <1>     test ax, ax
+  2575 000051DB 7519                <1>     jnz .emboseerror
+  2576 000051DD E844FFFFFF          <1>     call .ehciMsdBOTTestReady   ;Seems to flush data onto disk
+  2577 000051E2 7212                <1>     jc .emboseerror
+  2578 000051E4 E800FAFFFF          <1>     call .ehciMsdBOTCheckTransaction
+  2579 000051E9 6685C0              <1>     test ax, ax
+  2580 000051EC 7508                <1>     jnz .emboseerror
   2581                              <1> .embosexit:
-  2582 000051F3 58                  <1>     pop rax
-  2583 000051F4 415F                <1>     pop r15
-  2584 000051F6 415E                <1>     pop r14
-  2585 000051F8 4159                <1>     pop r9
-  2586 000051FA C3                  <1>     ret
+  2582 000051EE 58                  <1>     pop rax
+  2583 000051EF 415F                <1>     pop r15
+  2584 000051F1 415E                <1>     pop r14
+  2585 000051F3 4159                <1>     pop r9
+  2586 000051F5 C3                  <1>     ret
   2587                              <1> .emboseerror:
-  2588 000051FB F9                  <1>     stc
-  2589 000051FC EBF5                <1>     jmp short .embosexit
+  2588 000051F6 F9                  <1>     stc
+  2589 000051F7 EBF5                <1>     jmp short .embosexit
   2590                              <1> ;.ehciMsdBOTInSector64:
   2591                              <1> .ehciMsdBOTInSector512:
   2592                              <1> ;Input: 
@@ -11613,22 +11613,22 @@
   2596                              <1> ;Output:
   2597                              <1> ;   CF=CY: Host error, Reset host system
   2598                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2599 000051FE 4151                <1>     push r9
-  2600 00005200 4156                <1>     push r14
-  2601 00005202 4157                <1>     push r15
-  2602 00005204 50                  <1>     push rax
-  2603 00005205 49B980000000000000- <1>     mov r9, 80h ;Recieve an IN packet
-  2603 0000520E 00                  <1>
-  2604 0000520F 49BE-               <1>     mov r14, .ehciMsdBOTOII
-  2604 00005211 [E14C000000000000]  <1>
-  2605 00005219 49BF-               <1>     mov r15, .scsiRead10
-  2605 0000521B [D752000000000000]  <1>
-  2606 00005223 E80E000000          <1>     call .ehciMsdBOTSector512
-  2607 00005228 72D1                <1>     jc .emboseerror
-  2608 0000522A E8BFF9FFFF          <1>     call .ehciMsdBOTCheckTransaction
-  2609 0000522F 6685C0              <1>     test ax, ax
-  2610 00005232 75C7                <1>     jnz .emboseerror
-  2611 00005234 EBBD                <1>     jmp short .embosexit
+  2599 000051F9 4151                <1>     push r9
+  2600 000051FB 4156                <1>     push r14
+  2601 000051FD 4157                <1>     push r15
+  2602 000051FF 50                  <1>     push rax
+  2603 00005200 49B980000000000000- <1>     mov r9, 80h ;Recieve an IN packet
+  2603 00005209 00                  <1>
+  2604 0000520A 49BE-               <1>     mov r14, .ehciMsdBOTOII
+  2604 0000520C [DC4C000000000000]  <1>
+  2605 00005214 49BF-               <1>     mov r15, .scsiRead10
+  2605 00005216 [D252000000000000]  <1>
+  2606 0000521E E80E000000          <1>     call .ehciMsdBOTSector512
+  2607 00005223 72D1                <1>     jc .emboseerror
+  2608 00005225 E8BFF9FFFF          <1>     call .ehciMsdBOTCheckTransaction
+  2609 0000522A 6685C0              <1>     test ax, ax
+  2610 0000522D 75C7                <1>     jnz .emboseerror
+  2611 0000522F EBBD                <1>     jmp short .embosexit
   2612                              <1> .ehciMsdBOTSector512:
   2613                              <1> ;Input: 
   2614                              <1> ; rsi = Pointer to MSD table data structure that we want to read
@@ -11639,37 +11639,37 @@
   2619                              <1> ;Output:
   2620                              <1> ;   CF=CY: Host error, Reset host system
   2621                              <1> ;   CF=NC: Transaction succeeded, check data transferred successfully
-  2622 00005236 57                  <1>     push rdi
-  2623 00005237 4150                <1>     push r8
-  2624 00005239 4152                <1>     push r10
-  2625 0000523B 4153                <1>     push r11
+  2622 00005231 57                  <1>     push rdi
+  2623 00005232 4150                <1>     push r8
+  2624 00005234 4152                <1>     push r10
+  2625 00005236 4153                <1>     push r11
   2626                              <1> 
-  2627 0000523D 48BF-               <1>     mov rdi, ehciDataOut    ;Write the CBW at the data out point
-  2627 0000523F [8003000000000000]  <1>
-  2628 00005247 41B800020000        <1>     mov r8d, 200h           ;512 bytes to be transferred
-  2629 0000524D 4D31D2              <1>     xor r10, r10            ;LUN 0
-  2630 00005250 49BB0C000000000000- <1>     mov r11, 0Ch            ;The command block is 10 bytes long
-  2630 00005259 00                  <1>
-  2631 0000525A E828000000          <1>     call .msdWriteCBW     ;Write the CBW
+  2627 00005238 48BF-               <1>     mov rdi, ehciDataOut    ;Write the CBW at the data out point
+  2627 0000523A [8003000000000000]  <1>
+  2628 00005242 41B800020000        <1>     mov r8d, 200h           ;512 bytes to be transferred
+  2629 00005248 4D31D2              <1>     xor r10, r10            ;LUN 0
+  2630 0000524B 49BB0C000000000000- <1>     mov r11, 0Ch            ;The command block is 10 bytes long
+  2630 00005254 00                  <1>
+  2631 00005255 E828000000          <1>     call .msdWriteCBW     ;Write the CBW
   2632                              <1> 
-  2633 0000525F 50                  <1>     push rax                ;Temp push ax
-  2634 00005260 4150                <1>     push r8                 ;Temp save # of bytes for transfer
-  2635 00005262 30C0                <1>     xor al, al              ;LUN 0 device
-  2636 00005264 4189D0              <1>     mov r8d, edx            ;Starting LBA to read from
-  2637 00005267 49B901000000000000- <1>     mov r9, 1               ;Number of LBAs to read
-  2637 00005270 00                  <1>
-  2638 00005271 41FFD7              <1>     call r15                ;Write the valid CBW Command block
-  2639 00005274 4158                <1>     pop r8
-  2640 00005276 58                  <1>     pop rax
+  2633 0000525A 50                  <1>     push rax                ;Temp push ax
+  2634 0000525B 4150                <1>     push r8                 ;Temp save # of bytes for transfer
+  2635 0000525D 30C0                <1>     xor al, al              ;LUN 0 device
+  2636 0000525F 4189D0              <1>     mov r8d, edx            ;Starting LBA to read from
+  2637 00005262 49B901000000000000- <1>     mov r9, 1               ;Number of LBAs to read
+  2637 0000526B 00                  <1>
+  2638 0000526C 41FFD7              <1>     call r15                ;Write the valid CBW Command block
+  2639 0000526F 4158                <1>     pop r8
+  2640 00005271 58                  <1>     pop rax
   2641                              <1> 
-  2642 00005277 B90A000000          <1>     mov ecx, 10              ;Wait for data preparation, 10ms
-  2643 0000527C 41FFD6              <1>     call r14
+  2642 00005272 B90A000000          <1>     mov ecx, 10              ;Wait for data preparation, 10ms
+  2643 00005277 41FFD6              <1>     call r14
   2644                              <1> 
-  2645 0000527F 415B                <1>     pop r11
-  2646 00005281 415A                <1>     pop r10
-  2647 00005283 4158                <1>     pop r8
-  2648 00005285 5F                  <1>     pop rdi
-  2649 00005286 C3                  <1>     ret
+  2645 0000527A 415B                <1>     pop r11
+  2646 0000527C 415A                <1>     pop r10
+  2647 0000527E 4158                <1>     pop r8
+  2648 00005280 5F                  <1>     pop rdi
+  2649 00005281 C3                  <1>     ret
   2650                              <1> .msdWriteCBW:
   2651                              <1> ;Writes a Command Block Wrapper at the location pointed to by rdi
   2652                              <1> ; without a functional command block. Must be appended by user.
@@ -11679,27 +11679,27 @@
   2656                              <1> ;         r10b=Command Block Wrapper LUN nybble
   2657                              <1> ;         r11b=Command Block Wrapper Command Block Length
   2658                              <1> ; Output: rdi = Pointer to CBW's (SCSI) Command Descriptor Block buffer
-  2659 00005287 50                  <1>     push rax
-  2660 00005288 B855534243          <1>     mov eax, CBWSig
-  2661 0000528D AB                  <1>     stosd
-  2662 0000528E 0FB60425[4A020000]  <1>     movzx eax, byte [cbwTag]
-  2663 00005296 FE0425[4A020000]    <1>     inc byte [cbwTag]
-  2664 0000529D AB                  <1>     stosd
-  2665 0000529E 4489C0              <1>     mov eax, r8d
-  2666 000052A1 AB                  <1>     stosd
-  2667 000052A2 4488C8              <1>     mov al, r9b
-  2668 000052A5 AA                  <1>     stosb
-  2669 000052A6 4488D0              <1>     mov al, r10b
-  2670 000052A9 AA                  <1>     stosb
-  2671 000052AA 4488D8              <1>     mov al, r11b
-  2672 000052AD AA                  <1>     stosb
-  2673 000052AE 31C0                <1>     xor eax, eax
-  2674 000052B0 57                  <1>     push rdi
-  2675 000052B1 48AB                <1>     stosq   ;16 bytes in csw command block
-  2676 000052B3 48AB                <1>     stosq   ;Clear memory
-  2677 000052B5 5F                  <1>     pop rdi
-  2678 000052B6 58                  <1>     pop rax
-  2679 000052B7 C3                  <1>     ret
+  2659 00005282 50                  <1>     push rax
+  2660 00005283 B855534243          <1>     mov eax, CBWSig
+  2661 00005288 AB                  <1>     stosd
+  2662 00005289 0FB60425[4A020000]  <1>     movzx eax, byte [cbwTag]
+  2663 00005291 FE0425[4A020000]    <1>     inc byte [cbwTag]
+  2664 00005298 AB                  <1>     stosd
+  2665 00005299 4489C0              <1>     mov eax, r8d
+  2666 0000529C AB                  <1>     stosd
+  2667 0000529D 4488C8              <1>     mov al, r9b
+  2668 000052A0 AA                  <1>     stosb
+  2669 000052A1 4488D0              <1>     mov al, r10b
+  2670 000052A4 AA                  <1>     stosb
+  2671 000052A5 4488D8              <1>     mov al, r11b
+  2672 000052A8 AA                  <1>     stosb
+  2673 000052A9 31C0                <1>     xor eax, eax
+  2674 000052AB 57                  <1>     push rdi
+  2675 000052AC 48AB                <1>     stosq   ;16 bytes in csw command block
+  2676 000052AE 48AB                <1>     stosq   ;Clear memory
+  2677 000052B0 5F                  <1>     pop rdi
+  2678 000052B1 58                  <1>     pop rax
+  2679 000052B2 C3                  <1>     ret
   2680                              <1> 
   2681                              <1> ;                        --------SCSI functions---------
   2682                              <1> 
@@ -11707,128 +11707,128 @@
   2684                              <1> ;Writes an inquiry scsi command block to the location pointed to by rdi
   2685                              <1> ;al contains the LUN of the device we are accessing. (lower 3 bits considered)
   2686                              <1> ;al not preserved
-  2687 000052B8 B412                <1>     mov ah, 12h        ;Move inquiry command value high
-  2688 000052BA C0E005              <1>     shl al, 5        ;Shift left by five to align LUN properly
-  2689 000052BD 86E0                <1>     xchg ah, al        ;swap ah and al
-  2690 000052BF 66AB                <1>     stosw            ;Store command and shifted LUN together
-  2691 000052C1 4831C0              <1>     xor rax, rax
-  2692 000052C4 66AB                <1>     stosw            ;Store two zeros (reserved fields)
-  2693 000052C6 48B824000000000000- <1>     mov rax, 24h    ;Allocation length (36 bytes)
-  2693 000052CF 00                  <1>
-  2694 000052D0 48AB                <1>     stosq
-  2695 000052D2 C3                  <1>     ret
+  2687 000052B3 B412                <1>     mov ah, 12h        ;Move inquiry command value high
+  2688 000052B5 C0E005              <1>     shl al, 5        ;Shift left by five to align LUN properly
+  2689 000052B8 86E0                <1>     xchg ah, al        ;swap ah and al
+  2690 000052BA 66AB                <1>     stosw            ;Store command and shifted LUN together
+  2691 000052BC 4831C0              <1>     xor rax, rax
+  2692 000052BF 66AB                <1>     stosw            ;Store two zeros (reserved fields)
+  2693 000052C1 48B824000000000000- <1>     mov rax, 24h    ;Allocation length (36 bytes)
+  2693 000052CA 00                  <1>
+  2694 000052CB 48AB                <1>     stosq
+  2695 000052CD C3                  <1>     ret
   2696                              <1> ;NOTE! Using read/write 10 means can't read beyond the first 4 Gb of Medium.
   2697                              <1> .scsiWrite10:
   2698                              <1> ;Writes a scsi write 10 transfer command to the location pointed at by rdi
   2699                              <1> ;al contains the LUN of the device we are accessing
   2700                              <1> ;r8d contains the LBA start address
   2701                              <1> ;r9w contains the Verification Length
-  2702 000052D3 B42A                <1>     mov ah, 2Ah        ;Operation code for command
-  2703 000052D5 EB02                <1>     jmp short .scsirw
+  2702 000052CE B42A                <1>     mov ah, 2Ah        ;Operation code for command
+  2703 000052D0 EB02                <1>     jmp short .scsirw
   2704                              <1> .scsiRead10:
   2705                              <1> ;Writes a scsi Read 10 command to the location pointed to by rdi
   2706                              <1> ;al contains the LUN of the device we are accessing.
   2707                              <1> ;r8d contains the LBA to read from
   2708                              <1> ;r9w contains the number of contiguous blocks to read (should be 1 for us)
-  2709 000052D7 B428                <1>     mov ah, 28h        ;Move read(10) command value high
+  2709 000052D2 B428                <1>     mov ah, 28h        ;Move read(10) command value high
   2710                              <1> .scsirw:
-  2711 000052D9 C0E005              <1>     shl al, 5        ;Shift left by five to align LUN properly
-  2712 000052DC 86E0                <1>     xchg ah, al        ;swap ah and al
-  2713 000052DE 66AB                <1>     stosw            ;Store command and shifted LUN together
-  2714 000052E0 410FC8              <1>     bswap r8d        ;swap endianness of r8d
-  2715 000052E3 4489C0              <1>     mov eax, r8d
-  2716 000052E6 AB                  <1>     stosd
-  2717 000052E7 4831C0              <1>     xor rax, rax    ;Clear for a Reserved byte
-  2718 000052EA AA                  <1>     stosb
-  2719 000052EB 664489C8            <1>     mov ax, r9w        ;move into ax to use xchg on upper and lower bytes
-  2720 000052EF 86C4                <1>     xchg al, ah        ;MSB first, yuck yuck yuck
-  2721 000052F1 66AB                <1>     stosw
-  2722 000052F3 C1E810              <1>     shr eax, 16        ;Bring zeros down onto lower word
-  2723 000052F6 66AB                <1>     stosw            ;Store one reserved byte and two padding bytes
-  2724 000052F8 AA                  <1>     stosb            
-  2725 000052F9 C3                  <1>     ret
+  2711 000052D4 C0E005              <1>     shl al, 5        ;Shift left by five to align LUN properly
+  2712 000052D7 86E0                <1>     xchg ah, al        ;swap ah and al
+  2713 000052D9 66AB                <1>     stosw            ;Store command and shifted LUN together
+  2714 000052DB 410FC8              <1>     bswap r8d        ;swap endianness of r8d
+  2715 000052DE 4489C0              <1>     mov eax, r8d
+  2716 000052E1 AB                  <1>     stosd
+  2717 000052E2 4831C0              <1>     xor rax, rax    ;Clear for a Reserved byte
+  2718 000052E5 AA                  <1>     stosb
+  2719 000052E6 664489C8            <1>     mov ax, r9w        ;move into ax to use xchg on upper and lower bytes
+  2720 000052EA 86C4                <1>     xchg al, ah        ;MSB first, yuck yuck yuck
+  2721 000052EC 66AB                <1>     stosw
+  2722 000052EE C1E810              <1>     shr eax, 16        ;Bring zeros down onto lower word
+  2723 000052F1 66AB                <1>     stosw            ;Store one reserved byte and two padding bytes
+  2724 000052F3 AA                  <1>     stosb            
+  2725 000052F4 C3                  <1>     ret
   2726                              <1> .scsiRequestSense:
   2727                              <1> ;Writes a scsi Request Sense command to the location pointer to by rdi
   2728                              <1> ;al contains the LUN of the device we are accessing.
-  2729 000052FA B403                <1>     mov ah, 03h        ;Move reqsense command value high
-  2730 000052FC C0E005              <1>     shl al, 5        ;Shift left by five to align LUN properly
-  2731 000052FF 86E0                <1>     xchg ah, al        ;swap ah and al
-  2732 00005301 66AB                <1>     stosw            ;Store command and shifted LUN together
-  2733 00005303 4831C0              <1>     xor rax, rax    
-  2734 00005306 66AB                <1>     stosw            ;Reserved word
-  2735 00005308 B012                <1>     mov al, 12h    ;Move alloc length byte into al
-  2736 0000530A 48AB                <1>     stosq
-  2737 0000530C C3                  <1>     ret
+  2729 000052F5 B403                <1>     mov ah, 03h        ;Move reqsense command value high
+  2730 000052F7 C0E005              <1>     shl al, 5        ;Shift left by five to align LUN properly
+  2731 000052FA 86E0                <1>     xchg ah, al        ;swap ah and al
+  2732 000052FC 66AB                <1>     stosw            ;Store command and shifted LUN together
+  2733 000052FE 4831C0              <1>     xor rax, rax    
+  2734 00005301 66AB                <1>     stosw            ;Reserved word
+  2735 00005303 B012                <1>     mov al, 12h    ;Move alloc length byte into al
+  2736 00005305 48AB                <1>     stosq
+  2737 00005307 C3                  <1>     ret
   2738                              <1> .scsiTestUnitReady:
   2739                              <1> ;Writes a scsi test unit ready command to the location pointed to by rdi
   2740                              <1> ;al contains the LUN of the device we are accessing.
-  2741 0000530D 30E4                <1>     xor ah, ah        ;Operation code zero
-  2742 0000530F C0E005              <1>     shl al, 5
-  2743 00005312 86E0                <1>     xchg ah, al
-  2744 00005314 66AB                <1>     stosw            ;Store shifted LUN and command code
-  2745 00005316 C3                  <1>     ret
+  2741 00005308 30E4                <1>     xor ah, ah        ;Operation code zero
+  2742 0000530A C0E005              <1>     shl al, 5
+  2743 0000530D 86E0                <1>     xchg ah, al
+  2744 0000530F 66AB                <1>     stosw            ;Store shifted LUN and command code
+  2745 00005311 C3                  <1>     ret
   2746                              <1> .scsiReadFormatCapacities:
   2747                              <1> ;al contains the LUN of the device
-  2748 00005317 88C4                <1>     mov ah, al
-  2749 00005319 B023                <1>     mov al, 23h        ;Operation code for command
-  2750 0000531B 66AB                <1>     stosw            ;Store shifted LUN and command code
-  2751 0000531D 4831C0              <1>     xor rax, rax
-  2752 00005320 AB                  <1>     stosd          ;Reserved dword    
-  2753 00005321 66AB                <1>     stosw           ;Reserved word
-  2754 00005323 B0FC                <1>     mov al, 0FCh    ;Move alloc length byte into al
-  2755 00005325 AA                  <1>     stosb
-  2756 00005326 C3                  <1>     ret
+  2748 00005312 88C4                <1>     mov ah, al
+  2749 00005314 B023                <1>     mov al, 23h        ;Operation code for command
+  2750 00005316 66AB                <1>     stosw            ;Store shifted LUN and command code
+  2751 00005318 4831C0              <1>     xor rax, rax
+  2752 0000531B AB                  <1>     stosd          ;Reserved dword    
+  2753 0000531C 66AB                <1>     stosw           ;Reserved word
+  2754 0000531E B0FC                <1>     mov al, 0FCh    ;Move alloc length byte into al
+  2755 00005320 AA                  <1>     stosb
+  2756 00005321 C3                  <1>     ret
   2757                              <1> .scsiReadCap10:
   2758                              <1> ;Writes a scsi read capacity command to the location pointed to by rdi
   2759                              <1> ;al contains the LUN of the device we are accessing
-  2760 00005327 B425                <1>     mov ah, 25h        ;Operation code for command
-  2761 00005329 C0E005              <1>     shl al, 5
-  2762 0000532C 86E0                <1>     xchg ah, al
-  2763 0000532E 66AB                <1>     stosw            ;Store shifted LUN and command code
-  2764 00005330 C3                  <1>     ret
+  2760 00005322 B425                <1>     mov ah, 25h        ;Operation code for command
+  2761 00005324 C0E005              <1>     shl al, 5
+  2762 00005327 86E0                <1>     xchg ah, al
+  2763 00005329 66AB                <1>     stosw            ;Store shifted LUN and command code
+  2764 0000532B C3                  <1>     ret
   2765                              <1> .scsiFormatUnit:
   2766                              <1> ;Writes a scsi format unit command to the location pointed to by rdi
   2767                              <1> ;al contains the LUN of the device we are accessing
-  2768 00005331 B404                <1>     mov ah, 04h        ;Operation code for format command
-  2769 00005333 C0E005              <1>     shl al, 5
-  2770 00005336 0C17                <1>     or al, 17h      ;Set bits [3:0] and 5, keep bit 4 clear
-  2771 00005338 86E0                <1>     xchg ah, al
-  2772 0000533A 66AB                <1>     stosw
-  2773 0000533C 30C0                <1>     xor al, al
-  2774 0000533E 66AB                <1>     stosw            ;Vender specific, set to 0!!
-  2775 00005340 4831C0              <1>     xor rax, rax
-  2776 00005343 48AB                <1>     stosq            ;Store LSB byte and all the 0 padding
-  2777 00005345 C3                  <1>     ret
+  2768 0000532C B404                <1>     mov ah, 04h        ;Operation code for format command
+  2769 0000532E C0E005              <1>     shl al, 5
+  2770 00005331 0C17                <1>     or al, 17h      ;Set bits [3:0] and 5, keep bit 4 clear
+  2771 00005333 86E0                <1>     xchg ah, al
+  2772 00005335 66AB                <1>     stosw
+  2773 00005337 30C0                <1>     xor al, al
+  2774 00005339 66AB                <1>     stosw            ;Vender specific, set to 0!!
+  2775 0000533B 4831C0              <1>     xor rax, rax
+  2776 0000533E 48AB                <1>     stosq            ;Store LSB byte and all the 0 padding
+  2777 00005340 C3                  <1>     ret
   2778                              <1> .scsiVerify:
   2779                              <1> ;Writes a scsi verify transfer command to the location pointed at by rdi
   2780                              <1> ;al contains the LUN of the device we are accessing
   2781                              <1> ;r12d contains the LBA for the sector address
   2782                              <1> ;Verifies one sector
-  2783 00005346 B42F                <1>     mov ah, 2Fh        ;Operation code for command
-  2784 00005348 C0E005              <1>     shl al, 5        ;Hardcode bytecheck (byte [1]) to 0
-  2785 0000534B 86E0                <1>     xchg ah, al
-  2786 0000534D 66AB                <1>     stosw            ;Store shifted LUN and command code
-  2787 0000534F 410FCC              <1>     bswap r12d        ;swap endianness of r12d
-  2788 00005352 4489E0              <1>     mov eax, r12d
-  2789 00005355 AB                  <1>     stosd
-  2790 00005356 4831C0              <1>     xor rax, rax    ;Clear for a Reserved byte
-  2791 00005359 AA                  <1>     stosb
-  2792 0000535A 66B80001            <1>     mov ax, 0100h    ;Write the number 1 in Big endian
-  2793 0000535E 66AB                <1>     stosw
-  2794 00005360 C1E810              <1>     shr eax, 16        ;Bring zeros down onto lower word
-  2795 00005363 66AB                <1>     stosw            ;Store one reserved byte and two padding bytes
-  2796 00005365 AA                  <1>     stosb        
-  2797 00005366 C3                  <1>     ret
+  2783 00005341 B42F                <1>     mov ah, 2Fh        ;Operation code for command
+  2784 00005343 C0E005              <1>     shl al, 5        ;Hardcode bytecheck (byte [1]) to 0
+  2785 00005346 86E0                <1>     xchg ah, al
+  2786 00005348 66AB                <1>     stosw            ;Store shifted LUN and command code
+  2787 0000534A 410FCC              <1>     bswap r12d        ;swap endianness of r12d
+  2788 0000534D 4489E0              <1>     mov eax, r12d
+  2789 00005350 AB                  <1>     stosd
+  2790 00005351 4831C0              <1>     xor rax, rax    ;Clear for a Reserved byte
+  2791 00005354 AA                  <1>     stosb
+  2792 00005355 66B80001            <1>     mov ax, 0100h    ;Write the number 1 in Big endian
+  2793 00005359 66AB                <1>     stosw
+  2794 0000535B C1E810              <1>     shr eax, 16        ;Bring zeros down onto lower word
+  2795 0000535E 66AB                <1>     stosw            ;Store one reserved byte and two padding bytes
+  2796 00005360 AA                  <1>     stosb        
+  2797 00005361 C3                  <1>     ret
   2798                              <1> .scsiModeSense6:
   2799                              <1> ;al contains the LUN of the device we are accessing
-  2800 00005367 B41A                <1>     mov ah, 1Ah     ;Operation code for Mode Sense 6
-  2801 00005369 C0E005              <1>     shl al, 5       ;Move LUN
-  2802 0000536C 86E0                <1>     xchg ah, al
-  2803 0000536E 66AB                <1>     stosw
-  2804 00005370 B83F00C000          <1>     mov eax, 0C0003Fh    
+  2800 00005362 B41A                <1>     mov ah, 1Ah     ;Operation code for Mode Sense 6
+  2801 00005364 C0E005              <1>     shl al, 5       ;Move LUN
+  2802 00005367 86E0                <1>     xchg ah, al
+  2803 00005369 66AB                <1>     stosw
+  2804 0000536B B83F00C000          <1>     mov eax, 0C0003Fh    
   2805                              <1>     ;Request all pages, reserve byte, 192 bytes and 0 end byte
-  2806 00005375 AB                  <1>     stosd
-  2807 00005376 C3                  <1>     ret
+  2806 00005370 AB                  <1>     stosd
+  2807 00005371 C3                  <1>     ret
   2808                              <1> ;                    -------------------------------
   2809                              <1> .ehciGetOpBase:
   2810                              <1> ;Gets opbase from mmio base (aka adds caplength) into eax
@@ -11836,323 +11836,323 @@
   2812                              <1> ; al = offset into ehci table
   2813                              <1> ;Return:
   2814                              <1> ; eax = opbase (low 4Gb)
-  2815 00005377 53                  <1>     push rbx
-  2816 00005378 4831DB              <1>     xor rbx, rbx
-  2817 0000537B 480FB6C0            <1>     movzx rax, al
-  2818 0000537F 8B04C5[19020000]    <1>     mov eax, dword [eControllerList + 4 + 8*rax]    ;get mmiobase into eax
-  2819 00005386 85C0                <1>     test eax, eax             ;addrress of 0 means no controller
-  2820 00005388 7406                <1>     jz .egob1
-  2821 0000538A 670FB618            <1>     movzx ebx, byte [eax]    ;get the offset to opbase into ebx
-  2822 0000538E 01D8                <1>     add eax, ebx            ;add this offset to mmiobase to get opbase
+  2815 00005372 53                  <1>     push rbx
+  2816 00005373 4831DB              <1>     xor rbx, rbx
+  2817 00005376 480FB6C0            <1>     movzx rax, al
+  2818 0000537A 8B04C5[19020000]    <1>     mov eax, dword [eControllerList + 4 + 8*rax]    ;get mmiobase into eax
+  2819 00005381 85C0                <1>     test eax, eax             ;addrress of 0 means no controller
+  2820 00005383 7406                <1>     jz .egob1
+  2821 00005385 670FB618            <1>     movzx ebx, byte [eax]    ;get the offset to opbase into ebx
+  2822 00005389 01D8                <1>     add eax, ebx            ;add this offset to mmiobase to get opbase
   2823                              <1> .egob1:
-  2824 00005390 5B                  <1>     pop rbx
-  2825 00005391 C3                  <1>     ret
+  2824 0000538B 5B                  <1>     pop rbx
+  2825 0000538C C3                  <1>     ret
    110                                  ;====================================CPU Interrupts=============================
    111                                  %include "./Source/Resident/Hardware/CPU/xception.asm"
      1                              <1> i0:
-     2 00005392 4831C0              <1>     xor rax, rax
-     3 00005395 E936010000          <1>     jmp cpu_2args
+     2 0000538D 4831C0              <1>     xor rax, rax
+     3 00005390 E936010000          <1>     jmp cpu_2args
      4                              <1> i1:
-     5 0000539A 48B801000000000000- <1>     mov rax, 1
-     5 000053A3 00                  <1>
-     6 000053A4 E927010000          <1>     jmp cpu_2args
+     5 00005395 48B801000000000000- <1>     mov rax, 1
+     5 0000539E 00                  <1>
+     6 0000539F E927010000          <1>     jmp cpu_2args
      7                              <1> i2:
-     8 000053A9 48B802000000000000- <1>     mov rax, 2
-     8 000053B2 00                  <1>
-     9 000053B3 E918010000          <1>     jmp cpu_2args
+     8 000053A4 48B802000000000000- <1>     mov rax, 2
+     8 000053AD 00                  <1>
+     9 000053AE E918010000          <1>     jmp cpu_2args
     10                              <1> i3:
-    11 000053B8 48B803000000000000- <1>     mov rax, 3
-    11 000053C1 00                  <1>
-    12 000053C2 E909010000          <1>     jmp cpu_2args
+    11 000053B3 48B803000000000000- <1>     mov rax, 3
+    11 000053BC 00                  <1>
+    12 000053BD E909010000          <1>     jmp cpu_2args
     13                              <1> i4:
-    14 000053C7 48B804000000000000- <1>     mov rax, 4
-    14 000053D0 00                  <1>
-    15 000053D1 E9FA000000          <1>     jmp cpu_2args
+    14 000053C2 48B804000000000000- <1>     mov rax, 4
+    14 000053CB 00                  <1>
+    15 000053CC E9FA000000          <1>     jmp cpu_2args
     16                              <1> i5:
-    17 000053D6 48B805000000000000- <1>     mov rax, 5
-    17 000053DF 00                  <1>
-    18 000053E0 E9EB000000          <1>     jmp cpu_2args
+    17 000053D1 48B805000000000000- <1>     mov rax, 5
+    17 000053DA 00                  <1>
+    18 000053DB E9EB000000          <1>     jmp cpu_2args
     19                              <1> i6:
-    20 000053E5 48B806000000000000- <1>     mov rax, 6
-    20 000053EE 00                  <1>
-    21 000053EF E9DC000000          <1>     jmp cpu_2args
+    20 000053E0 48B806000000000000- <1>     mov rax, 6
+    20 000053E9 00                  <1>
+    21 000053EA E9DC000000          <1>     jmp cpu_2args
     22                              <1> i7:
-    23 000053F4 48B807000000000000- <1>     mov rax, 7
-    23 000053FD 00                  <1>
-    24 000053FE E9CD000000          <1>     jmp cpu_2args
+    23 000053EF 48B807000000000000- <1>     mov rax, 7
+    23 000053F8 00                  <1>
+    24 000053F9 E9CD000000          <1>     jmp cpu_2args
     25                              <1> i8:
-    26 00005403 48B808000000000000- <1>     mov rax, 8
-    26 0000540C 00                  <1>
-    27 0000540D E9B2000000          <1>     jmp cpu_3args
+    26 000053FE 48B808000000000000- <1>     mov rax, 8
+    26 00005407 00                  <1>
+    27 00005408 E9B2000000          <1>     jmp cpu_3args
     28                              <1> i9:
-    29 00005412 48B809000000000000- <1>     mov rax, 9
-    29 0000541B 00                  <1>
-    30 0000541C E9AF000000          <1>     jmp cpu_2args
+    29 0000540D 48B809000000000000- <1>     mov rax, 9
+    29 00005416 00                  <1>
+    30 00005417 E9AF000000          <1>     jmp cpu_2args
     31                              <1> i10:
-    32 00005421 48B80A000000000000- <1>     mov rax, 0Ah
-    32 0000542A 00                  <1>
-    33 0000542B E994000000          <1>     jmp cpu_3args
+    32 0000541C 48B80A000000000000- <1>     mov rax, 0Ah
+    32 00005425 00                  <1>
+    33 00005426 E994000000          <1>     jmp cpu_3args
     34                              <1> i11:
-    35 00005430 48B80B000000000000- <1>     mov rax, 0Bh
-    35 00005439 00                  <1>
-    36 0000543A E985000000          <1>     jmp cpu_3args
+    35 0000542B 48B80B000000000000- <1>     mov rax, 0Bh
+    35 00005434 00                  <1>
+    36 00005435 E985000000          <1>     jmp cpu_3args
     37                              <1> i12:
-    38 0000543F 48B80C000000000000- <1>     mov rax, 0Ch
-    38 00005448 00                  <1>
-    39 00005449 E976000000          <1>     jmp cpu_3args
+    38 0000543A 48B80C000000000000- <1>     mov rax, 0Ch
+    38 00005443 00                  <1>
+    39 00005444 E976000000          <1>     jmp cpu_3args
     40                              <1> i13:
-    41 0000544E 48B80D000000000000- <1>     mov rax, 0Dh
-    41 00005457 00                  <1>
-    42 00005458 EB6A                <1>     jmp short cpu_3args
+    41 00005449 48B80D000000000000- <1>     mov rax, 0Dh
+    41 00005452 00                  <1>
+    42 00005453 EB6A                <1>     jmp short cpu_3args
     43                              <1> i14:
-    44 0000545A 48B80E000000000000- <1>     mov rax, 0Eh
-    44 00005463 00                  <1>
-    45 00005464 EB52                <1>     jmp short cpu_4args
+    44 00005455 48B80E000000000000- <1>     mov rax, 0Eh
+    44 0000545E 00                  <1>
+    45 0000545F EB52                <1>     jmp short cpu_4args
     46                              <1> i15:
-    47 00005466 48B80F000000000000- <1>     mov rax, 0Fh
-    47 0000546F 00                  <1>
-    48 00005470 EB5E                <1>     jmp short cpu_2args
+    47 00005461 48B80F000000000000- <1>     mov rax, 0Fh
+    47 0000546A 00                  <1>
+    48 0000546B EB5E                <1>     jmp short cpu_2args
     49                              <1> i16:
-    50 00005472 48B810000000000000- <1>     mov rax, 10h
-    50 0000547B 00                  <1>
-    51 0000547C EB52                <1>     jmp short cpu_2args
+    50 0000546D 48B810000000000000- <1>     mov rax, 10h
+    50 00005476 00                  <1>
+    51 00005477 EB52                <1>     jmp short cpu_2args
     52                              <1> i17:
-    53 0000547E 48B811000000000000- <1>     mov rax, 11h
-    53 00005487 00                  <1>
-    54 00005488 EB3A                <1>     jmp short cpu_3args
+    53 00005479 48B811000000000000- <1>     mov rax, 11h
+    53 00005482 00                  <1>
+    54 00005483 EB3A                <1>     jmp short cpu_3args
     55                              <1> i18:
-    56 0000548A 48B812000000000000- <1>     mov rax, 12h
-    56 00005493 00                  <1>
-    57 00005494 EB3A                <1>     jmp short cpu_2args
+    56 00005485 48B812000000000000- <1>     mov rax, 12h
+    56 0000548E 00                  <1>
+    57 0000548F EB3A                <1>     jmp short cpu_2args
     58                              <1> i19:
-    59 00005496 48B813000000000000- <1>     mov rax, 13h
-    59 0000549F 00                  <1>
-    60 000054A0 EB2E                <1>     jmp short cpu_2args
+    59 00005491 48B813000000000000- <1>     mov rax, 13h
+    59 0000549A 00                  <1>
+    60 0000549B EB2E                <1>     jmp short cpu_2args
     61                              <1> i20:
-    62 000054A2 48B814000000000000- <1>     mov rax, 14h
-    62 000054AB 00                  <1>
-    63 000054AC EB22                <1>     jmp short cpu_2args
+    62 0000549D 48B814000000000000- <1>     mov rax, 14h
+    62 000054A6 00                  <1>
+    63 000054A7 EB22                <1>     jmp short cpu_2args
     64                              <1> i21:
-    65 000054AE 48B815000000000000- <1>     mov rax, 15h
-    65 000054B7 00                  <1>
+    65 000054A9 48B815000000000000- <1>     mov rax, 15h
+    65 000054B2 00                  <1>
     66                              <1> cpu_4args:
-    67 000054B8 48B903000000000000- <1>     mov rcx, 3
-    67 000054C1 00                  <1>
-    68 000054C2 EB16                <1>     jmp short cpu_exception
+    67 000054B3 48B903000000000000- <1>     mov rcx, 3
+    67 000054BC 00                  <1>
+    68 000054BD EB16                <1>     jmp short cpu_exception
     69                              <1> cpu_3args:
-    70 000054C4 48B902000000000000- <1>     mov rcx, 2
-    70 000054CD 00                  <1>
-    71 000054CE EB0A                <1>     jmp short cpu_exception
+    70 000054BF 48B902000000000000- <1>     mov rcx, 2
+    70 000054C8 00                  <1>
+    71 000054C9 EB0A                <1>     jmp short cpu_exception
     72                              <1> cpu_2args:
-    73 000054D0 48B901000000000000- <1>     mov rcx, 1
-    73 000054D9 00                  <1>
+    73 000054CB 48B901000000000000- <1>     mov rcx, 1
+    73 000054D4 00                  <1>
     74                              <1> cpu_exception:
-    75 000054DA 50                  <1>     push rax
-    76 000054DB 51                  <1>     push rcx
-    77 000054DC 66BB1F00            <1>     mov bx, 001Fh    ;cls attribs
-    78 000054E0 E812ACFFFF          <1>     call cls
+    75 000054D5 50                  <1>     push rax
+    76 000054D6 51                  <1>     push rcx
+    77 000054D7 66BB1F00            <1>     mov bx, 001Fh    ;cls attribs
+    78 000054DB E817ACFFFF          <1>     call cls
     79                              <1> 
-    80 000054E5 48B800020000000000- <1>     mov rax, 0200h
-    80 000054EE 00                  <1>
-    81 000054EF 4831DB              <1>     xor rbx, rbx
-    82 000054F2 48BA22070000000000- <1>     mov rdx, 0722h    ;7 Rows down, 24 columns across
-    82 000054FB 00                  <1>
-    83 000054FC 48BD-               <1>     mov rbp, .fatalt0
-    83 000054FE [4756000000000000]  <1>
-    84 00005506 66BB7100            <1>     mov bx, 0071h     ;blue grey attribs, page 0
-    85 0000550A 66B80113            <1>     mov ax, 1301h     ;print zero 8 chars, with bh attrib
-    86 0000550E 48B908000000000000- <1>     mov rcx, 8
-    86 00005517 00                  <1>
-    87 00005518 CD30                <1>     int 30h
+    80 000054E0 48B800020000000000- <1>     mov rax, 0200h
+    80 000054E9 00                  <1>
+    81 000054EA 4831DB              <1>     xor rbx, rbx
+    82 000054ED 48BA22070000000000- <1>     mov rdx, 0722h    ;7 Rows down, 24 columns across
+    82 000054F6 00                  <1>
+    83 000054F7 48BD-               <1>     mov rbp, .fatalt0
+    83 000054F9 [4256000000000000]  <1>
+    84 00005501 66BB7100            <1>     mov bx, 0071h     ;blue grey attribs, page 0
+    85 00005505 66B80113            <1>     mov ax, 1301h     ;print zero 8 chars, with bh attrib
+    86 00005509 48B908000000000000- <1>     mov rcx, 8
+    86 00005512 00                  <1>
+    87 00005513 CD30                <1>     int 30h
     88                              <1> 
-    89 0000551A 48B800020000000000- <1>     mov rax, 0200h
-    89 00005523 00                  <1>
-    90 00005524 30FF                <1>     xor bh, bh
-    91 00005526 48BA040A0000000000- <1>     mov rdx, 0A04h    ;11 Rows down, 24 columns across
-    91 0000552F 00                  <1>
-    92 00005530 CD30                <1>     int 30h
-    93 00005532 48BD-               <1>     mov rbp, .fatal1
-    93 00005534 [4F56000000000000]  <1>
-    94 0000553C 30FF                <1>     xor bh, bh        ;blue grey attribs, page 0
-    95 0000553E 66B80413            <1>     mov ax, 1304h            ;print zero terminated string
-    96 00005542 CD30                <1>     int 30h
+    89 00005515 48B800020000000000- <1>     mov rax, 0200h
+    89 0000551E 00                  <1>
+    90 0000551F 30FF                <1>     xor bh, bh
+    91 00005521 48BA040A0000000000- <1>     mov rdx, 0A04h    ;11 Rows down, 24 columns across
+    91 0000552A 00                  <1>
+    92 0000552B CD30                <1>     int 30h
+    93 0000552D 48BD-               <1>     mov rbp, .fatal1
+    93 0000552F [4A56000000000000]  <1>
+    94 00005537 30FF                <1>     xor bh, bh        ;blue grey attribs, page 0
+    95 00005539 66B80413            <1>     mov ax, 1304h            ;print zero terminated string
+    96 0000553D CD30                <1>     int 30h
     97                              <1> 
-    98 00005544 59                  <1>     pop rcx
-    99 00005545 58                  <1>     pop rax                ;pop the exception number back into rax
-   100 00005546 E8DF000000          <1>     call .printbyte
+    98 0000553F 59                  <1>     pop rcx
+    99 00005540 58                  <1>     pop rax                ;pop the exception number back into rax
+   100 00005541 E8DF000000          <1>     call .printbyte
    101                              <1> 
-   102 0000554B 48B804130000000000- <1>     mov rax, 1304h
-   102 00005554 00                  <1>
-   103 00005555 30FF                <1>     xor bh, bh
-   104 00005557 48BD-               <1>     mov rbp, .fatal2
-   104 00005559 [9057000000000000]  <1>
-   105 00005561 CD30                <1>     int 30h
+   102 00005546 48B804130000000000- <1>     mov rax, 1304h
+   102 0000554F 00                  <1>
+   103 00005550 30FF                <1>     xor bh, bh
+   104 00005552 48BD-               <1>     mov rbp, .fatal2
+   104 00005554 [8B57000000000000]  <1>
+   105 0000555C CD30                <1>     int 30h
    106                              <1> 
-   107 00005563 80F901              <1>     cmp cl, 1
-   108 00005566 773A                <1>     ja .cpuextendederror    ;rax contains error code, or extra cr2 value
+   107 0000555E 80F901              <1>     cmp cl, 1
+   108 00005561 773A                <1>     ja .cpuextendederror    ;rax contains error code, or extra cr2 value
    109                              <1> .cpurollprint:
-   110 00005568 488B1424            <1>     mov rdx, qword [rsp]    ;Get address
+   110 00005563 488B1424            <1>     mov rdx, qword [rsp]    ;Get address
    111                              <1> ;Takes whats in rdx, rols left by one byte, prints al
-   112 0000556C B108                <1>     mov cl, 8    ;8 bytes
+   112 00005567 B108                <1>     mov cl, 8    ;8 bytes
    113                              <1> .cpurollprint1:
-   114 0000556E 48C1C208            <1>     rol rdx, 8
-   115 00005572 88D0                <1>     mov al, dl
-   116 00005574 52                  <1>     push rdx
-   117 00005575 E8B0000000          <1>     call .printbyte
-   118 0000557A 5A                  <1>     pop rdx
-   119 0000557B FEC9                <1>     dec cl
-   120 0000557D 75EF                <1>     jnz .cpurollprint1
+   114 00005569 48C1C208            <1>     rol rdx, 8
+   115 0000556D 88D0                <1>     mov al, dl
+   116 0000556F 52                  <1>     push rdx
+   117 00005570 E8B0000000          <1>     call .printbyte
+   118 00005575 5A                  <1>     pop rdx
+   119 00005576 FEC9                <1>     dec cl
+   120 00005578 75EF                <1>     jnz .cpurollprint1
    121                              <1> 
    122                              <1> .cpuexendloop:
-   123 0000557F 6631C0              <1>     xor ax, ax
-   124 00005582 CD36                <1>     int 36h
-   125 00005584 3C1B                <1>     cmp al, 1Bh    ;Check for escape pressed (unlikely?)
-   126 00005586 740F                <1>     je .cpu_exception_appret
-   127 00005588 3C0D                <1>     cmp al, 0Dh ;Check for enter pressed
-   128 0000558A 75F3                <1>     jne .cpuexendloop
+   123 0000557A 6631C0              <1>     xor ax, ax
+   124 0000557D CD36                <1>     int 36h
+   125 0000557F 3C1B                <1>     cmp al, 1Bh    ;Check for escape pressed (unlikely?)
+   126 00005581 740F                <1>     je .cpu_exception_appret
+   127 00005583 3C0D                <1>     cmp al, 0Dh ;Check for enter pressed
+   128 00005585 75F3                <1>     jne .cpuexendloop
    129                              <1> 
-   130 0000558C 66BB0700            <1>     mov bx, 0007h    ;cls attribs
-   131 00005590 E862ABFFFF          <1>     call cls
-   132 00005595 CD38                <1>     int 38h    ;Jump to debugger
+   130 00005587 66BB0700            <1>     mov bx, 0007h    ;cls attribs
+   131 0000558B E867ABFFFF          <1>     call cls
+   132 00005590 CD38                <1>     int 38h    ;Jump to debugger
    133                              <1> .cpu_exception_appret:
-   134 00005597 66BB0700            <1>     mov bx, 0007h    ;cls attribs
-   135 0000559B E857ABFFFF          <1>     call cls
-   136 000055A0 48CF                <1>     iretq ;Return to address on stack
+   134 00005592 66BB0700            <1>     mov bx, 0007h    ;cls attribs
+   135 00005596 E85CABFFFF          <1>     call cls
+   136 0000559B 48CF                <1>     iretq ;Return to address on stack
    137                              <1> 
    138                              <1> .cpuextendederror:
-   139 000055A2 5A                  <1>     pop rdx
-   140 000055A3 48FFC9              <1>     dec rcx
-   141 000055A6 51                  <1>     push rcx
-   142 000055A7 B102                <1>     mov cl, 2    ;CAN CHANGE TO 4 BYTES IN THE FUTURE
+   139 0000559D 5A                  <1>     pop rdx
+   140 0000559E 48FFC9              <1>     dec rcx
+   141 000055A1 51                  <1>     push rcx
+   142 000055A2 B102                <1>     mov cl, 2    ;CAN CHANGE TO 4 BYTES IN THE FUTURE
    143                              <1> .pr1:
-   144 000055A9 C1C208              <1>     rol edx, 8    ;Print just edx
-   145 000055AC 88D0                <1>     mov al, dl
-   146 000055AE 52                  <1>     push rdx
-   147 000055AF E876000000          <1>     call .printbyte
-   148 000055B4 5A                  <1>     pop rdx
-   149 000055B5 FEC9                <1>     dec cl
-   150 000055B7 75F0                <1>     jnz .pr1
+   144 000055A4 C1C208              <1>     rol edx, 8    ;Print just edx
+   145 000055A7 88D0                <1>     mov al, dl
+   146 000055A9 52                  <1>     push rdx
+   147 000055AA E876000000          <1>     call .printbyte
+   148 000055AF 5A                  <1>     pop rdx
+   149 000055B0 FEC9                <1>     dec cl
+   150 000055B2 75F0                <1>     jnz .pr1
    151                              <1> 
-   152 000055B9 48B804130000000000- <1>     mov rax, 1304h
-   152 000055C2 00                  <1>
-   153 000055C3 48BB17000000000000- <1>     mov rbx, 17h
-   153 000055CC 00                  <1>
-   154 000055CD 48BD-               <1>     mov rbp, .fatal2
-   154 000055CF [9057000000000000]  <1>
-   155 000055D7 CD30                <1>     int 30h
-   156 000055D9 59                  <1>     pop rcx    ;Bring the comparison value back into rcx
+   152 000055B4 48B804130000000000- <1>     mov rax, 1304h
+   152 000055BD 00                  <1>
+   153 000055BE 48BB17000000000000- <1>     mov rbx, 17h
+   153 000055C7 00                  <1>
+   154 000055C8 48BD-               <1>     mov rbp, .fatal2
+   154 000055CA [8B57000000000000]  <1>
+   155 000055D2 CD30                <1>     int 30h
+   156 000055D4 59                  <1>     pop rcx    ;Bring the comparison value back into rcx
    157                              <1>     
-   158 000055DA 48FFC9              <1>     dec rcx
-   159 000055DD 7489                <1>     jz .cpurollprint
+   158 000055D5 48FFC9              <1>     dec rcx
+   159 000055D8 7489                <1>     jz .cpurollprint
    160                              <1> 
-   161 000055DF B108                <1>     mov cl, 8
-   162 000055E1 0F20D2              <1>     mov rdx, cr2    ;Get page fault address
+   161 000055DA B108                <1>     mov cl, 8
+   162 000055DC 0F20D2              <1>     mov rdx, cr2    ;Get page fault address
    163                              <1> .pr2:
-   164 000055E4 48C1C208            <1>     rol rdx, 8    ;Print rdx
-   165 000055E8 88D0                <1>     mov al, dl
-   166 000055EA 52                  <1>     push rdx
-   167 000055EB E83A000000          <1>     call .printbyte
-   168 000055F0 5A                  <1>     pop rdx
-   169 000055F1 FEC9                <1>     dec cl
-   170 000055F3 75EF                <1>     jnz .pr2
+   164 000055DF 48C1C208            <1>     rol rdx, 8    ;Print rdx
+   165 000055E3 88D0                <1>     mov al, dl
+   166 000055E5 52                  <1>     push rdx
+   167 000055E6 E83A000000          <1>     call .printbyte
+   168 000055EB 5A                  <1>     pop rdx
+   169 000055EC FEC9                <1>     dec cl
+   170 000055EE 75EF                <1>     jnz .pr2
    171                              <1> 
-   172 000055F5 48B804130000000000- <1>     mov rax, 1304h
-   172 000055FE 00                  <1>
-   173 000055FF 48BB17000000000000- <1>     mov rbx, 17h
-   173 00005608 00                  <1>
-   174 00005609 48BD-               <1>     mov rbp, .fatal2
-   174 0000560B [9057000000000000]  <1>
-   175 00005613 CD30                <1>     int 30h
+   172 000055F0 48B804130000000000- <1>     mov rax, 1304h
+   172 000055F9 00                  <1>
+   173 000055FA 48BB17000000000000- <1>     mov rbx, 17h
+   173 00005603 00                  <1>
+   174 00005604 48BD-               <1>     mov rbp, .fatal2
+   174 00005606 [8B57000000000000]  <1>
+   175 0000560E CD30                <1>     int 30h
    176                              <1>     
-   177 00005615 E94EFFFFFF          <1>     jmp .cpurollprint
+   177 00005610 E94EFFFFFF          <1>     jmp .cpurollprint
    178                              <1> 
    179                              <1> 
    180                              <1> .char:    ;Print a single character
-   181 0000561A 48BB-               <1>     mov rbx, .ascii
-   181 0000561C [9457000000000000]  <1>
-   182 00005624 D7                  <1>     xlatb    ;point al to entry in ascii table, using al as offset into table
+   181 00005615 48BB-               <1>     mov rbx, .ascii
+   181 00005617 [8F57000000000000]  <1>
+   182 0000561F D7                  <1>     xlatb    ;point al to entry in ascii table, using al as offset into table
    183                              <1>     ;xor bh, bh
-   184 00005625 B40E                <1>     mov ah, 0Eh
-   185 00005627 CD30                <1>     int 30h    ;print char
-   186 00005629 C3                  <1>     ret
+   184 00005620 B40E                <1>     mov ah, 0Eh
+   185 00005622 CD30                <1>     int 30h    ;print char
+   186 00005624 C3                  <1>     ret
    187                              <1> .printbyte:
-   188 0000562A 88C2                <1>     mov dl, al            ;save byte in dl
-   189 0000562C 6625F000            <1>     and ax, 00F0h        ;Hi nybble
-   190 00005630 6681E20F00          <1>     and dx, 000Fh        ;Lo nybble
-   191 00005635 66C1E804            <1>     shr ax, 4            ;shift one hex place value pos right
-   192 00005639 E8DCFFFFFF          <1>     call .char
-   193 0000563E 6689D0              <1>     mov ax, dx            ;mov lo nybble, to print
-   194 00005641 E8D4FFFFFF          <1>     call .char
-   195 00005646 C3                  <1>     ret    
-   196 00005647 5343502F42494F53    <1> .fatalt0:  db "SCP/BIOS"
-   197 0000564F 4120706F74656E7469- <1> .fatal1:   db "A potentially fatal error has occured. To continue: ",0Ah,0Ah,0Dh
-   197 00005658 616C6C792066617461- <1>
-   197 00005661 6C206572726F722068- <1>
-   197 0000566A 6173206F6363757265- <1>
-   197 00005673 642E20546F20636F6E- <1>
-   197 0000567C 74696E75653A200A0A- <1>
-   197 00005685 0D                  <1>
-   198 00005686 202020205072657373- <1> db "    Press Enter to launch SYSDEBUG, or",0Ah,0Ah,0Dh 
-   198 0000568F 20456E74657220746F- <1>
-   198 00005698 206C61756E63682053- <1>
-   198 000056A1 595344454255472C20- <1>
-   198 000056AA 6F720A0A0D          <1>
-   199 000056AF 202020205072657373- <1> db "    Press ESC to try and return to the application which caused the error," 
-   199 000056B8 2045534320746F2074- <1>
-   199 000056C1 727920616E64207265- <1>
-   199 000056CA 7475726E20746F2074- <1>
-   199 000056D3 6865206170706C6963- <1>
-   199 000056DC 6174696F6E20776869- <1>
-   199 000056E5 636820636175736564- <1>
-   199 000056EE 20746865206572726F- <1>
-   199 000056F7 722C                <1>
-   200 000056F9 6F720A0A0D          <1> db "or", 0Ah, 0Ah,0Dh,
-   201 000056FE 202020205072657373- <1> db "    Press CTRL+ALT+DEL to restart your system. If you do this,",0Ah,0Dh
-   201 00005707 204354524C2B414C54- <1>
-   201 00005710 2B44454C20746F2072- <1>
-   201 00005719 65737461727420796F- <1>
-   201 00005722 75722073797374656D- <1>
-   201 0000572B 2E20496620796F7520- <1>
-   201 00005734 646F20746869732C0A- <1>
-   201 0000573D 0D                  <1>
-   202 0000573E 20202020796F752077- <1> db "    you will lose any unsaved information in all open applications.",0Ah, 
-   202 00005747 696C6C206C6F736520- <1>
-   202 00005750 616E7920756E736176- <1>
-   202 00005759 656420696E666F726D- <1>
-   202 00005762 6174696F6E20696E20- <1>
-   202 0000576B 616C6C206F70656E20- <1>
-   202 00005774 6170706C6963617469- <1>
-   202 0000577D 6F6E732E0A          <1>
-   203 00005782 0A0D                <1> db 0Ah, 0Dh
-   204 00005784 202020204572726F72- <1> db "    Error: ",0
-   204 0000578D 3A2000              <1>
-   205 00005790 203A2000            <1> .fatal2:   db " : ",0
-   206 00005794 303132333435363738- <1> .ascii:    db '0123456789ABCDEF'
-   206 0000579D 39414243444546      <1>
+   188 00005625 88C2                <1>     mov dl, al            ;save byte in dl
+   189 00005627 6625F000            <1>     and ax, 00F0h        ;Hi nybble
+   190 0000562B 6681E20F00          <1>     and dx, 000Fh        ;Lo nybble
+   191 00005630 66C1E804            <1>     shr ax, 4            ;shift one hex place value pos right
+   192 00005634 E8DCFFFFFF          <1>     call .char
+   193 00005639 6689D0              <1>     mov ax, dx            ;mov lo nybble, to print
+   194 0000563C E8D4FFFFFF          <1>     call .char
+   195 00005641 C3                  <1>     ret    
+   196 00005642 5343502F42494F53    <1> .fatalt0:  db "SCP/BIOS"
+   197 0000564A 4120706F74656E7469- <1> .fatal1:   db "A potentially fatal error has occured. To continue: ",0Ah,0Ah,0Dh
+   197 00005653 616C6C792066617461- <1>
+   197 0000565C 6C206572726F722068- <1>
+   197 00005665 6173206F6363757265- <1>
+   197 0000566E 642E20546F20636F6E- <1>
+   197 00005677 74696E75653A200A0A- <1>
+   197 00005680 0D                  <1>
+   198 00005681 202020205072657373- <1> db "    Press Enter to launch SYSDEBUG, or",0Ah,0Ah,0Dh 
+   198 0000568A 20456E74657220746F- <1>
+   198 00005693 206C61756E63682053- <1>
+   198 0000569C 595344454255472C20- <1>
+   198 000056A5 6F720A0A0D          <1>
+   199 000056AA 202020205072657373- <1> db "    Press ESC to try and return to the application which caused the error," 
+   199 000056B3 2045534320746F2074- <1>
+   199 000056BC 727920616E64207265- <1>
+   199 000056C5 7475726E20746F2074- <1>
+   199 000056CE 6865206170706C6963- <1>
+   199 000056D7 6174696F6E20776869- <1>
+   199 000056E0 636820636175736564- <1>
+   199 000056E9 20746865206572726F- <1>
+   199 000056F2 722C                <1>
+   200 000056F4 6F720A0A0D          <1> db "or", 0Ah, 0Ah,0Dh,
+   201 000056F9 202020205072657373- <1> db "    Press CTRL+ALT+DEL to restart your system. If you do this,",0Ah,0Dh
+   201 00005702 204354524C2B414C54- <1>
+   201 0000570B 2B44454C20746F2072- <1>
+   201 00005714 65737461727420796F- <1>
+   201 0000571D 75722073797374656D- <1>
+   201 00005726 2E20496620796F7520- <1>
+   201 0000572F 646F20746869732C0A- <1>
+   201 00005738 0D                  <1>
+   202 00005739 20202020796F752077- <1> db "    you will lose any unsaved information in all open applications.",0Ah, 
+   202 00005742 696C6C206C6F736520- <1>
+   202 0000574B 616E7920756E736176- <1>
+   202 00005754 656420696E666F726D- <1>
+   202 0000575D 6174696F6E20696E20- <1>
+   202 00005766 616C6C206F70656E20- <1>
+   202 0000576F 6170706C6963617469- <1>
+   202 00005778 6F6E732E0A          <1>
+   203 0000577D 0A0D                <1> db 0Ah, 0Dh
+   204 0000577F 202020204572726F72- <1> db "    Error: ",0
+   204 00005788 3A2000              <1>
+   205 0000578B 203A2000            <1> .fatal2:   db " : ",0
+   206 0000578F 303132333435363738- <1> .ascii:    db '0123456789ABCDEF'
+   206 00005798 39414243444546      <1>
    112                                  ;==========================Dummy Interrupts======================
    113                                  %include "./Source/Resident/Hardware/dummyInt.asm"
      1                              <1> dummy_interrupt:
      2                              <1> .pic2:
-     3 000057A4 50                  <1>     push rax
-     4 000057A5 B020                <1>     mov al, EOI
-     5 000057A7 E6A0                <1>     out pic2command, al    ;EOI to pic2
-     6 000057A9 EB01                <1>     jmp short .p1
+     3 0000579F 50                  <1>     push rax
+     4 000057A0 B020                <1>     mov al, EOI
+     5 000057A2 E6A0                <1>     out pic2command, al    ;EOI to pic2
+     6 000057A4 EB01                <1>     jmp short .p1
      7                              <1> .pic1:
-     8 000057AB 50                  <1>     push rax
+     8 000057A6 50                  <1>     push rax
      9                              <1> .p1:
-    10 000057AC B020                <1>     mov al, EOI
-    11 000057AE E620                <1>     out pic1command, al    ;EOI to pic2
-    12 000057B0 58                  <1>     pop rax
+    10 000057A7 B020                <1>     mov al, EOI
+    11 000057A9 E620                <1>     out pic1command, al    ;EOI to pic2
+    12 000057AB 58                  <1>     pop rax
     13                              <1> dummy_return_64:
-    14 000057B1 48CF                <1>     iretq
+    14 000057AC 48CF                <1>     iretq
    114                                  %include "./Source/Resident/Misc/version.asm"
      1                              <1> ;----------------------------------------------------------------
-     2 000057B3 76302E392053435042- <1> signature:    db "v0.9 SCPBIOS"    ;12 byte signature
-     2 000057BC 494F53              <1>
-     3 000057BF 436F70797269676874- <1> signature2:   db "Copyright (C) Yll Buzoku"
-     3 000057C8 2028432920596C6C20- <1>
-     3 000057D1 42757A6F6B75        <1>
-     4 000057D7 31302F30352F323032- <1>               db "10/05/2024"
-     4 000057E0 34                  <1>
+     2 000057AE 76302E392053435042- <1> signature:    db "v0.9 SCPBIOS"    ;12 byte signature
+     2 000057B7 494F53              <1>
+     3 000057BA 436F70797269676874- <1> signature2:   db "Copyright (C) Yll Buzoku"
+     3 000057C3 2028432920596C6C20- <1>
+     3 000057CC 42757A6F6B75        <1>
+     4 000057D2 31302F30352F323032- <1>               db "10/05/2024"
+     4 000057DB 34                  <1>
    115                                  codeResidentEndPtr:
    116                                  residentLength  equ $-$$
