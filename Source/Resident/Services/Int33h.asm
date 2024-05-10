@@ -101,7 +101,7 @@ disk_io:
     jc .srexitbad1
     call USB.ehciMsdBOTRequestSense
     call USB.ehciMsdBOTCheckTransaction
-    test ax, ax
+    test ah, ah
     pop rax         ;Get back original error code
     jnz .srexitbad2
     movzx r8, byte [ehciDataIn + 13]  ;Get ASCQ into r8
@@ -122,7 +122,7 @@ disk_io:
 .srexitbad:
     pop rsi
     mov byte [msdStatus], ah
-    jmp short .rsbad
+    jmp short .srexit
 
 .readsectors:
     push rdi
@@ -668,7 +668,7 @@ disk_io:
     cmp byte [msdStatus], 20h   ;General Controller Failure
     je .deviceInitExit
     call USB.ehciMsdBOTCheckTransaction
-    test ax, ax     ;Clears CF
+    test ah, ah     ;Clears CF
     jz .deviceInitWriteTableEntry   ;Success, write table entry
     call USB.ehciMsdBOTResetRecovery    ;Just force a device reset
     cmp byte [msdStatus], 20h   ;General Controller Failure
