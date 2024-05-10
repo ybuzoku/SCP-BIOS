@@ -1782,10 +1782,18 @@ USB:
     jc .ehciMsdInitFail
     call .ehciMsdBOTInquiry
     jc .ehciMsdInitFail
+    ;VV Earmark for removal. Necessary for windows-like behaviour VV
+    call .ehciMsdBOTReadFormatCapacities    ;Ignore if this fails
+    ;^^ Earmark for removal. Necessary for windows-like behaviour ^^
     mov ecx, 5
 .emi0:
+    call .ehciMsdBOTInquiry
+    cmp byte [msdStatus], 20h   ;Host error
+    je .ehciMsdInitialisePfail  ;Protocol fail
+    call .ehciMsdBOTCheckTransaction
+    test ax, ax
+    jnz .emipf0
     call .ehciMsdBOTReadCapacity10
-    ;call .ehciMsdBOTReadFormatCapacities
     cmp byte [msdStatus], 20h   ;Host error
     je .ehciMsdInitialisePfail  ;Protocol fail
     call .ehciMsdBOTCheckTransaction
@@ -2342,32 +2350,32 @@ USB:
     pop rbx
     ret
 
-;.ehciMsdBOTReadFormatCapacities:
-;;Input: 
-;; rsi = Pointer to MSD table data structure
-;;Output:
-;;   CF=CY: Host error, Reset host system
-;;   CF=NC: Transaction succeeded, check data transferred successfully
-;    push rbx
-;    push rcx
-;    push r8
-;    push r11
-;    push r14
-;    push r15
-;    mov rbx, ehciDataIn
-;    mov ecx, 0
-;    mov r8, 0FCh            ;Return 252 bytes
-;    mov r11, 0Ah            ;The command block is 10 bytes
-;    mov r15, .scsiReadFormatCapacities
-;    mov r14, .ehciMsdBOTOII
-;    call .ehciMsdBOTRequest
-;    pop r15
-;    pop r14
-;    pop r11
-;    pop r8
-;    pop rcx
-;    pop rbx
-;    ret
+.ehciMsdBOTReadFormatCapacities:
+;Input: 
+; rsi = Pointer to MSD table data structure
+;Output:
+;   CF=CY: Host error, Reset host system
+;   CF=NC: Transaction succeeded, check data transferred successfully
+    push rbx
+    push rcx
+    push r8
+    push r11
+    push r14
+    push r15
+    mov rbx, ehciDataIn
+    mov ecx, 0
+    mov r8, 0FCh            ;Return 252 bytes
+    mov r11, 0Ah            ;The command block is 10 bytes
+    mov r15, .scsiReadFormatCapacities
+    mov r14, .ehciMsdBOTOII
+    call .ehciMsdBOTRequest
+    pop r15
+    pop r14
+    pop r11
+    pop r8
+    pop rcx
+    pop rbx
+    ret
 
 .ehciMsdBOTReadCapacity10:
 ;Input: 
@@ -2735,17 +2743,17 @@ USB:
     xchg ah, al
     stosw            ;Store shifted LUN and command code
     ret
-;.scsiReadFormatCapacities:
-;;al contains the LUN of the device
-;    mov ah, al
-;    mov al, 23h        ;Operation code for command
-;    stosw            ;Store shifted LUN and command code
-;    xor rax, rax
-;    stosd          ;Reserved dword    
-;    stosw           ;Reserved word
-;    mov al, 0FCh    ;Move alloc length byte into al
-;    stosb
-;    ret
+.scsiReadFormatCapacities:
+;al contains the LUN of the device
+    mov ah, al
+    mov al, 23h        ;Operation code for command
+    stosw            ;Store shifted LUN and command code
+    xor rax, rax
+    stosd          ;Reserved dword    
+    stosw           ;Reserved word
+    mov al, 0FCh    ;Move alloc length byte into al
+    stosb
+    ret
 .scsiReadCap10:
 ;Writes a scsi read capacity command to the location pointed to by rdi
 ;al contains the LUN of the device we are accessing
