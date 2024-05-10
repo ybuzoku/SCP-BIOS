@@ -13,11 +13,11 @@ Output file:  ./Binaries/scpbios.bin
 Vstart            Start             Stop              Length    Class     Name
              800               800               800  00000000  progbits  .text
              800               800              22BF  00001ABF  progbits  codeInit
-          117493              22BF              7A7E  000057BF  progbits  codeResident
+          117493              22BF              7A1D  0000575E  progbits  codeResident
           110000            110000            117020  00007020  nobits    BIOSTables
           117020            117020            117493  00000473  nobits    data
-          11CC52            11CC52            11D452  00000800  nobits    MCPseg
-          11D480            11D480            11DA70  000005F0  nobits    xdata
+          11CBF1            11CBF1            11D3F1  00000800  nobits    MCPseg
+          11D400            11D400            11D9F0  000005F0  nobits    xdata
              600               600               60C  0000000C  nobits    SysInitParams
              700               700               800  00000100  nobits    lowStack
 
@@ -48,7 +48,7 @@ vfollows:  not defined
 ---- Section codeResident -----------------------------------------------------
 
 class:     progbits
-length:                57BF
+length:                575E
 start:                 22BF
 align:                    1
 follows:   codeInit
@@ -82,10 +82,10 @@ vfollows:  BIOSTables
 
 class:     nobits
 length:                 800
-start:               11CC52
+start:               11CBF1
 align:                    1
 follows:   not defined
-vstart:              11CC52
+vstart:              11CBF1
 valign:                   1
 vfollows:  codeResident
 
@@ -93,10 +93,10 @@ vfollows:  codeResident
 
 class:     nobits
 length:                 5F0
-start:               11D480
+start:               11D400
 align:                   40
 follows:   not defined
-vstart:              11D480
+vstart:              11D400
 valign:                  40
 vfollows:  MCPseg
 
@@ -261,7 +261,7 @@ Value     Name
 000000A0  scr_io_table_length
 00000013  MCP_int.asciil
 00000013  MCP_int.lstl
-000057BF  residentLength
+0000575E  residentLength
 
 
 ---- Section codeInit ---------------------------------------------------------
@@ -1248,84 +1248,82 @@ Real              Virtual           Name
             7151            11C325  USB.ehciMsdWriteInQHead
             7190            11C364  USB.ehciMsdBOTRequest
             71CF            11C3A3  USB.ehciMsdBOTInquiry
-            721C            11C3F0  USB.ehciMsdBOTReadFormatCapacities
-            726D            11C441  USB.ehciMsdBOTReadCapacity10
-            72BE            11C492  USB.ehciMsdBOTFormatUnit
-            72F9            11C4CD  USB.embfu0
-            731B            11C4EF  USB.embfuexit
-            7325            11C4F9  USB.embfuerror
-            7328            11C4FC  USB.ehciMsdBOTVerify
-            7368            11C53C  USB.embvexit
-            7374            11C548  USB.embvbad
-            7377            11C54B  USB.ehciMsdBOTRequestSense
-            73C8            11C59C  USB.ehciMsdBOTTestReady
-            73FF            11C5D3  USB.ehciMsdBOTModeSense6
-            7450            11C624  USB.ehciMsdBOTOutSector512
-            7490            11C664  USB.embosexit
-            7498            11C66C  USB.emboseerror
-            749B            11C66F  USB.ehciMsdBOTInSector512
-            74D3            11C6A7  USB.ehciMsdBOTSector512
-            7524            11C6F8  USB.msdWriteCBW
-            7555            11C729  USB.scsiInquiry
-            7570            11C744  USB.scsiWrite10
-            7574            11C748  USB.scsiRead10
-            7576            11C74A  USB.scsirw
-            7597            11C76B  USB.scsiRequestSense
-            75AA            11C77E  USB.scsiTestUnitReady
-            75B4            11C788  USB.scsiReadFormatCapacities
-            75C4            11C798  USB.scsiReadCap10
-            75CE            11C7A2  USB.scsiFormatUnit
-            75E3            11C7B7  USB.scsiVerify
-            7604            11C7D8  USB.scsiModeSense6
-            7614            11C7E8  USB.ehciGetOpBase
-            762D            11C801  USB.egob1
-            762F            11C803  i0
-            7637            11C80B  i1
-            7646            11C81A  i2
-            7655            11C829  i3
-            7664            11C838  i4
-            7673            11C847  i5
-            7682            11C856  i6
-            7691            11C865  i7
-            76A0            11C874  i8
-            76AF            11C883  i9
-            76BE            11C892  i10
-            76CD            11C8A1  i11
-            76DC            11C8B0  i12
-            76EB            11C8BF  i13
-            76F7            11C8CB  i14
-            7703            11C8D7  i15
-            770F            11C8E3  i16
-            771B            11C8EF  i17
-            7727            11C8FB  i18
-            7733            11C907  i19
-            773F            11C913  i20
-            774B            11C91F  i21
-            7755            11C929  cpu_4args
-            7761            11C935  cpu_3args
-            776D            11C941  cpu_2args
-            7777            11C94B  cpu_exception
-            7805            11C9D9  cpu_exception.cpurollprint
-            780B            11C9DF  cpu_exception.cpurollprint1
-            781C            11C9F0  cpu_exception.cpuexendloop
-            7834            11CA08  cpu_exception.cpu_exception_appret
-            783F            11CA13  cpu_exception.cpuextendederror
-            7846            11CA1A  cpu_exception.pr1
-            7881            11CA55  cpu_exception.pr2
-            78B7            11CA8B  cpu_exception.char
-            78C7            11CA9B  cpu_exception.printbyte
-            78E4            11CAB8  cpu_exception.fatalt0
-            78EC            11CAC0  cpu_exception.fatal1
-            7A2D            11CC01  cpu_exception.fatal2
-            7A31            11CC05  cpu_exception.ascii
-            7A41            11CC15  dummy_interrupt
-            7A41            11CC15  dummy_interrupt.pic2
-            7A48            11CC1C  dummy_interrupt.pic1
-            7A49            11CC1D  dummy_interrupt.p1
-            7A4E            11CC22  dummy_return_64
-            7A50            11CC24  signature
-            7A5C            11CC30  signature2
-            7A7E            11CC52  codeResidentEndPtr
+            721C            11C3F0  USB.ehciMsdBOTReadCapacity10
+            726D            11C441  USB.ehciMsdBOTFormatUnit
+            72A8            11C47C  USB.embfu0
+            72CA            11C49E  USB.embfuexit
+            72D4            11C4A8  USB.embfuerror
+            72D7            11C4AB  USB.ehciMsdBOTVerify
+            7317            11C4EB  USB.embvexit
+            7323            11C4F7  USB.embvbad
+            7326            11C4FA  USB.ehciMsdBOTRequestSense
+            7377            11C54B  USB.ehciMsdBOTTestReady
+            73AE            11C582  USB.ehciMsdBOTModeSense6
+            73FF            11C5D3  USB.ehciMsdBOTOutSector512
+            743F            11C613  USB.embosexit
+            7447            11C61B  USB.emboseerror
+            744A            11C61E  USB.ehciMsdBOTInSector512
+            7482            11C656  USB.ehciMsdBOTSector512
+            74D3            11C6A7  USB.msdWriteCBW
+            7504            11C6D8  USB.scsiInquiry
+            751F            11C6F3  USB.scsiWrite10
+            7523            11C6F7  USB.scsiRead10
+            7525            11C6F9  USB.scsirw
+            7546            11C71A  USB.scsiRequestSense
+            7559            11C72D  USB.scsiTestUnitReady
+            7563            11C737  USB.scsiReadCap10
+            756D            11C741  USB.scsiFormatUnit
+            7582            11C756  USB.scsiVerify
+            75A3            11C777  USB.scsiModeSense6
+            75B3            11C787  USB.ehciGetOpBase
+            75CC            11C7A0  USB.egob1
+            75CE            11C7A2  i0
+            75D6            11C7AA  i1
+            75E5            11C7B9  i2
+            75F4            11C7C8  i3
+            7603            11C7D7  i4
+            7612            11C7E6  i5
+            7621            11C7F5  i6
+            7630            11C804  i7
+            763F            11C813  i8
+            764E            11C822  i9
+            765D            11C831  i10
+            766C            11C840  i11
+            767B            11C84F  i12
+            768A            11C85E  i13
+            7696            11C86A  i14
+            76A2            11C876  i15
+            76AE            11C882  i16
+            76BA            11C88E  i17
+            76C6            11C89A  i18
+            76D2            11C8A6  i19
+            76DE            11C8B2  i20
+            76EA            11C8BE  i21
+            76F4            11C8C8  cpu_4args
+            7700            11C8D4  cpu_3args
+            770C            11C8E0  cpu_2args
+            7716            11C8EA  cpu_exception
+            77A4            11C978  cpu_exception.cpurollprint
+            77AA            11C97E  cpu_exception.cpurollprint1
+            77BB            11C98F  cpu_exception.cpuexendloop
+            77D3            11C9A7  cpu_exception.cpu_exception_appret
+            77DE            11C9B2  cpu_exception.cpuextendederror
+            77E5            11C9B9  cpu_exception.pr1
+            7820            11C9F4  cpu_exception.pr2
+            7856            11CA2A  cpu_exception.char
+            7866            11CA3A  cpu_exception.printbyte
+            7883            11CA57  cpu_exception.fatalt0
+            788B            11CA5F  cpu_exception.fatal1
+            79CC            11CBA0  cpu_exception.fatal2
+            79D0            11CBA4  cpu_exception.ascii
+            79E0            11CBB4  dummy_interrupt
+            79E0            11CBB4  dummy_interrupt.pic2
+            79E7            11CBBB  dummy_interrupt.pic1
+            79E8            11CBBC  dummy_interrupt.p1
+            79ED            11CBC1  dummy_return_64
+            79EF            11CBC3  signature
+            79FB            11CBCF  signature2
+            7A1D            11CBF1  codeResidentEndPtr
 
 ---- Section BIOSTables -------------------------------------------------------
 
@@ -1448,21 +1446,21 @@ Real              Virtual           Name
 ---- Section MCPseg -----------------------------------------------------------
 
 Real              Virtual           Name
-          11D452            11D452  MCPsegEnd
+          11D3F1            11D3F1  MCPsegEnd
 
 ---- Section xdata ------------------------------------------------------------
 
 Real              Virtual           Name
-          11D480            11D480  ehciAschedule
-          11D480            11D480  ehciQHead0
-          11D500            11D500  ehciQHead1
-          11D580            11D580  ehciTDSpace
-          11D800            11D800  ehciDataOut
-          11D840            11D840  sectorbuffer
-          11D840            11D840  ehciDataIn
-          11DA40            11DA40  msdCSW
-          11DA60            11DA60  prdt
-          11DA70            11DA70  bigmapptr
+          11D400            11D400  ehciAschedule
+          11D400            11D400  ehciQHead0
+          11D480            11D480  ehciQHead1
+          11D500            11D500  ehciTDSpace
+          11D780            11D780  ehciDataOut
+          11D7C0            11D7C0  sectorbuffer
+          11D7C0            11D7C0  ehciDataIn
+          11D9C0            11D9C0  msdCSW
+          11D9E0            11D9E0  prdt
+          11D9F0            11D9F0  bigmapptr
 
 ---- Section SysInitParams ----------------------------------------------------
 
