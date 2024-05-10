@@ -1780,11 +1780,21 @@ USB:
     call .ehciDeviceSetupMsd
     mov al, 2
     jc .ehciMsdInitFail
+    ;Start of the init new device routine!
+    ;If any host errors here... something is fishy, crash the init.
+    mov ecx, 5
     call .ehciMsdBOTInquiry
     jc .ehciMsdInitFail
-    ;VV Earmark for removal. Necessary for windows-like behaviour VV
-    call .ehciMsdBOTReadFormatCapacities    ;Ignore if this fails
-    ;^^ Earmark for removal. Necessary for windows-like behaviour ^^
+    cmp byte [msdStatus], 20h   ;Host error
+    je .ehciMsdInitFail
+    ;Since we don't use anything other than LUN0 for BIOS, this is
+    ; purely for Windows like behaviour. Only halt the init if the
+    ; host errors
+    call .ehciMsdBOTReadFormatCapacities
+    jc .ehciMsdInitFail
+    cmp byte [msdStatus], 20h   ;Host error
+    je .ehciMsdInitFail
+;Now main part
     mov ecx, 5
 .emi0:
     call .ehciMsdBOTInquiry
