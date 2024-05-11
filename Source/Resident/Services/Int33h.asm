@@ -118,6 +118,7 @@ disk_io:
     mov ah, -1  ;Sense operation failed
     jmp short .srexitbad
 .srexitbad1:
+    pop rax ;Pop the original error code from the stack
     mov ah, 20h ;General Controller Failure
 .srexitbad:
     pop rsi
