@@ -186,7 +186,7 @@ struc msdDevTblEntry
     .bHubPort   db ?    ;Port number we are inserted in
     .bIFNum     db ?    ;Interface number being used
     .bIFSClass  db ?    ;A msdIFSC_* value
-    .bIFProt    db ?    ;A <sdIFProt_* value
+    .bIFProt    db ?    ;A msdIFProt_* value
     .bMaxPacketSize0    db ?    ; Max packet size to endpoint 0
     .bEPInAddr  db ?    ;4 bit address of IN EP
     .wMaxPacketSizeIn   dw ?    ;Max packet size to chosen In endpoint
