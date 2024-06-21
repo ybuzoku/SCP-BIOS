@@ -98,6 +98,46 @@ ehciasyncaddr    equ    18h    ;Next Asynchronus List Address
 ehciconfigflag   equ    40h    ;Configured Flag Register
 ehciportsc       equ    44h    ;Read = 1 - # of ports, Write = port ctrl
 ;                ------------------------
+;                ------xHCI equates------
+struc xhciCapRegs
+;xHCI Host Controller Capability Registers. All entries are RO.
+;The ptr to these regs is obtained from the PCI entry for this controller
+    .bCAPLENGHT     db ?
+    .bResvd         db ?
+    .wHCIVERSION    dw ?    ;Interface Version Number
+    .dHCSPARAMS1    dd ?    ;Structural Parameters 1
+    .dHCSPARAMS2    dd ?    ;Structural Parameters 2
+    .dHCSPARAMS3    dd ?    ;Structural Parameters 3
+    .dHCCPARAMS1    dd ?    ;Capability Parameters 1
+    .dDBOFF         dd ?    ;Doorbell Offset
+    .dRTSOFF        dd ?    ;Runtime Register Space Offset
+    .dHCCPARAMS2    dd ?    ;Capability Parameters 2
+    ;CAPLENGTH - 20h are all reserved
+endstruc
+
+struc xhciOpRegs
+;xHCI Operational Registers. These registers are found past the end of the 
+; capability registers.
+    .dUSBCMD    dd ?    ;USB Command reg
+    .dUSBSTS    dd ?    ;USB Status reg
+    .dPAGESIZE  dd ?    ;Page size
+    .res1       dd 2 dup (?)
+    .dDNCTRL    dd ?    ;Device Notification Control
+    .dCRCR      dd ?    ;Command Ring Control
+    .res2       dd 4 dup (?)
+    .dDCBAAP    dd ?    ;Device Context Base Address Array Pointer
+    .dCONFIG    dd ?    ;Configuration register
+    .res3       dd 241 dup (?)  ;Align to 400h, where the port regs start
+endstruc
+
+struc xhciPortReg
+    .dPORTSC    dd ?
+    .dPORTPMSC  dd ?
+    .dPORTLI    dd ?
+    .dPORTHLPMC dd ?
+endstruc
+
+;                ------------------------
 ;                -------MSD equates------
 setupReset       equ 0FFh
 setupGetMaxLUN   equ 0FEh
@@ -153,6 +193,7 @@ struc msdDevTblEntry
     .bEPOutAddr db ?    ;4 bit address of OUT EP
     .wMaxPacketSizeOut  dw ?    ;Max packet size to OUT endpoint
 ;These past two bytes are temporarily kept separate! Will bitstuff later
+;These two are EHCI data only.
     .bInEPdt    db ?    ;In Endpoints' dt bit
     .bOutEPdt   db ?    ;Out Endpoints' dt bit
 endstruc

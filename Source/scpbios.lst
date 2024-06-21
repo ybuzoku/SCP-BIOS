@@ -101,162 +101,203 @@
     98                              <1> ehciconfigflag   equ    40h    ;Configured Flag Register
     99                              <1> ehciportsc       equ    44h    ;Read = 1 - # of ports, Write = port ctrl
    100                              <1> ;                ------------------------
-   101                              <1> ;                -------MSD equates------
-   102                              <1> setupReset       equ 0FFh
-   103                              <1> setupGetMaxLUN   equ 0FEh
-   104                              <1> ;                ------------------------
-   105                              <1> ;                ------Bulk Storage equates------
-   106                              <1> CBWSig           equ    043425355h
-   107                              <1> CSWSig           equ    053425355h
-   108                              <1> CBWFlagOut       equ    00h    ;Switch to send to device
-   109                              <1> CBWFlagIn        equ    80h    ;Switch to recieve from
-   110                              <1> bCSWPassed       equ    00h
-   111                              <1> bCSWFailed       equ    01h
-   112                              <1> bCSWPhase        equ    02h
-   113                              <1> ;                ------------------------
-   114                              <1> ;------------------USB Table equates------------------
-   115                              <1> usbMaxDevices   equ 10
-   116                              <1> usbDevTblSz     equ usbMaxDevices  ;Number of Entries in the usb device table!
-   117                              <1> struc usbDevTblEntry
-   118 00000000 ??                  <1>     .bAddr      db ?    ;Dev Addr
-   119 00000001 ??                  <1>     .bBus       db ?    ;Root hub
-   120 00000002 ??                  <1>     .bClassCde  db ?    ;A usbDevClass_* value
-   121                              <1> endstruc
-   122                              <1> ;USB device Class codes
-   123                              <1> usbDevClass_MSD equ 8
-   124                              <1> usbDevClass_Hub equ 9
-   125                              <1> 
-   126                              <1> ;------------------Hub Table equates------------------
-   127                              <1> hubDevTblSz     equ 10  ;Number of Entries in the hub device table!
-   128                              <1> struc hubDevTblEntry
-   129 00000000 ??                  <1>     .bAddr      db ?    ;The assigned device address
-   130 00000001 ??                  <1>     .bBus       db ?    ;Host Bus [Root hub]
-   131 00000002 ??                  <1>     .bHostHub   db ?    ;Address of Hub we are attached to or 0 for Root
-   132 00000003 ??                  <1>     .bHubPort   db ?    ;Port number we are inserted in
-   133 00000004 ??                  <1>     .bMaxPacketSize0    db ?    ;Max packet size to endpoint 0
-   134 00000005 ??                  <1>     .bNumPorts  db ?    ;Number of downstream ports on hub
-   135 00000006 ??                  <1>     .bPowerOn2PowerGood db ?  ;Time in units of 2ms for dev on port to turn on
-   136 00000007 ??                  <1>     .bRes       db ?    ;Endpoint address, for when we add interrupt eps
-   137                              <1> ;   If bNumPorts=0 => Hub needs to undergo Hub Config
+   101                              <1> ;                ------xHCI equates------
+   102                              <1> struc xhciCapRegs
+   103                              <1> ;xHCI Host Controller Capability Registers. All entries are RO.
+   104                              <1> ;The ptr to these regs is obtained from the PCI entry for this controller
+   105 00000000 ??                  <1>     .bCAPLENGHT     db ?
+   106 00000001 ??                  <1>     .bResvd         db ?
+   107 00000002 ????                <1>     .wHCIVERSION    dw ?    ;Interface Version Number
+   108 00000004 ????????            <1>     .dHCSPARAMS1    dd ?    ;Structural Parameters 1
+   109 00000008 ????????            <1>     .dHCSPARAMS2    dd ?    ;Structural Parameters 2
+   110 0000000C ????????            <1>     .dHCSPARAMS3    dd ?    ;Structural Parameters 3
+   111 00000010 ????????            <1>     .dHCCPARAMS1    dd ?    ;Capability Parameters 1
+   112 00000014 ????????            <1>     .dDBOFF         dd ?    ;Doorbell Offset
+   113 00000018 ????????            <1>     .dRTSOFF        dd ?    ;Runtime Register Space Offset
+   114 0000001C ????????            <1>     .dHCCPARAMS2    dd ?    ;Capability Parameters 2
+   115                              <1>     ;CAPLENGTH - 20h are all reserved
+   116                              <1> endstruc
+   117                              <1> 
+   118                              <1> struc xhciOpRegs
+   119                              <1> ;xHCI Operational Registers. These registers are found past the end of the 
+   120                              <1> ; capability registers.
+   121 00000000 ????????            <1>     .dUSBCMD    dd ?    ;USB Command reg
+   122 00000004 ????????            <1>     .dUSBSTS    dd ?    ;USB Status reg
+   123 00000008 ????????            <1>     .dPAGESIZE  dd ?    ;Page size
+   124 0000000C ????????????????    <1>     .res1       dd 2 dup (?)
+   125 00000014 ????????            <1>     .dDNCTRL    dd ?    ;Device Notification Control
+   126 00000018 ????????            <1>     .dCRCR      dd ?    ;Command Ring Control
+   127 0000001C <res 10h>           <1>     .res2       dd 4 dup (?)
+   128 0000002C ????????            <1>     .dDCBAAP    dd ?    ;Device Context Base Address Array Pointer
+   129 00000030 ????????            <1>     .dCONFIG    dd ?    ;Configuration register
+   130 00000034 <res 3C4h>          <1>     .res3       dd 241 dup (?)  ;Align to 400h, where the port regs start
+   131                              <1> endstruc
+   132                              <1> 
+   133                              <1> struc xhciPortReg
+   134 00000000 ????????            <1>     .dPORTSC    dd ?
+   135 00000004 ????????            <1>     .dPORTPMSC  dd ?
+   136 00000008 ????????            <1>     .dPORTLI    dd ?
+   137 0000000C ????????            <1>     .dPORTHLPMC dd ?
    138                              <1> endstruc
    139                              <1> 
-   140                              <1> ;------------------MSD Table equates------------------
-   141                              <1> msdDevTblSz     equ 10  ;Number of Entries in the msd device table :)
-   142                              <1> struc msdDevTblEntry 
-   143 00000000 ??                  <1>     .bAddr      db ?    ;The assigned device address
-   144 00000001 ??                  <1>     .bBus       db ?    ;Host Bus [Root hub]
-   145 00000002 ??                  <1>     .bHostHub   db ?    ;Address of Hub we are attached to or 0 for Root
-   146 00000003 ??                  <1>     .bHubPort   db ?    ;Port number we are inserted in
-   147 00000004 ??                  <1>     .bIFNum     db ?    ;Interface number being used
-   148 00000005 ??                  <1>     .bIFSClass  db ?    ;A msdIFSC_* value
-   149 00000006 ??                  <1>     .bIFProt    db ?    ;A <sdIFProt_* value
-   150 00000007 ??                  <1>     .bMaxPacketSize0    db ?    ; Max packet size to endpoint 0
-   151 00000008 ??                  <1>     .bEPInAddr  db ?    ;4 bit address of IN EP
-   152 00000009 ????                <1>     .wMaxPacketSizeIn   dw ?    ;Max packet size to chosen In endpoint
-   153 0000000B ??                  <1>     .bEPOutAddr db ?    ;4 bit address of OUT EP
-   154 0000000C ????                <1>     .wMaxPacketSizeOut  dw ?    ;Max packet size to OUT endpoint
-   155                              <1> ;These past two bytes are temporarily kept separate! Will bitstuff later
-   156 0000000E ??                  <1>     .bInEPdt    db ?    ;In Endpoints' dt bit
-   157 0000000F ??                  <1>     .bOutEPdt   db ?    ;Out Endpoints' dt bit
-   158                              <1> endstruc
-   159                              <1> ;Interface Subclass types for MSD 
-   160                              <1> msdIFSC_Dflt    equ 0   ;Default = SCSI Interface Subclass
-   161                              <1> msdIFSC_SCSI    equ 6   ;SCSI Interface Subclass 
-   162                              <1> msdIFSC_UFI     equ 4   ;UFI Interface Subclass (Not yet supported...)
-   163                              <1> ;Interface Protocol types for MSD
-   164                              <1> msdIFProt_BBB   equ 50h ;BBB protocol
-   165                              <1> msdIFProt_iCBI  equ 0   ;CBI (not supported)
-   166                              <1> msdIFProt_CBI   equ 1   ;CBI without interrupt (not supported)
-   167                              <1> ;                ------------------------
-   168                              <1> ;------------------EHCI Transfer Descriptor size------------------
-   169                              <1> ehciSizeOfQH    equ 60h
-   170                              <1> ehciSizeOfTD    equ 40h
-   171                              <1> ;------------------------------------------------------------
-   172                              <1> ;----------------------ATA equates---------------------------
-   173                              <1> ata0_base       equ    1F0h
-   174                              <1> ata0_ctrl       equ    3F6h
-   175                              <1> ata1_base       equ    170h
-   176                              <1> ata1_ctrl       equ    376h
-   177                              <1> 
-   178                              <1> msd_class       equ    01h
-   179                              <1> ide_subclass    equ    01h
-   180                              <1> sata_subclass   equ    06h
-   181                              <1> ;------------------------------------------------------------
-   182                              <1> ;----------------------IDE equates---------------------------
-   183                              <1> ideCtrlrTblSz   equ     2   ;Max 2 controllers
-   184                              <1> struc ideCtrlrTblEntry
-   185 00000000 ????????            <1>     .dPCIAddress    dd ?    ;PCI IO address of controller
-   186 00000004 ????????            <1>     .dPCIBAR4       dd ?    ;PCI BAR4, the Bus Mastery address
-   187                              <1> ; Note that this address is given with the bottom nybble indicating
-   188                              <1> ; if the address is IO or MMIO. Bit set => IO
-   189                              <1> endstruc
-   190                              <1> ;----------------------FDD equates---------------------------
-   191                              <1> fdd_base        equ    3F0h
-   192                              <1> ;----------------------ATA equates---------------------------
-   193                              <1> fdiskTblSz  equ 4   ;Max 4 ATA disks on a system
-   194                              <1> struc fdiskTblEntry
-   195 00000000 ??                  <1>     .signature  db ? 
-   196                              <1>     ;CHS really shouldnt be used
-   197 00000001 ????                <1>     .wHeads     dw ?  ;Number of CHS Heads
-   198 00000003 ????                <1>     .wCylinder  dw ?  ;Number of CHS Cylinders
-   199 00000005 ????                <1>     .wSecTrc    dw ?  ;Number of CHS Sectors per Track
-   200 00000007 ????????            <1>     .lbaMax     dd ?  ;Number of maximum sector accessible by LBA28
-   201 0000000B ????????????????    <1>     .lbaMax48   dq ?  ;Number of maximum sector accessible by LBA48
-   202 00000013 ????                <1>     .ioBase     dw ?  ;IO Base address
-   203 00000015 ??                  <1>     .msBit      db ?  ;Master Slave bit in 0A0h/0B0h format
-   204                              <1> endstruc
-   205                              <1> ;.signature is as follows:
-   206                              <1> ;.signature[0] set = Device present and OK to use.
-   207                              <1> ;.signature[1] set = LBA 28 supported, detected by non-zero LBA28 field
-   208                              <1> ;.signature[2] set = LBA 48 supported, detected by bit set AND non-zero 
-   209                              <1> ;                       LBA 48 sectors field
-   210                              <1> ;.signature[7:3] = Reserved
-   211                              <1> ;Bitfield equates
-   212                              <1>     fdePresent  equ 1
-   213                              <1>     fdeLBA28    equ 2
-   214                              <1>     fdeLBA48    equ 4
-   215                              <1> 
-   216                              <1> ;Equates for the ATA identify command
-   217                              <1>     idCurrCyl   equ 2*54    ;54th word
-   218                              <1>     idCurrHed   equ 2*55    ;55th word
-   219                              <1>     idCurrSecTk equ 2*56    ;56th word
-   220                              <1>     idLBASectrs equ 2*60    ;60th word
-   221                              <1>     idLBA48Sec  equ 2*100   ;100th word
-   222                              <1> ;----------------------Int 33h Equates-----------------------
-   223                              <1> i33DevTblSz     equ 10h   ;10 i33 devices.
-   224                              <1> 
-   225                              <1> struc i33DevTblEntry
-   226 00000000 ??                  <1>     .bDevType   db ?    ;A ddDevType_* type value
-   227 00000001 ????                <1>     .wDevAddr   dw ?    ;USB Address/Bus pair OR local device table address
-   228 00000003 ????????            <1>     .dBlockSize dd ?    ;Dword size of LBA block (should be 512 for remdev)
-   229 00000007 ????????????????    <1>     .qLastLBA   dq ?    ;Last LBA address (OS WILL subtract 1)
-   230 0000000F ??                  <1>     .bEPSize    db ?    ;EP size for sector xfr. ddDevEPSize_* value.
-   231                              <1> endstruc
-   232                              <1> ;REMEMBER: LBA SECTOR 0 IS CHS SECTOR 0,0,1 !!
-   233                              <1> 
-   234                              <1> ;Disk device Max IO to EP size
-   235                              <1> ddDevEPSize_low equ 1   ;64 byte max IO size to EP. Unsupported and not used.
-   236                              <1> ddDevEPSize_reg equ 2   ;512 byte IO size to EP.
-   237                              <1> ddDevEPSize_big equ 3   ;4096 byte IO size to EP. Not yet supported
-   238                              <1> 
-   239                              <1> ;Disk device types 
-   240                              <1> ddDevType_free  equ 0   ;Free table entry
-   241                              <1> ddDevType_eMSD  equ 1   ;MSD on an EHCI bus
-   242                              <1> ddDevType_xMSD  equ 2   ;MSD on an xHCI bus
-   243                              <1> ddDevType_fdd   equ 3   ;Physical FDD (unsupported)
-   244                              <1> ddDevType_ata   equ 4   ;Physical ATA device 
-   245                              <1> ddDevType_atapi equ 5   ;Physical ATAPI device (partially supported)
-   246                              <1> 
-   247                              <1> ;------------------------------------------------------------
-   248                              <1> ;------------------------------------------------------------
-   249                              <1> ;------------------------Misc--------------------------------
-   250                              <1> port61h         equ 61h         ;I/O port 61h
-   251                              <1> EOI             equ 20h         ;End of interrupt signal
-   252                              <1> waitp           equ 80h         ;debug port used to wait for io cycles
-   253                              <1> bochsout        equ 0E9h        ;Emulator debug port
-   254                              <1> BREAKPOINT      equ 0CCh        ;Use to manually encode breakpoints in program
-   255                              <1> sizeOfMCPAlloc  equ 800h        ;2Kb allocated space
-   256                              <1> ;------------------------------------------------------------
+   140                              <1> ;                ------------------------
+   141                              <1> ;                -------MSD equates------
+   142                              <1> setupReset       equ 0FFh
+   143                              <1> setupGetMaxLUN   equ 0FEh
+   144                              <1> ;                ------------------------
+   145                              <1> ;                ------Bulk Storage equates------
+   146                              <1> CBWSig           equ    043425355h
+   147                              <1> CSWSig           equ    053425355h
+   148                              <1> CBWFlagOut       equ    00h    ;Switch to send to device
+   149                              <1> CBWFlagIn        equ    80h    ;Switch to recieve from
+   150                              <1> bCSWPassed       equ    00h
+   151                              <1> bCSWFailed       equ    01h
+   152                              <1> bCSWPhase        equ    02h
+   153                              <1> ;                ------------------------
+   154                              <1> ;------------------USB Table equates------------------
+   155                              <1> usbMaxDevices   equ 10
+   156                              <1> usbDevTblSz     equ usbMaxDevices  ;Number of Entries in the usb device table!
+   157                              <1> struc usbDevTblEntry
+   158 00000000 ??                  <1>     .bAddr      db ?    ;Dev Addr
+   159 00000001 ??                  <1>     .bBus       db ?    ;Root hub
+   160 00000002 ??                  <1>     .bClassCde  db ?    ;A usbDevClass_* value
+   161                              <1> endstruc
+   162                              <1> ;USB device Class codes
+   163                              <1> usbDevClass_MSD equ 8
+   164                              <1> usbDevClass_Hub equ 9
+   165                              <1> 
+   166                              <1> ;------------------Hub Table equates------------------
+   167                              <1> hubDevTblSz     equ 10  ;Number of Entries in the hub device table!
+   168                              <1> struc hubDevTblEntry
+   169 00000000 ??                  <1>     .bAddr      db ?    ;The assigned device address
+   170 00000001 ??                  <1>     .bBus       db ?    ;Host Bus [Root hub]
+   171 00000002 ??                  <1>     .bHostHub   db ?    ;Address of Hub we are attached to or 0 for Root
+   172 00000003 ??                  <1>     .bHubPort   db ?    ;Port number we are inserted in
+   173 00000004 ??                  <1>     .bMaxPacketSize0    db ?    ;Max packet size to endpoint 0
+   174 00000005 ??                  <1>     .bNumPorts  db ?    ;Number of downstream ports on hub
+   175 00000006 ??                  <1>     .bPowerOn2PowerGood db ?  ;Time in units of 2ms for dev on port to turn on
+   176 00000007 ??                  <1>     .bRes       db ?    ;Endpoint address, for when we add interrupt eps
+   177                              <1> ;   If bNumPorts=0 => Hub needs to undergo Hub Config
+   178                              <1> endstruc
+   179                              <1> 
+   180                              <1> ;------------------MSD Table equates------------------
+   181                              <1> msdDevTblSz     equ 10  ;Number of Entries in the msd device table :)
+   182                              <1> struc msdDevTblEntry 
+   183 00000000 ??                  <1>     .bAddr      db ?    ;The assigned device address
+   184 00000001 ??                  <1>     .bBus       db ?    ;Host Bus [Root hub]
+   185 00000002 ??                  <1>     .bHostHub   db ?    ;Address of Hub we are attached to or 0 for Root
+   186 00000003 ??                  <1>     .bHubPort   db ?    ;Port number we are inserted in
+   187 00000004 ??                  <1>     .bIFNum     db ?    ;Interface number being used
+   188 00000005 ??                  <1>     .bIFSClass  db ?    ;A msdIFSC_* value
+   189 00000006 ??                  <1>     .bIFProt    db ?    ;A <sdIFProt_* value
+   190 00000007 ??                  <1>     .bMaxPacketSize0    db ?    ; Max packet size to endpoint 0
+   191 00000008 ??                  <1>     .bEPInAddr  db ?    ;4 bit address of IN EP
+   192 00000009 ????                <1>     .wMaxPacketSizeIn   dw ?    ;Max packet size to chosen In endpoint
+   193 0000000B ??                  <1>     .bEPOutAddr db ?    ;4 bit address of OUT EP
+   194 0000000C ????                <1>     .wMaxPacketSizeOut  dw ?    ;Max packet size to OUT endpoint
+   195                              <1> ;These past two bytes are temporarily kept separate! Will bitstuff later
+   196                              <1> ;These two are EHCI data only.
+   197 0000000E ??                  <1>     .bInEPdt    db ?    ;In Endpoints' dt bit
+   198 0000000F ??                  <1>     .bOutEPdt   db ?    ;Out Endpoints' dt bit
+   199                              <1> endstruc
+   200                              <1> ;Interface Subclass types for MSD 
+   201                              <1> msdIFSC_Dflt    equ 0   ;Default = SCSI Interface Subclass
+   202                              <1> msdIFSC_SCSI    equ 6   ;SCSI Interface Subclass 
+   203                              <1> msdIFSC_UFI     equ 4   ;UFI Interface Subclass (Not yet supported...)
+   204                              <1> ;Interface Protocol types for MSD
+   205                              <1> msdIFProt_BBB   equ 50h ;BBB protocol
+   206                              <1> msdIFProt_iCBI  equ 0   ;CBI (not supported)
+   207                              <1> msdIFProt_CBI   equ 1   ;CBI without interrupt (not supported)
+   208                              <1> ;                ------------------------
+   209                              <1> ;------------------EHCI Transfer Descriptor size------------------
+   210                              <1> ehciSizeOfQH    equ 60h
+   211                              <1> ehciSizeOfTD    equ 40h
+   212                              <1> ;------------------------------------------------------------
+   213                              <1> ;----------------------ATA equates---------------------------
+   214                              <1> ata0_base       equ    1F0h
+   215                              <1> ata0_ctrl       equ    3F6h
+   216                              <1> ata1_base       equ    170h
+   217                              <1> ata1_ctrl       equ    376h
+   218                              <1> 
+   219                              <1> msd_class       equ    01h
+   220                              <1> ide_subclass    equ    01h
+   221                              <1> sata_subclass   equ    06h
+   222                              <1> ;------------------------------------------------------------
+   223                              <1> ;----------------------IDE equates---------------------------
+   224                              <1> ideCtrlrTblSz   equ     2   ;Max 2 controllers
+   225                              <1> struc ideCtrlrTblEntry
+   226 00000000 ????????            <1>     .dPCIAddress    dd ?    ;PCI IO address of controller
+   227 00000004 ????????            <1>     .dPCIBAR4       dd ?    ;PCI BAR4, the Bus Mastery address
+   228                              <1> ; Note that this address is given with the bottom nybble indicating
+   229                              <1> ; if the address is IO or MMIO. Bit set => IO
+   230                              <1> endstruc
+   231                              <1> ;----------------------FDD equates---------------------------
+   232                              <1> fdd_base        equ    3F0h
+   233                              <1> ;----------------------ATA equates---------------------------
+   234                              <1> fdiskTblSz  equ 4   ;Max 4 ATA disks on a system
+   235                              <1> struc fdiskTblEntry
+   236 00000000 ??                  <1>     .signature  db ? 
+   237                              <1>     ;CHS really shouldnt be used
+   238 00000001 ????                <1>     .wHeads     dw ?  ;Number of CHS Heads
+   239 00000003 ????                <1>     .wCylinder  dw ?  ;Number of CHS Cylinders
+   240 00000005 ????                <1>     .wSecTrc    dw ?  ;Number of CHS Sectors per Track
+   241 00000007 ????????            <1>     .lbaMax     dd ?  ;Number of maximum sector accessible by LBA28
+   242 0000000B ????????????????    <1>     .lbaMax48   dq ?  ;Number of maximum sector accessible by LBA48
+   243 00000013 ????                <1>     .ioBase     dw ?  ;IO Base address
+   244 00000015 ??                  <1>     .msBit      db ?  ;Master Slave bit in 0A0h/0B0h format
+   245                              <1> endstruc
+   246                              <1> ;.signature is as follows:
+   247                              <1> ;.signature[0] set = Device present and OK to use.
+   248                              <1> ;.signature[1] set = LBA 28 supported, detected by non-zero LBA28 field
+   249                              <1> ;.signature[2] set = LBA 48 supported, detected by bit set AND non-zero 
+   250                              <1> ;                       LBA 48 sectors field
+   251                              <1> ;.signature[7:3] = Reserved
+   252                              <1> ;Bitfield equates
+   253                              <1>     fdePresent  equ 1
+   254                              <1>     fdeLBA28    equ 2
+   255                              <1>     fdeLBA48    equ 4
+   256                              <1> 
+   257                              <1> ;Equates for the ATA identify command
+   258                              <1>     idCurrCyl   equ 2*54    ;54th word
+   259                              <1>     idCurrHed   equ 2*55    ;55th word
+   260                              <1>     idCurrSecTk equ 2*56    ;56th word
+   261                              <1>     idLBASectrs equ 2*60    ;60th word
+   262                              <1>     idLBA48Sec  equ 2*100   ;100th word
+   263                              <1> ;----------------------Int 33h Equates-----------------------
+   264                              <1> i33DevTblSz     equ 10h   ;10 i33 devices.
+   265                              <1> 
+   266                              <1> struc i33DevTblEntry
+   267 00000000 ??                  <1>     .bDevType   db ?    ;A ddDevType_* type value
+   268 00000001 ????                <1>     .wDevAddr   dw ?    ;USB Address/Bus pair OR local device table address
+   269 00000003 ????????            <1>     .dBlockSize dd ?    ;Dword size of LBA block (should be 512 for remdev)
+   270 00000007 ????????????????    <1>     .qLastLBA   dq ?    ;Last LBA address (OS WILL subtract 1)
+   271 0000000F ??                  <1>     .bEPSize    db ?    ;EP size for sector xfr. ddDevEPSize_* value.
+   272                              <1> endstruc
+   273                              <1> ;REMEMBER: LBA SECTOR 0 IS CHS SECTOR 0,0,1 !!
+   274                              <1> 
+   275                              <1> ;Disk device Max IO to EP size
+   276                              <1> ddDevEPSize_low equ 1   ;64 byte max IO size to EP. Unsupported and not used.
+   277                              <1> ddDevEPSize_reg equ 2   ;512 byte IO size to EP.
+   278                              <1> ddDevEPSize_big equ 3   ;4096 byte IO size to EP. Not yet supported
+   279                              <1> 
+   280                              <1> ;Disk device types 
+   281                              <1> ddDevType_free  equ 0   ;Free table entry
+   282                              <1> ddDevType_eMSD  equ 1   ;MSD on an EHCI bus
+   283                              <1> ddDevType_xMSD  equ 2   ;MSD on an xHCI bus
+   284                              <1> ddDevType_fdd   equ 3   ;Physical FDD (unsupported)
+   285                              <1> ddDevType_ata   equ 4   ;Physical ATA device 
+   286                              <1> ddDevType_atapi equ 5   ;Physical ATAPI device (partially supported)
+   287                              <1> 
+   288                              <1> ;------------------------------------------------------------
+   289                              <1> ;------------------------------------------------------------
+   290                              <1> ;------------------------Misc--------------------------------
+   291                              <1> port61h         equ 61h         ;I/O port 61h
+   292                              <1> EOI             equ 20h         ;End of interrupt signal
+   293                              <1> waitp           equ 80h         ;debug port used to wait for io cycles
+   294                              <1> bochsout        equ 0E9h        ;Emulator debug port
+   295                              <1> BREAKPOINT      equ 0CCh        ;Use to manually encode breakpoints in program
+   296                              <1> sizeOfMCPAlloc  equ 800h        ;2Kb allocated space
+   297                              <1> ;------------------------------------------------------------
      4                                  ;----------------------------------------------------------------
      5                                  ;                 BIOS SYSTEM TABLE AREA                        :
      6                                  ;----------------------------------------------------------------
