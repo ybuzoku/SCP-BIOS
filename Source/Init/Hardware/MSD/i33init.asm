@@ -3,9 +3,9 @@
 ;----------------------------------------------------------------    
 int33hinit:
 ;Create Int 33h data table entry for each MSD/floppy device using steps 1-3.
-;Go through MSD table and add devices to diskDevices
+;Go through MSD table and add devices to i33DevTbl
     mov rbp, usbDevTbl
-    mov rdi, diskDevices
+    mov rdi, i33DevTbl
 .i33i1:
     cmp byte [rbp + 2], 08h ;MSD USB Class code
     jne .i33proceed
@@ -19,12 +19,12 @@ int33hinit:
     je .i33ibad 
     cmp al, 3   ;Device not added to data tables
     je .i33proceed
-;Valid device added, increment rdi to next diskDevices table entry
-    add rdi, int33TblEntrySize
+;Valid device added, increment rdi to next i33DevTbl table entry
+    add rdi, i33DevTblEntry_size
 .i33proceed:
-    cmp rbp, usbDevTblEnd
+    cmp rbp, usbDevTbl + usbDevTblSz*usbDevTblEntry_size
     je .i33iend
-    add rbp, usbDevTblEntrySize
+    add rbp, usbDevTblEntry_size
     jmp .i33i1
 .i33ibad:   ;If it goes here, clear table entry
     mov qword [rdi], 0  ;Remove from diskDevice table

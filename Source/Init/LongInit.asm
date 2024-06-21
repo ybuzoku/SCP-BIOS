@@ -163,19 +163,19 @@ longmode_ep:
     inc ax
     stosd
 ;USB Tables
-    mov cx, 10*usbDevTblEntrySize
+    mov cx, usbDevTblSz*usbDevTblEntry_size
     rep stosb
-    mov cx, 10*hubDevTblEntrySize
+    mov cx, hubDevTblSz*hubDevTblEntry_size
     rep stosb
-    mov cx, 10*msdDevTblEntrySize
+    mov cx, msdDevTblSz*msdDevTblEntry_size
     rep stosb
 ;IDE and Int 33h stuff
-    stosb       ;ideNumberOfControllers
-    mov cx, 2*ideTableEntrySize ;ideControllerTable
+    stosb       ;ideNumCtrlr
+    mov cx, ideCtrlrTblSz*ideCtrlrTblEntry_size ;ideCtrlrTbl
     rep stosb
-    mov cx, 4*fdiskEntry_size
+    mov cx, fdiskTblSz*fdiskTblEntry_size
     rep stosb
-    mov cx, 10*int33TblEntrySize
+    mov cx, i33DevTblSz*i33DevTblEntry_size
     rep stosb
 ;End of BDA variable init
 

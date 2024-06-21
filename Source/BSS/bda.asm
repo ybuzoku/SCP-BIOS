@@ -3,146 +3,147 @@
 ;                    ah=80h => Invalid function.
 ;                    ah=86h => Not (yet) supported.
 ;------------------------------Data Area-------------------------
-IDTlength       resw 1 ;Maximum number of Interrupts is 256
+IDTlength       dw ? ;Maximum number of Interrupts is 256
 IDTpointer:
-.Limit          resw 1
-.Base           resq 1
+.Limit          dw ?
+.Base           dq ?
 
-GDTlength       resw 1
+GDTlength       dw ?
 GDTpointer:
-.Limit          resw 1
-.Base           resq 1
+.Limit          dw ?
+.Base           dq ?
 
-pageTablePtr:   resq 1
+pageTablePtr:   dq ?
 ;----------------------------------------
 ;       Spurious Interrupt counter      :
 ;----------------------------------------
-spurint1        resb 1    ;Keep track of how many spur ints on pic1
-spurint2        resb 1    ;pic 2
+spurint1        db ?    ;Keep track of how many spur ints on pic1
+spurint2        db ?    ;pic 2
 ;----------------------------------------
 ;            Keyboard Data Area         :
 ;----------------------------------------
-kb_buffer       resw 10h
-kb_buf_head     resq 1    ;Pointer to Keyboard buffer head
-kb_buf_tail     resq 1    ;Pointer to Keyboard buffer tail 
-kb_buf_start    resq 1    ;Pointer for circular buffer start
-kb_buf_end      resq 1    ;Ditto..., for end
-kb_flags        resb 1    ;Keyboard state flags
-kb_flags_1      resb 1    ;Extended flags, empty for now
-kb_flags_2      resb 1    ;Bit 0 = E1 present, Bit 1 = E0 present
-break_flag      resb 1    ;Well, its not for the Print Screen key
+kb_buffer       dw 10h dup (?)
+kb_buf_head     dq ?    ;Pointer to Keyboard buffer head
+kb_buf_tail     dq ?    ;Pointer to Keyboard buffer tail 
+kb_buf_start    dq ?    ;Pointer for circular buffer start
+kb_buf_end      dq ?    ;Ditto..., for end
+kb_flags        db ?    ;Keyboard state flags
+kb_flags_1      db ?    ;Extended flags, empty for now
+kb_flags_2      db ?    ;Bit 0 = E1 present, Bit 1 = E0 present
+break_flag      db ?    ;Well, its not for the Print Screen key
 ;----------------------------------------
 ;            Serial Data Area           :
 ;----------------------------------------
-numCOM          resb 1  ;Number of Serial Ports
-com_addresses   resw 4     ;Space for 4 IO addresses
+numCOM          db ?  ;Number of Serial Ports
+com_addresses   dw 4 dup (?)     ;Space for 4 IO addresses
 
 comX_buffer:
-com1_buffer     resb 10h 
-com2_buffer     resb 10h
-com3_buffer     resb 10h
-com4_buffer     resb 10h
+com1_buffer     db 10h dup (?)
+com2_buffer     db 10h dup (?)
+com3_buffer     db 10h dup (?)
+com4_buffer     db 10h dup (?)
 
 comX_buf_head:
-com1_buf_head   resq 1
-com2_buf_head   resq 1
-com3_buf_head   resq 1
-com4_buf_head   resq 1
+com1_buf_head   dq ?
+com2_buf_head   dq ?
+com3_buf_head   dq ?
+com4_buf_head   dq ?
 
 comX_buf_tail:
-com1_buf_tail   resq 1
-com2_buf_tail   resq 1
-com3_buf_tail   resq 1
-com4_buf_tail   resq 1
+com1_buf_tail   dq ?
+com2_buf_tail   dq ?
+com3_buf_tail   dq ?
+com4_buf_tail   dq ?
 
 comX_buf_start:
-com1_buf_start  resq 1
-com2_buf_start  resq 1
-com3_buf_start  resq 1
-com4_buf_start  resq 1
+com1_buf_start  dq ?
+com2_buf_start  dq ?
+com3_buf_start  dq ?
+com4_buf_start  dq ?
 
 comX_buf_end:
-com1_buf_end    resq 1
-com2_buf_end    resq 1
-com3_buf_end    resq 1
-com4_buf_end    resq 1
+com1_buf_end    dq ?
+com2_buf_end    dq ?
+com3_buf_end    dq ?
+com4_buf_end    dq ?
 
 ;----------------------------------------
 ;            Printer Data Area          :
 ;----------------------------------------
-prt_addresses   resw 3    ;Space for 3 IO addresses
+prt_addresses   dw 3 dup (?)    ;Space for 3 IO addresses
 ;----------------------------------------
 ;            Timer Data Area            :
 ;----------------------------------------
-pit_divisor     resw 1
-pit_ticks       resd 1    ;Similar to IBM PC, only with default divisor
+pit_divisor     dw ?
+pit_ticks       dd ?    ;Similar to IBM PC, only with default divisor
 ;[31]=OF cnt, [30:21]=Res [20:16]=Hi cnt, [15,0]=Lo cnt
-rtc_ticks       resq 1
+rtc_ticks       dq ?
 ;----------------------------------------
 ;            Screen Data Area           :
 ;----------------------------------------
-scr_curs_pos    resw 8    ;Cursor pos, hi byte = row / lo byte = column
-scr_cols        resb 1    ;80 Cols
-scr_rows        resb 1    ;25 Rows
-scr_curs_shape  resw 1    ;Packed start/end scan line
-scr_char_attr   resb 1    ;Grey text on black background
-scr_mode        resb 1    ;80x25, 16 colours default
-scr_active_page resb 1    ;Mode dependent
-scr_crtc_base   resw 1    ;03D4h for Graphics, 03B4h for MDA
-scr_page_addr   resd 1    ;CRTC Register 12 changes base address accessed
-scr_mode_params resq 1    ;Stub pointer location for future mode parameters
-scr_vga_ptrs    resq 8  ;VGA pointers
+scr_curs_pos    dw 8 dup (?)    ;Cursor pos, hi byte = row / lo byte = column
+scr_cols        db ?    ;80 Cols
+scr_rows        db ?    ;25 Rows
+scr_curs_shape  dw ?    ;Packed start/end scan line
+scr_char_attr   db ?    ;Grey text on black background
+scr_mode        db ?    ;80x25, 16 colours default
+scr_active_page db ?    ;Mode dependent
+scr_crtc_base   dw ?    ;03D4h for Graphics, 03B4h for MDA
+scr_page_addr   dd ?    ;CRTC Register 12 changes base address accessed
+scr_mode_params dq ?    ;Stub pointer location for future mode parameters
+scr_vga_ptrs    dq 8 dup (?)  ;VGA pointers
 ;----------------------------------------
 ;       Mass storage Data Area          :
 ;----------------------------------------
-i33Devices      resb 1  ;Number of devices Int 33h is aware of
-msdStatus       resb 1  ;Status byte. Used by BIOS for all transfers with Int 33h.
-fdiskNum        resb 1  ;Number of fixed disks
-ata0CmdByte     resb 1  ;Contains bitfield of instructions, Bit 0 is master/slave, Bit 1 is Data Mutex
-ata0Status      resb 1  ;Contains the status of the last transaction
-ata1CmdByte     resb 1
-ata1Status      resb 1
-diskDptPtr      resq 1
-fdiskDptPtr     resq 1
+i33Devices      db ?  ;Number of devices Int 33h is aware of
+msdStatus       db ?  ;Status byte. Used by BIOS for all transfers with Int 33h.
+fdiskNum        db ?  ;Number of fixed disks
+ata0CmdByte     db ?  ;Contains bitfield of instructions, Bit 0 is master/slave, Bit 1 is Data Mutex
+ata0Status      db ?  ;Contains the status of the last transaction
+ata1CmdByte     db ?
+ata1Status      db ?
+diskDptPtr      dq ?
+fdiskDptPtr     dq ?
 ;----------------------------------------
 ;            SysInit Data Area          :
 ;----------------------------------------
-nextFilePtr     resq 1  ;Pointer to next file to load
-numSectors      resw 1  ;Number of sectors to copy 
+nextFilePtr     dq ?  ;Pointer to next file to load
+numSectors      dw ?  ;Number of sectors to copy 
 ;----------------------------------------
 ;            Memory Data Area           :
 ;----------------------------------------
-MachineWord     resw 1    ;Really Legacy Hardware Bitfield
-convRAM         resw 1  ;Conventional memory word
-userBase        resq 1    ;Start address of the user space
-bigmapSize      resb 1    ;First byte, in units of 24 bytes
-srData          resw 4  ;4 words for memory64MB word 0 is ax word 1 is bx etc.
-srData1         resw 1  ;Reserve 1 word for memory16MB
-sysMem          resq 1  ;Size of usable system RAM (without SCP/BIOS)
-scpSize         resd 1  ;Size of SCP/BIOS allocation
+MachineWord     dw ?    ;Really Legacy Hardware Bitfield
+convRAM         dw ?  ;Conventional memory word
+userBase        dq ?    ;Start address of the user space
+bigmapSize      db ?    ;First byte, in units of 24 bytes
+srData          dw 4 dup(?)  ;4 words for memory64MB
+srData1         dw ?  ;Reserve 1 word for memory16MB
+sysMem          dq ?  ;Size of usable system RAM (without SCP/BIOS)
+scpSize         dd ?  ;Size of SCP/BIOS allocation
 ;----------------------------------------
 ;            MCP Data Area              :
 ;----------------------------------------
-mcpUserBase     resq 1  ;Pointer to register save space
-mcpUserRip      resq 1  ;Save the custom user RIP for new jumps
-mcpUserkeybf    resq 1  ;Pointer to the keyboard buffer
-mcpUserRaxStore resq 1  ;Temp rax save space
-mcpStackPtr     resq 1  ;Address of base of user Stack Pointer
+mcpUserBase     dq ?  ;Pointer to register save space
+mcpUserRip      dq ?  ;Save the custom user RIP for new jumps
+mcpUserkeybf    dq ?  ;Pointer to the keyboard buffer
+mcpUserRaxStore dq ?  ;Temp rax save space
+mcpStackPtr     dq ?  ;Address of base of user Stack Pointer
 ;----------------------------------------
 ;            USB Data Area              :
 ;----------------------------------------
-eControllers    resb 1    ;Number of EHCI controllers
-eControllerList resq 4    ;Entry = PCI space addr|MMIO addrs
-usbDevices      resb 1    ;Max value, 10 for now!
-eHCErrorHandler resq 1  ;Address of default error handler
+xControllers    db ?
+eControllers    db ?    ;Number of EHCI controllers
+eControllerList dq 4 dup (?)    ;Entry = PCI space addr|MMIO addrs
+usbDevices      db ?    ;Max value, 10 for now!
+eHCErrorHandler dq ?  ;Address of default error handler
 ;----------------------------------------
 ;            EHCI Async Area            :
 ;----------------------------------------
-eCurrAsyncHead  resq 1      ;Point to the current head of the async list
-eNewBus         resb 1      ;Default to 0, if 1, a new bus was selected
-eActiveCtrlr    resb 1        ;Current working controller (default -1)
-eActiveInt      resb 1        ;Gives a copy of the usbsts intr bits
-eAsyncMutex     resb 1    
+eCurrAsyncHead  dq ?      ;Point to the current head of the async list
+eNewBus         db ?      ;Default to 0, if 1, a new bus was selected
+eActiveCtrlr    db ?      ;Current working controller (default -1)
+eActiveInt      db ?      ;Gives a copy of the usbsts intr bits
+eAsyncMutex     db ?    
     ;Mutex, x1b=data NOT ready, wait. x0b=ready, data ready to access.
     ;        1xb=Internal buffer. 0xb=user provided buffer.
     ;        bits [7:2], number of interrupts to ignore (if any)
@@ -150,70 +151,26 @@ eAsyncMutex     resb 1
 ;----------------------------------------
 ;            MSD Data Area              :
 ;----------------------------------------
-cbwTag          resb 1        ;cbw transaction unique id (inc post use)
-numMSD          resb 1        ;Number of MSD devices
+cbwTag  db ?        ;cbw transaction unique id (inc post use)
+numMSD  db ?        ;Number of MSD devices
 ;----------------------------------------
 ;           USB Tables                  :
 ;----------------------------------------
-usbDevTbl       resb 10*usbDevTblEntrySize
-usbDevTblEnd    equ $
-usbDevTblE      equ ($ - usbDevTbl)/usbDevTblEntrySize ;Number of Entries
-;Byte 0 = Dev Addr, Byte 1 = Root hub, Byte 2 = Class Code (USB standard)
-; i.e. 08h=MSD, 09h=Hub
-hubDevTbl       resb 10*hubDevTblEntrySize
-hubDevTblEnd    equ $
-hubDevTblE      equ ($ - hubDevTbl)/hubDevTblEntrySize
-;bAddress - The assigned device address
-;bBus - Host Bus [Root hub]
-;bHostHub - Address of Hub we are attached to or 0 for Root
-;bHubPort - Port number we are inserted in
-;bMaxPacketSize0 - Max packet size to endpoint 0
-;bNumPorts - Number of downstream ports on hub
-;bPowerOn2PowerGood - Time in units of 2ms for device on port to turn on
-;bRes- Endpoint address, for when we add interrupt eps
-;   If bNumPorts=0 => Hub needs to undergo Hub Config
-msdDevTbl       resb 10*msdDevTblEntrySize
-msdDevTblEnd    equ $
-msdDevTblE      equ    ($ - msdDevTbl)/msdDevTblEntrySize
-;bAddress - The assigned device address [+ 0]
-;bBus - Host Bus [Root hub] [+ 1]
-;bHostHub - Address of Hub we are attached to or 0 for Root [+ 2]
-;bHubPort - Port number we are inserted in  [+ 3]
-;bInerfaceNumber - Interface number being used  [+ 4]
-;bInterfaceSubclass - 00h (defacto SCSI), 06h (SCSI), 04h (UFI)     [+ 5]
-;bInterfaceProtocol - 50h (BBB), 00h (CBI), 01h (CBI w/o interrupt) [+ 6]
-;bMaxPacketSize0 - Max packet size to endpoint 0                    [+ 7]
-;bEndpointInAddress - 4 bit address of IN EP                        [+ 8]
-;wMaxPacketSizeIn - Max packet size to chosen In endpoint           [+ 9]
-;bEndpointOutAddress - 4 bit address of OUT EP                      [+ 11]
-;wMaxPacketSizeOut - Max packet size to OUT endpoint                [+ 12]
-;bInEPdt - In Endpoints' dt bit                                     [+ 14]
-;bOutEPdt - Out Endpoints' dt bit                                   [+ 15]
-;These past two bytes are temporarily kept separate! Will bitstuff later
+usbDevTbl   db usbDevTblSz*usbDevTblEntry_size dup (?)
+hubDevTbl   db hubDevTblSz*hubDevTblEntry_size dup (?)
+msdDevTbl   db msdDevTblSz*msdDevTblEntry_size dup (?)
 ;----------------------------------------
 ;           IDE Tables                  :
 ;----------------------------------------
 ;Support up to two IDE controllers
-ideNumberOfControllers: resb 1
-ideControllerTable:     resb  2*ideTableEntrySize ;Max 2 controllers
-;dPCIAddress   - PCI IO address of controller   [+0]
-;dPCIBAR4 - PCI BAR4, the Bus Mastery address [+4]
-; Note that this address is given with the bottom nybble indicating
-; if the address is IO or MMIO. Bit set => IO
+ideNumCtrlr db ?
+ideCtrlrTbl db ideCtrlrTblSz*ideCtrlrTblEntry_size dup (?)
 ;----------------------------------------
 ;           ATA Tables                  :
 ;----------------------------------------
-fdiskTable:     resb 4*fdiskEntry_size  ;Max 4 fixed disks
+fdiskTbl  db fdiskTblSz*fdiskTblEntry_size dup (?) ;Max 4 fixed disks
 ;----------------------------------------
 ;            Int33h Table Area          :
 ;----------------------------------------
-diskDevices:    resb 10*int33TblEntrySize
-diskDevicesE    equ ($ - diskDevices)/int33TblEntrySize
-;bDevType - 0 = Unasigned, 1 = MSD EHCI, 2 = MSD xHCI, 3 = Floppy Physical,
-;           4 = ATA device, 5 = ATAPI device   [+ 0]
-;wDeviceAddress - USB Address/Bus pair OR local device table address  [+ 1]
-;dBlockSize - Dword size of LBA block (should be 512 for remdev) [+ 3]
-;qLastLBANum - Last LBA address (OS MAY minus 1 to avoid crashing device) [+ 7]
-;bEPSize - 1 = 64 byte, 2 = 512 byte (EP size for sector transfer)  [+ 15]
-;NOTE: LBA SECTOR 0 IS CHS SECTOR 0,0,1 !!
+i33DevTbl   db i33DevTblSz*i33DevTblEntry_size dup (?)
 ;----------------------------------------------------------------

@@ -104,18 +104,66 @@ setupGetMaxLUN   equ 0FEh
 ;                ------------------------
 ;                ------Bulk Storage equates------
 CBWSig           equ    043425355h
-CSWSig           equ 053425355h
+CSWSig           equ    053425355h
 CBWFlagOut       equ    00h    ;Switch to send to device
 CBWFlagIn        equ    80h    ;Switch to recieve from
 bCSWPassed       equ    00h
 bCSWFailed       equ    01h
 bCSWPhase        equ    02h
 ;                ------------------------
-;------------------USB Device table entry sizes------------------
-msdDevTblEntrySize    equ 10h
-hubDevTblEntrySize    equ 8h
-usbDevTblEntrySize    equ 3h
-usbMaxDevices         equ 10
+;------------------USB Table equates------------------
+usbMaxDevices   equ 10
+usbDevTblSz     equ usbMaxDevices  ;Number of Entries in the usb device table!
+struc usbDevTblEntry
+    .bAddr      db ?    ;Dev Addr
+    .bBus       db ?    ;Root hub
+    .bClassCde  db ?    ;A usbDevClass_* value
+endstruc
+;USB device Class codes
+usbDevClass_MSD equ 8
+usbDevClass_Hub equ 9
+
+;------------------Hub Table equates------------------
+hubDevTblSz     equ 10  ;Number of Entries in the hub device table!
+struc hubDevTblEntry
+    .bAddr      db ?    ;The assigned device address
+    .bBus       db ?    ;Host Bus [Root hub]
+    .bHostHub   db ?    ;Address of Hub we are attached to or 0 for Root
+    .bHubPort   db ?    ;Port number we are inserted in
+    .bMaxPacketSize0    db ?    ;Max packet size to endpoint 0
+    .bNumPorts  db ?    ;Number of downstream ports on hub
+    .bPowerOn2PowerGood db ?  ;Time in units of 2ms for dev on port to turn on
+    .bRes       db ?    ;Endpoint address, for when we add interrupt eps
+;   If bNumPorts=0 => Hub needs to undergo Hub Config
+endstruc
+
+;------------------MSD Table equates------------------
+msdDevTblSz     equ 10  ;Number of Entries in the msd device table :)
+struc msdDevTblEntry 
+    .bAddr      db ?    ;The assigned device address
+    .bBus       db ?    ;Host Bus [Root hub]
+    .bHostHub   db ?    ;Address of Hub we are attached to or 0 for Root
+    .bHubPort   db ?    ;Port number we are inserted in
+    .bIFNum     db ?    ;Interface number being used
+    .bIFSClass  db ?    ;A msdIFSC_* value
+    .bIFProt    db ?    ;A <sdIFProt_* value
+    .bMaxPacketSize0    db ?    ; Max packet size to endpoint 0
+    .bEPInAddr  db ?    ;4 bit address of IN EP
+    .wMaxPacketSizeIn   dw ?    ;Max packet size to chosen In endpoint
+    .bEPOutAddr db ?    ;4 bit address of OUT EP
+    .wMaxPacketSizeOut  dw ?    ;Max packet size to OUT endpoint
+;These past two bytes are temporarily kept separate! Will bitstuff later
+    .bInEPdt    db ?    ;In Endpoints' dt bit
+    .bOutEPdt   db ?    ;Out Endpoints' dt bit
+endstruc
+;Interface Subclass types for MSD 
+msdIFSC_Dflt    equ 0   ;Default = SCSI Interface Subclass
+msdIFSC_SCSI    equ 6   ;SCSI Interface Subclass 
+msdIFSC_UFI     equ 4   ;UFI Interface Subclass (Not yet supported...)
+;Interface Protocol types for MSD
+msdIFProt_BBB   equ 50h ;BBB protocol
+msdIFProt_iCBI  equ 0   ;CBI (not supported)
+msdIFProt_CBI   equ 1   ;CBI without interrupt (not supported)
 ;                ------------------------
 ;------------------EHCI Transfer Descriptor size------------------
 ehciSizeOfQH    equ 60h
@@ -132,20 +180,27 @@ ide_subclass    equ    01h
 sata_subclass   equ    06h
 ;------------------------------------------------------------
 ;----------------------IDE equates---------------------------
-ideTableEntrySize     equ 10h
+ideCtrlrTblSz   equ     2   ;Max 2 controllers
+struc ideCtrlrTblEntry
+    .dPCIAddress    dd ?    ;PCI IO address of controller
+    .dPCIBAR4       dd ?    ;PCI BAR4, the Bus Mastery address
+; Note that this address is given with the bottom nybble indicating
+; if the address is IO or MMIO. Bit set => IO
+endstruc
 ;----------------------FDD equates---------------------------
 fdd_base        equ    3F0h
 ;----------------------ATA equates---------------------------
-struc fdiskEntry
-    .signature  resb 1 
+fdiskTblSz  equ 4   ;Max 4 ATA disks on a system
+struc fdiskTblEntry
+    .signature  db ? 
     ;CHS really shouldnt be used
-    .wHeads     resw 1  ;Number of CHS Heads
-    .wCylinder  resw 1  ;Number of CHS Cylinders
-    .wSecTrc    resw 1  ;Number of CHS Sectors per Track
-    .lbaMax     resd 1  ;Number of maximum sector accessible by LBA28
-    .lbaMax48   resq 1  ;Number of maximum sector accessible by LBA48
-    .ioBase     resw 1  ;IO Base address
-    .msBit      resb 1  ;Master Slave bit in 0A0h/0B0h format
+    .wHeads     dw ?  ;Number of CHS Heads
+    .wCylinder  dw ?  ;Number of CHS Cylinders
+    .wSecTrc    dw ?  ;Number of CHS Sectors per Track
+    .lbaMax     dd ?  ;Number of maximum sector accessible by LBA28
+    .lbaMax48   dq ?  ;Number of maximum sector accessible by LBA48
+    .ioBase     dw ?  ;IO Base address
+    .msBit      db ?  ;Master Slave bit in 0A0h/0B0h format
 endstruc
 ;.signature is as follows:
 ;.signature[0] set = Device present and OK to use.
@@ -165,7 +220,30 @@ endstruc
     idLBASectrs equ 2*60    ;60th word
     idLBA48Sec  equ 2*100   ;100th word
 ;----------------------Int 33h Equates-----------------------
-int33TblEntrySize     equ 10h
+i33DevTblSz     equ 10h   ;10 i33 devices.
+
+struc i33DevTblEntry
+    .bDevType   db ?    ;A ddDevType_* type value
+    .wDevAddr   dw ?    ;USB Address/Bus pair OR local device table address
+    .dBlockSize dd ?    ;Dword size of LBA block (should be 512 for remdev)
+    .qLastLBA   dq ?    ;Last LBA address (OS WILL subtract 1)
+    .bEPSize    db ?    ;EP size for sector xfr. ddDevEPSize_* value.
+endstruc
+;REMEMBER: LBA SECTOR 0 IS CHS SECTOR 0,0,1 !!
+
+;Disk device Max IO to EP size
+ddDevEPSize_low equ 1   ;64 byte max IO size to EP. Unsupported and not used.
+ddDevEPSize_reg equ 2   ;512 byte IO size to EP.
+ddDevEPSize_big equ 3   ;4096 byte IO size to EP. Not yet supported
+
+;Disk device types 
+ddDevType_free  equ 0   ;Free table entry
+ddDevType_eMSD  equ 1   ;MSD on an EHCI bus
+ddDevType_xMSD  equ 2   ;MSD on an xHCI bus
+ddDevType_fdd   equ 3   ;Physical FDD (unsupported)
+ddDevType_ata   equ 4   ;Physical ATA device 
+ddDevType_atapi equ 5   ;Physical ATAPI device (partially supported)
+
 ;------------------------------------------------------------
 ;------------------------------------------------------------
 ;------------------------Misc--------------------------------

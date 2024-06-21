@@ -62,6 +62,7 @@ BITS 64
 ;              Drive Enum and Initialisation procedures         :
 ;----------------------------------------------------------------
 %include "./Source/Init/Hardware/IDE/ideinit.asm"
+%include "./Source/Init/Hardware/USB/xHCI/xhciinit.asm"
 %include "./Source/Init/Hardware/USB/EHCI/ehciinit.asm"
 %include "./Source/Init/Hardware/USB/MSD/msdinit.asm"
 %include "./Source/Init/Hardware/MSD/i33init.asm"
@@ -107,6 +108,7 @@ Segment codeResident follows=codeInit vfollows=data align=1 valign=1
 ;========================RESIDENT DRIVERS=====================
 %include "./Source/Resident/Hardware/ATA/ataDrv.asm"
 %include "./Source/Resident/Hardware/USB/EHCI/ehciDriv.asm"
+%include "./Source/Resident/Hardware/USB/xHCI/xhciDriv.asm"
 ;====================================CPU Interrupts=============================
 %include "./Source/Resident/Hardware/CPU/xception.asm"
 ;==========================Dummy Interrupts======================

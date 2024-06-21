@@ -57,8 +57,8 @@ ATA:
 ;        CF=CY -> drive not set
     push rdx
     push rax
-    mov al, byte [rbp + fdiskEntry.msBit]
-    mov dx, word [rbp + fdiskEntry.ioBase]
+    mov al, byte [rbp + fdiskTblEntry.msBit]
+    mov dx, word [rbp + fdiskTblEntry.ioBase]
     call .selectDrive
     pop rax
     pop rdx
@@ -155,15 +155,15 @@ ATA:
     and dl, 7Fh ;Clear top bit
     cmp dl, 3   ;Only 4 fixed disks allowed!
     ja .gtpBad
-    lea rbp, fdiskTable ;Point to the fdisktable
+    lea rbp, fdiskTbl ;Point to the fdiskTbl
 .gtpSearch:
     test dl, dl
     jz .gtpVerifyOk
     dec dl
-    add rbp, fdiskEntry_size    ;Goto next entry
+    add rbp, fdiskTblEntry_size    ;Goto next entry
     jmp short .gtpSearch
 .gtpVerifyOk:
-    cmp byte [rbp + fdiskEntry.signature], 1    ;Configured bit must be set
+    cmp byte [rbp + fdiskTblEntry.signature], 1    ;Configured bit must be set
     jz .gtpBad 
     pop rdx
     clc
@@ -182,7 +182,7 @@ ATA:
     ;        CF=NC -> Channel reset
     ;If the channel doesnt reset, the caller will establish an error code
     ;
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 206h   ;Go to alternate base
     mov al, 4h      ;Set the SoftwareReSeT (SRST) bit
     out dx, al      ;Set the bit
@@ -202,7 +202,7 @@ ATA:
     ;Here clear the master/slave bit in ataXCmdByte
     lea rbx, ata0CmdByte
     lea rcx, ata1CmdByte
-    cmp word [rbp + fdiskEntry.ioBase], ata0_base
+    cmp word [rbp + fdiskTblEntry.ioBase], ata0_base
     cmovne rbx, rcx
     and byte [rbx], 0FEh    ;Clear low bit
 
@@ -225,7 +225,7 @@ ATA:
     mov bl, al      ;Save sector count in bl
 .rWait:
     mov ecx, -1  ;Data should be ready within ~67 miliseconds
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Dummy read on status register
 .rWaitLoop:
     dec ecx
@@ -277,7 +277,7 @@ ATA:
     mov bl, al      ;Save sector count in bl
 .writeWait:
     mov ecx, -1  ;Data should be ready within ~67 miliseconds
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Dummy read on Alt status register
 .writeWaitLoop:
     dec ecx
@@ -341,7 +341,7 @@ ATA:
     out dx, al  ;Output the command byte!
     ;Now we wait for BSY to go low and DRDY to go high
     mov cx, -1  ;Data should be ready within ~67 miliseconds
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto status register
 .vLoop:
     dec cx
@@ -366,7 +366,7 @@ ATA:
     mov bl, al     ;Save sector count in bl to use as counter
 .formatWait:
     mov ecx, -1  ;Data should be ready within ~67 miliseconds
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Dummy read on Alt status register
 .formatWaitLoop:
     dec ecx
@@ -397,7 +397,7 @@ ATA:
     call .setupCHS
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 20h ;ATA READ COMMAND!
@@ -409,7 +409,7 @@ ATA:
     call .setupCHS
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 30h ;ATA WRITE COMMAND!
@@ -419,20 +419,20 @@ ATA:
     call .setupCHS
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov al, 40h ;ATA VERIFY COMMAND!
     jmp .verify
 
 .formatCHS:
 ;Ignore al (number of sectors) and cl[5:0] (Starting sector number)
-    mov ax, word [rbp + fdiskEntry.wSecTrc] ;Get sectors in a track to clear
+    mov ax, word [rbp + fdiskTblEntry.wSecTrc] ;Get sectors in a track to clear
     ;Sectors per track is always less than 256 so byte is ok!
     and cl, 0C0h    ;Clear bottom 6 bits. 
     or cl, 1        ;All tracks start at sector 1
     call .setupCHS
     jc .errorExit
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 30h ;ATA WRITE COMMAND!
@@ -446,7 +446,7 @@ ATA:
     ;Now the drive has been selected, we can write to it
     push rax    ;Only sector count needs to be preserved
     push rdx    ;Temporarily save drive head bits to use later
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 2  ;Goto base + 2, Sector count
     out dx, al
     inc edx     ;Goto base + 3, Starting sector number
@@ -464,7 +464,7 @@ ATA:
     pop rax     ;Get back the drive head number from dh into ah
     mov al, ah  
     and al, 0Fh ;Save only bottom nybble
-    or al, byte [rbp + fdiskEntry.msBit]    ;Add the MS bits to al
+    or al, byte [rbp + fdiskTblEntry.msBit]    ;Add the MS bits to al
     out dx, al
     pop rax
     clc
@@ -478,7 +478,7 @@ ATA:
     call .setupLBA
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 20h ;ATA READ COMMAND!
@@ -488,7 +488,7 @@ ATA:
     call .setupLBA
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 30h ;ATA WRITE COMMAND!
@@ -498,7 +498,7 @@ ATA:
     call .setupLBA
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 40h ;ATA VERIFY COMMAND!
@@ -508,7 +508,7 @@ ATA:
     call .setupLBA
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 30h ;ATA WRITE COMMAND!
@@ -520,7 +520,7 @@ ATA:
     call .selectDriveFromTable
     jc .sLBAFailed
     push rax        ;Save sector count on stack
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 2      ;Goto base + 2, Sector count
     out dx, al      ;Output sector number
     inc edx         ;Goto base + 3, LBA low
@@ -541,7 +541,7 @@ ATA:
     inc edx         ;Goto base + 6, LBA upper bits and drive select
     mov al, cl      ;Get final nybble into al
     and al, 0Fh     ;Clear extra bits
-    or al, byte [rbp + fdiskEntry.msBit]    ;Add the master/slave bit and fixed bits
+    or al, byte [rbp + fdiskTblEntry.msBit]    ;Add the master/slave bit and fixed bits
     or al, 40h      ;Set LBA bit
     out dx, al
     pop rax  ;Return sector count into al
@@ -556,7 +556,7 @@ ATA:
     call .setupLBA48
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 24h ;ATA READ EXT COMMAND!
@@ -566,7 +566,7 @@ ATA:
     call .setupLBA48
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 34h ;ATA WRITE EXT COMMAND!
@@ -576,7 +576,7 @@ ATA:
     call .setupLBA48
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 42h ;ATA VERIFY EXT COMMAND!
@@ -586,7 +586,7 @@ ATA:
     call .setupLBA48
     jc .errorExit
     ;Send command
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto command register
     mov cl, al  ;Save sector count in cl
     mov al, 34h ;ATA WRITE EXT COMMAND!
@@ -598,7 +598,7 @@ ATA:
     call .selectDriveFromTable
     jc .sLBAFailed
     push rax        ;Save sector count on stack
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 2      ;Goto base + 2, Sector count
     ror rcx, 24     ;Move the upper three bytes low
     xor al, al      ;High byte of sector count is always 0
@@ -640,7 +640,7 @@ ATA:
     out dx, al
 
     inc edx         ;Goto base + 6, write drive select
-    mov al, byte [rbp + fdiskEntry.msBit]    ;Add the master/slave bit and fixed bits
+    mov al, byte [rbp + fdiskTblEntry.msBit]    ;Add the master/slave bit and fixed bits
     or al, 40h      ;Set LBA bit
     out dx, al
 

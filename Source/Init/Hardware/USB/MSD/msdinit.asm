@@ -22,8 +22,8 @@ remDevInit:
     call USB.ehciDevSetupHub  ;Only needs a valid device in rsi
     jc .hubnextentry
 .hubnextentry:
-    add rsi, hubDevTblEntrySize ;Goto next table entry
-    cmp rsi, hubDevTbl + 10*hubDevTblEntrySize  ;End of table address
+    add rsi, hubDevTblEntry_size ;Goto next table entry
+    cmp rsi, hubDevTbl + hubDevTblSz*hubDevTblEntry_size  ;End of table address
     jb .redi1  ;We are still in table
 .hub_rescan:
 ;Now we check that all hubs are initialised
@@ -49,8 +49,8 @@ remDevInit:
     jz USB.ehciCriticalErrorWrapper ;al = 1 => Host error, 
 ;                                    al = 2 => Bad dev, removed from MSD tables
 .msdNextEntry:
-    add rsi, msdDevTblEntrySize ;Goto next entry
-    cmp rsi, msdDevTbl + 10*msdDevTblEntrySize
+    add rsi, msdDevTblEntry_size ;Goto next entry
+    cmp rsi, msdDevTbl + msdDevTblSz*msdDevTblEntry_size
     jne .msd1
 .rediexit:
     mov ax, 1304h

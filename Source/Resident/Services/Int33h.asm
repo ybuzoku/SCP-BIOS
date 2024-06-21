@@ -294,9 +294,9 @@ disk_io:
     push rdx
     push rax
     movzx rax, dl   ;Move drive number offset into rax
-    mov rdx, int33TblEntrySize
+    mov rdx, i33DevTblEntry_size
     mul rdx
-    lea rdx, qword [diskDevices + rax]  ;Move address into rdx
+    lea rdx, qword [i33DevTbl + rax]  ;Move address into rdx
     xor ebx, ebx
     mov ebx, dword [rdx + 3]    ;Get dBlockSize for device
     mov rcx, qword [rdx + 7]    ;Get qLastLBANum for device
@@ -359,9 +359,9 @@ disk_io:
 ;        al = EHCI bus the device is on
     push rbx    ;Need to temporarily preserve rbx
     movzx rax, dl   ;Move drive number offset into rax
-    mov rdx, int33TblEntrySize
+    mov rdx, i33DevTblEntry_size
     mul rdx
-    lea rdx, qword [diskDevices + rax]  ;Move address into rdx
+    lea rdx, qword [i33DevTbl + rax]  ;Move address into rdx
     cmp byte [rdx], 0   ;Check to see if the device type is 0 (ie doesnt exist)
     jz .i33egdpbad ;If not, exit
     mov ax, word [rdx + 1]  ;Get address/Bus pair into ax
@@ -626,11 +626,11 @@ disk_io:
     call USB.ehciMsdInitialise
     test al, al
     jnz .bsrFail    ;Exit if the device failed to initialise
-;Multiply dl by int33TblEntrySize to get the address to write Int33h table
+;Multiply dl by i33DevTblEntry_size to get the address to write Int33h table
     mov edx, ebp    ;Move the device number into edx (dl)
-    mov eax, int33TblEntrySize  ;Zeros the upper bytes
-    mul dl  ;Multiply dl by al. ax has offset into diskDevices table
-    add rax, diskDevices
+    mov eax, i33DevTblEntry_size  ;Zeros the upper bytes
+    mul dl  ;Multiply dl by al. ax has offset into i33DevTbl table
+    add rax, i33DevTbl
     mov rdi, rax    ;Put the offset into the table into rdi
     call .deviceInit
     test al, al
@@ -644,7 +644,7 @@ disk_io:
 .deviceInit:    
 ;Further initialises an MSD device for use with the int33h interface.
 ;Adds device data to the allocated int33h data table.
-;Input: rdi = device diskDevice ptr (given by device number*int33TblEntrySize)
+;Input: rdi = device diskDevice ptr (given by device number*i33DevTblEntry_size)
 ;       rsi = device MSDDevTbl entry (USB address into getDevPtr)
 ;Output: al = 0 : Device added successfully
 ;        al = 1 : Bus error
@@ -704,10 +704,10 @@ disk_io:
 ;Output: Nothing, device entry invalidated
     push rax
     push rdx
-    mov al, int33TblEntrySize
+    mov al, i33DevTblEntry_size
     mul dl  ;Multiply tbl entry size by device number, offset in ax
     movzx rax, ax
-    mov byte [diskDevices + rax], 0 ;Invalidate entry
+    mov byte [i33DevTbl + rax], 0 ;Invalidate entry
     pop rdx
     pop rax
     ret
@@ -878,14 +878,14 @@ fdisk_io:
     pop rdx
     pop rcx
     pop rbx
-    movzx eax, word [rbp + fdiskEntry.wHeads]
+    movzx eax, word [rbp + fdiskTblEntry.wHeads]
     mov dh, al
-    movzx eax, word [rbp + fdiskEntry.wCylinder]
+    movzx eax, word [rbp + fdiskTblEntry.wCylinder]
     mov ch, al  ;Low 8 bits 
     shr ax, 2   ;Move bits [1:0] of ah to bits [7:6] of al
     and al, 0C0h    ;Clear lower bits [5:0]
     mov cl, al
-    movzx eax, word [rbp + fdiskEntry.wSecTrc]
+    movzx eax, word [rbp + fdiskTblEntry.wSecTrc]
     and al, 3Fh ;Save only bits [5:0]
     or cl, al   ;Add the sector per track bits here
     mov dl, byte [fdiskNum] ;Get number of fixed disks in dl
@@ -899,7 +899,7 @@ fdisk_io:
     push rsi
     lea rsi, ATA.readLBA
     lea rdi, ATA.readLBA48
-    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    test byte [rbp + fdiskTblEntry.signature], fdeLBA48
     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
     call rdi    ;rdi is a free parameter anyway
     pop rsi
@@ -912,7 +912,7 @@ fdisk_io:
     push rsi
     lea rsi, ATA.writeLBA
     lea rdi, ATA.writeLBA48
-    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    test byte [rbp + fdiskTblEntry.signature], fdeLBA48
     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
     call rdi    ;rdi is a free parameter anyway
     pop rsi
@@ -925,7 +925,7 @@ fdisk_io:
     push rsi
     lea rsi, ATA.verifyLBA
     lea rdi, ATA.verifyLBA48
-    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    test byte [rbp + fdiskTblEntry.signature], fdeLBA48
     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
     call rdi    ;rdi is a free parameter anyway
     pop rsi
@@ -939,7 +939,7 @@ fdisk_io:
     push rsi
     lea rsi, ATA.formatLBA
     lea rdi, ATA.formatLBA48
-    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    test byte [rbp + fdiskTblEntry.signature], fdeLBA48
     cmovz rdi, rsi  ;If LBA48 not supported, call LBA instead
     call rdi    ;rdi is a free parameter anyway
     pop rsi
@@ -958,9 +958,9 @@ fdisk_io:
     pop rcx
     pop rbx
     xor ecx, ecx    ;Zero whole of rcx
-    mov ecx, dword [rbp + fdiskEntry.lbaMax]
-    mov rax, qword [rbp + fdiskEntry.lbaMax48]
-    test byte [rbp + fdiskEntry.signature], fdeLBA48
+    mov ecx, dword [rbp + fdiskTblEntry.lbaMax]
+    mov rax, qword [rbp + fdiskTblEntry.lbaMax48]
+    test byte [rbp + fdiskTblEntry.signature], fdeLBA48
     cmovnz rcx, rax ;Move lba48 value into rcx if LBA48 bit set
     mov dl, byte [fdiskNum] ;Number of fixed disks
     xor ebx, ebx
@@ -971,7 +971,7 @@ fdisk_io:
 ; to see what the error may have been. If nothing, then the error
 ; that is in the msdStatus byte is left as is, unless it is 0
 ; where a Undefined Error is placed.
-    movzx edx, word [rbp + fdiskEntry.ioBase]
+    movzx edx, word [rbp + fdiskTblEntry.ioBase]
     add edx, 7  ;Goto status
     call ATA.wait400ns
     in al, dx   ;Get status byte

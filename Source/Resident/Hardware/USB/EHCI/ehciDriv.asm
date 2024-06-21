@@ -892,12 +892,12 @@ USB:
     je .eadttbad        ;If max, fail
     inc bp      ;Increment error counter (Stage 1)
     mov rdi, usbDevTbl
-    mov cl, usbDevTblE  ;Within the length of the table
+    mov cl, usbDevTblSz  ;Within the length of the table
 ;Write Common table first
 .eadtt0:
     or byte [rdi], 0   ;Check if there exists a free entry
     jz .eadtt1
-    add rdi, usbDevTblEntrySize ;Go to next entry
+    add rdi, usbDevTblEntry_size ;Go to next entry
     dec cl
     jz .eadttbad
     jmp short .eadtt0
@@ -918,12 +918,12 @@ USB:
     jmp .eadttbad
 .eadttmsd:
     mov rdi, msdDevTbl
-    mov cl, msdDevTblE  ;Max entries possible
+    mov cl, msdDevTblSz  ;Max entries possible
     inc bp      ;Increment error counter (Stage 4)
 .eadttmsd0:
     or byte [rdi], 0
     jz .eadttmsd1
-    add rdi, msdDevTblEntrySize
+    add rdi, msdDevTblEntry_size
     dec cl
     jz .eadttbad
     jmp short .eadttmsd0
@@ -985,12 +985,12 @@ USB:
     jmp .eadttpass
 .eadtthub:
     mov rdi, hubDevTbl
-    mov cl,  hubDevTblE ;Max entries possible
+    mov cl,  hubDevTblSz ;Max entries possible
     mov bp, 7      ;Increment error counter (Stage 7)
 .eadtthub0:
     or byte [rdi], 0
     jz .eadtthub1
-    add rdi, hubDevTblEntrySize
+    add rdi, hubDevTblEntry_size
     dec cl
     jz .eadttbad
     jmp short .eadtthub0
@@ -1028,7 +1028,7 @@ USB:
     push rcx
     push rbx
     mov rdi, usbDevTbl
-    mov cl, usbDevTblE    ;10 entries possible
+    mov cl, usbDevTblSz    ;10 entries possible
 .erdft0:
     scasw
     je .erdft1    ;Device signature found
@@ -1045,7 +1045,7 @@ USB:
 .erdft11:
 ;Clear usbDevTbl entry for usb device
     push rax
-    mov ecx, usbDevTblEntrySize    ;Table entry size
+    mov ecx, usbDevTblEntry_size    ;Table entry size
     xor al, al
     rep stosb    ;Store zeros for entry
     pop rax
@@ -1055,8 +1055,8 @@ USB:
     cmp ah, 09h
     cmove rcx, rbx ;If 09h (Hub), change table pointed to by rcx
     mov rdi, rcx    ;Point rdi to appropriate table
-    mov ebx, hubDevTblEntrySize    ;Size of hub table entry
-    mov ecx, msdDevTblEntrySize    ;Size of msd table entry
+    mov ebx, hubDevTblEntry_size    ;Size of hub table entry
+    mov ecx, msdDevTblEntry_size    ;Size of msd table entry
     cmp ah, 09h
     cmove ecx, ebx    ;If hub, move size into cx
 ;cx has entry size, rdi points to appropriate table
@@ -1097,7 +1097,7 @@ USB:
     cmp al, 80h
     jae .egvaexit
     mov rdi, usbDevTbl
-    mov cl, usbDevTblE    ;10 entries possible
+    mov cl, usbDevTblSz    ;10 entries possible
 .egva1:
     scasw
     je .egva0
@@ -1234,17 +1234,17 @@ USB:
 .egdp0:
     cmp ax, word [rsi]
     je .egdp1   ;Device found
-    add rsi, usbDevTblEntrySize
+    add rsi, usbDevTblEntry_size
     dec cx
     jz .egdpfail    ;Got to the end with no dev found, exit
     jmp short .egdp0
 .egdp1:
     mov rbp, hubDevTbl
-    mov ecx, hubDevTblEntrySize
+    mov ecx, hubDevTblEntry_size
     movzx ebx, byte [rsi + 2]  ;Return bl for device type
     cmp bl, 09h ;Are we hub?
     mov rsi, msdDevTbl  ;Set to msd
-    mov edx, msdDevTblEntrySize
+    mov edx, msdDevTblEntry_size
     cmove rsi, rbp  ;If hub, reload rsi pointer to hub table
     cmove edx, ecx    ;If hub, reload dx with hub table size
     mov ecx, usbMaxDevices
