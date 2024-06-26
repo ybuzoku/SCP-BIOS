@@ -261,7 +261,7 @@ endstruc
     idLBASectrs equ 2*60    ;60th word
     idLBA48Sec  equ 2*100   ;100th word
 ;----------------------Int 33h Equates-----------------------
-i33DevTblSz     equ 10h   ;10 i33 devices.
+i33DevTblSz     equ 10h     ;10 i33 devices.
 
 struc i33DevTblEntry
     .bDevType   db ?    ;A ddDevType_* type value

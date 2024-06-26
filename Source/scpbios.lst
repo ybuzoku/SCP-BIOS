@@ -189,7 +189,7 @@
    186 00000003 ??                  <1>     .bHubPort   db ?    ;Port number we are inserted in
    187 00000004 ??                  <1>     .bIFNum     db ?    ;Interface number being used
    188 00000005 ??                  <1>     .bIFSClass  db ?    ;A msdIFSC_* value
-   189 00000006 ??                  <1>     .bIFProt    db ?    ;A <sdIFProt_* value
+   189 00000006 ??                  <1>     .bIFProt    db ?    ;A msdIFProt_* value
    190 00000007 ??                  <1>     .bMaxPacketSize0    db ?    ; Max packet size to endpoint 0
    191 00000008 ??                  <1>     .bEPInAddr  db ?    ;4 bit address of IN EP
    192 00000009 ????                <1>     .wMaxPacketSizeIn   dw ?    ;Max packet size to chosen In endpoint
@@ -264,7 +264,7 @@
    261                              <1>     idLBASectrs equ 2*60    ;60th word
    262                              <1>     idLBA48Sec  equ 2*100   ;100th word
    263                              <1> ;----------------------Int 33h Equates-----------------------
-   264                              <1> i33DevTblSz     equ 10h   ;10 i33 devices.
+   264                              <1> i33DevTblSz     equ 10h     ;10 i33 devices.
    265                              <1> 
    266                              <1> struc i33DevTblEntry
    267 00000000 ??                  <1>     .bDevType   db ?    ;A ddDevType_* type value
