@@ -8,6 +8,7 @@
 ;All registers not mentioned above, preserved
 ;----------------------------------------------------------------
 disk_io:
+    and byte [rsp + 2*8h], ~1   ;Clear CF on entry
     cld ;Ensure all string reads/writes are in the right way
     test dl, 80h
     jnz fdisk_io    ;If bit 7 set, goto Fixed disk routines
@@ -18,10 +19,15 @@ disk_io:
     ja .baddev
     cmp ah, 16h
     jz .deviceChanged   ;Pick it off
-
-    call .busScan   ;Bus scan only in valid cases
-    cmp byte [msdStatus], 40h   ;Media seek failed
-    je .noDevInDrive
+;In the below, handle updating internal tables if a device swap occured.
+;MsdStatus set to 06 if an empty slot found.
+;Any other error codes here are very serious so return immdediately!
+;Crucially though, if a device was swapped, the changeline status 
+;gets lost! This doesn't return with AH=06h in that case. For that
+;purpose, ah=16 is placed before the bus scan as this should be manually
+; checked first before doing an operation!
+    call .busScan       ;Bus scan. Return CF=CY if an error occured.
+    jc .noDevInDrive
 
     test ah, ah
     jz .reset           ;ah = 00h Reset Device
@@ -73,7 +79,6 @@ disk_io:
     pop rsi
     jc .rrbad
     mov ah, byte [msdStatus]
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .rrbad:
     mov ah, 5   ;Reset failed
@@ -85,10 +90,11 @@ disk_io:
     mov ah, byte [msdStatus]    ;Get last status into ah
     test ah, ah ;If status is zero, exit
     jnz .srmain
-    and byte [rsp + 2*8h], 0FEh     ;Clear CF
     iretq
 .srmain:
     mov byte [msdStatus], 00    ;Reset status byte
+    cmp ah, 06h     ;Swap media?
+    je .srexit
     cmp ah, 20h     ;General Controller failure?
     je .srexit
     cmp ah, 80h     ;Timeout?
@@ -132,7 +138,6 @@ disk_io:
     pop rdi
     mov ah, byte [msdStatus]    ;Return Error code in ah
     jc .rsbad
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .rsbad:
     or byte [rsp + 2*8h], 1    ;Set Carry flag on for invalid function
@@ -145,7 +150,6 @@ disk_io:
     pop rdi
     mov ah, byte [msdStatus]
     jc .rsbad
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 
 .verify:
@@ -155,7 +159,6 @@ disk_io:
     pop rdi
     mov ah, byte [msdStatus]
     jc .rsbad
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .format:
 ;Cleans sectors on chosen track. DOES NOT Low Level Format.
@@ -208,7 +211,6 @@ disk_io:
     pop rax
     mov ah, byte [msdStatus]
     jc .rsbad
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .fbadBB:
     mov byte [msdStatus], 0BBh  ;Unknown Error, request sense
@@ -222,7 +224,6 @@ disk_io:
     pop rdi
     mov ah, byte [msdStatus]    ;Return Error code in ah
     jc .rsbad
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq   
 .lbawrite:
     push rdi
@@ -231,7 +232,6 @@ disk_io:
     pop rdi
     mov ah, byte [msdStatus]    ;Return Error code in ah
     jc .rsbad
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .lbaverify:
     push rdi
@@ -240,7 +240,6 @@ disk_io:
     pop rdi
     mov ah, byte [msdStatus]    ;Return Error code in ah
     jc .rsbad
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .lbaformat:
     push rax
@@ -283,14 +282,21 @@ disk_io:
     pop rsi
     mov ah, byte [msdStatus]
     jc .rsbad
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .lbareadparams:
 ;Reads drive parameters (for drive dl which is always valid at this point)
 ;Output: rbx = dBlockSize (Dword for LBA block size)
 ;        rcx = qLastLBANum (Qword address of last LBA)
 ;         dl = Number of removable devices 
-;         ah = 0
+;         ax = Information flags
+;               Bit[0] = [Reserved Set] DMA errors handled transparently
+;               Bit[1] = [Reserved Clear] CHS information is valid
+;               Bit[2] = Set if removable. Clear if fixed.
+;               Bit[3] = [Always Set] Write with verify supported.
+;               Bit[4] = Drive has changeline support. Clear if fixed.
+;               Bit[5] = [Always Clear] Drive can be locked.
+;               Bit[6] = [Always Set] CHS information set to maximum value.
+;               Bit[15]-Bit[7] = [Reserved Clear]
     push rdx
     push rax
     movzx rax, dl   ;Move drive number offset into rax
@@ -302,9 +308,11 @@ disk_io:
     mov rcx, qword [rdx + 7]    ;Get qLastLBANum for device
     pop rax
     pop rdx
+    test dl, 80h    ;Is device removable? ZF=ZE if not.
+    mov eax, 049h   ;Hard drive standard (no changeline and fixed disk)
+    mov edx, 05Dh   ;Removable USB device standard (changeline and rem)
+    cmovz eax, edx  ;And move this value into eax if removable device
     mov dl, byte [numMSD]
-    xor ah, ah
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
     iretq
 .sectorsEHCI:
 ;Input: rdi = Address of USB EHCI MSD BBB function
@@ -405,8 +413,9 @@ disk_io:
 .deviceChanged:
 ;Entry: dl = Drive number
 ;Exit: ah = 00h, No device changed occured, CF = CN
-;      ah = 01h, Device changed occured, CF = CN
+;      ah = 06h, Device changed occured, CF = CY
 ;      CF = CY if an error occured or device removed
+    push rax
     push rbx
     push rcx
     push rdx
@@ -415,12 +424,9 @@ disk_io:
     push rbp
     push r8
     push r9
-    push r10
-    push r11
 
-    push rax
+    mov byte [msdStatus], 0     ;Set the status to 0 to start with!
 
-    movzx r11, byte [msdStatus] ;Preserve the original status byte
     movzx ebp, dl               ;Save the device number in ebp
     call .i33ehciGetDevicePtr   ;Get MSD dev data block ptr in rsi and bus in al
 ;Check port on device for status change.
@@ -443,30 +449,16 @@ disk_io:
     call USB.ehciGetRequest
     jc .dcError
 
-    mov r8, USB.ehciEnumerateHubPort    ;Store address for if bit is set
     mov edx, dword [ehciDataIn]
     and edx, 10000h ;Isolate the port status changed bit
-    shr edx, 10h    ;Shift status from bit 16 to bit 0
-.dcNoError:
-    mov byte [msdStatus], r11b  ;Return back the original status byte
-    pop rax
-    mov ah, dl                  ;Place return value in ah
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rbp
-    pop rdi
-    pop rsi
-    pop rdx
-    pop rcx
-    pop rbx
-    and byte [rsp + 2*8h], 0FEh ;Clear CF
-    iretq
+    jz .dcNoError
+.dcChange:
+    mov byte [msdStatus], 06h   ;Set the swap retcode
+    stc
+    jmp short .dcNoError
 .dcError:
-    pop rax ;Just return the old rax value
-    pop r11
-    pop r10
+    mov byte [msdStatus], 80h   ;Get req failed. Drive not ready.
+.dcNoError:
     pop r9
     pop r8
     pop rbp
@@ -475,7 +467,11 @@ disk_io:
     pop rdx
     pop rcx
     pop rbx
-    or byte [rsp + 2*8h], 1    ;Set Carry flag on for invalid function
+    pop rax
+    mov ah, byte [msdStatus]    ;Get the status byte
+    jnc .dcExit
+    or byte [rsp + 2*8h], 1 ;Set the CF bit
+.dcExit:
     iretq
 .dcRoot:
 ;Root hub procedure.
@@ -485,8 +481,8 @@ disk_io:
     dec ebx                     ;Reduce by one
     mov edx, dword [eax + 4*ebx + ehciportsc]  ;Get port status into eax
     and dl, 2h      ;Only save bit 1, status changed bit
-    shr dl, 1       ;Shift down by one bit
-    jmp short .dcNoError    ;Exit
+    jz .dcNoError   ;If bit is zero, no change! Exit
+    jmp short .dcChange
 .busScan:
 ;Will request the hub bitfield from the RMH the device is plugged in to.
 ;Preserves ALL registers.
@@ -494,7 +490,7 @@ disk_io:
 
 ;If status changed bit set, call appropriate enumeration function.
 ;If enumeration returns empty device, keep current device data blocks in memory,
-; but return Int 33h error 40h = Seek operation Failed.
+; but return Int 33h error 06h = Change line active.
     push rax
     push rbx
     push rcx
@@ -531,7 +527,7 @@ disk_io:
     call USB.ehciGetRequest
     jc .bsErrorExit
 
-    mov r8, USB.ehciEnumerateHubPort    ;Store address for if bit is set
+    mov r8, USB.ehciEnumerateHubPort    ;Needed for .bsCommonEP
     mov edx, dword [ehciDataIn]
     and edx, 10001h
     test edx, 10000h
@@ -554,7 +550,7 @@ disk_io:
     pop rbx
     pop rax
     ret
-.bsrExit06h:    ;If its clear, nothing in port, return media changed error
+.bsrExit06h:    ;If nothing in port, return media changed error.
     mov r11, 06h ;Change the msdStatus byte, media changed or removed
     stc
     jmp short .bsexit
@@ -576,7 +572,7 @@ disk_io:
     jmp short .bsCommonEP   ;Else new device in port needs enum (edx = 10001h)
 .bsRtNoDev:
     or dword [eax + 4*ebx + ehciportsc], 2  ;Clear the bit
-    jmp short .bsrExit06h   ;Exit with seek error
+    jmp short .bsrExit06h   ;Exit with changeline bit high!
 .bsRoot:
 ;Root hub procedure.
     call USB.ehciAdjustAsyncSchedCtrlr  ;Reset the bus if needed
@@ -590,7 +586,7 @@ disk_io:
     dec dl          ;Device in port     (dl=01b)
     jz .bsexit      ;Exit, no status change
     dec dl          ;New device, Device removed from port   (dl=10b)
-    jz .bsRtNoDev   ;Clear state change bit and exit Seek error
+    jz .bsRtNoDev   ;Clear state change bit and exit new device (empty port)
 ;Fallthrough case, New device, Device inserted in port  (dl=11b)
     or dword [eax + 4*ebx + ehciportsc], 2  ;Clear the state change bit
     mov r8,  USB.ehciEnumerateRootPort   ;The enumeration function to call
@@ -821,8 +817,7 @@ fdisk_io:
 .paramExit:
     pop rax
     pop rbp
-    mov ah, byte [msdStatus]
-    and byte [rsp + 2*8h], 0FEh ;Clear Carry flag    
+    mov ah, byte [msdStatus]  
     iretq
 ;Misc functions
 .fdiskReset:
