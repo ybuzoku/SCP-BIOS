@@ -1775,50 +1775,131 @@ USB:
     push rcx
     mov al, byte [rsi + 1]  ;Get the bus number into al
     call .ehciAdjustAsyncSchedCtrlr
-    mov al, 1
-    jc .ehciMsdInitFail
+    jc .emiAbortHost
     call .ehciDeviceSetupMsd
-    mov al, 2
-    jc .ehciMsdInitFail
-    call .ehciMsdBOTInquiry
-    jc .ehciMsdInitFail
-    mov ecx, 5
-.emi0:
-    call .ehciMsdBOTReadFormatCapacities
-    cmp byte [msdStatus], 20h   ;Host error
-    je .ehciMsdInitialisePfail  ;Protocol fail
-    call .ehciMsdBOTCheckTransaction
+    jc .emiAbortHost
     test ax, ax
-    jnz .emipf0
-    call .ehciMsdBOTModeSense6
-    cmp byte [msdStatus], 20h   ;Host error
-    je .ehciMsdInitialisePfail  ;Protocol fail
+    jnz .emiAbortHost
+
+;Start of the init new device routine!
+;If any host errors here... something is fishy, crash the init.
+    mov ecx, 5
+.emiInq1:
+    call .ehciMsdBOTInquiry
+    call .emiGetXactStatus
+    jc .emiAbortHost
+    jz .emiInq1RR
     call .ehciMsdBOTCheckTransaction
-    test ax, ax     ;Also clears CF if zero
-    jnz .emipf0
-.ehciMsdInitExit:
-    pop rcx
-    ret
-.ehciMsdInitFail:
-    mov ax, word [rsi]
-    call .ehciRemoveDevFromTables
-    dec byte [numMSD]   ;Device was removed from tables, decrement
-    stc
-    mov al, 2
-    jmp short .ehciMsdInitExit
-.ehciMsdInitialisePfail:
+    test ah, ah
+    jnz .emiInq1RR
+    mov ecx, 5  ;Reset count for the next command
+    jmp short .emiReadFormCap
+.emiInq1RR:
     call .ehciMsdBOTResetRecovery
     dec ecx
-    jz .ehciMsdInitFail
-.emipf0:
-    call .ehciMsdBOTRequestSense
-    cmp byte [msdStatus], 20h
-    je .ehciMsdInitialisePfail
+    jz .emiAbortBOT
+    jmp short .emiInq1
+.emiReadFormCap:
+    ;Since we don't use anything other than LUN0 for BIOS, this is
+    ; purely for Windows like behaviour. Only halt the init if the
+    ; host errors
+    call .ehciMsdBOTReadFormatCapacities
+    call .emiGetXactStatus
+    jc .emiAbortHost
+    jz .emiRFCRR
     call .ehciMsdBOTCheckTransaction
-    test ax, ax
-    jz .emi0
-    jmp short .ehciMsdInitialisePfail
+    test ah, ah
+    jz .emiRFCProceed
+    cmp ah, 02h
+    jne .emiRFCRR
+    and al, 0Fh ;Save low nybble only
+    cmp al, 2
+    je .emiRFCProceed     ;Ignore this issue!
+.emiRFCRR:
+    call .ehciMsdBOTResetRecovery
+    dec ecx
+    jz .emiAbortBOT
+    jmp short .emiReadFormCap
+.emiRFCProceed:
+    mov ecx, 5  ;Reset count for the next command
+.emiInq2:
+    call .ehciMsdBOTInquiry
+    call .emiGetXactStatus
+    jc .emiAbortHost
+    jz .emiInq2RR
+    call .ehciMsdBOTCheckTransaction
+    test ah, ah
+    jnz .emiInq2RR
+    mov ecx, 5  ;Reset count for the next command
+    jmp short .emiReadCap
+.emiInq2RR:
+    call .ehciMsdBOTResetRecovery
+    dec ecx
+    jz .emiAbortBOT
+    jmp short .emiInq2
+.emiReadCap:
+    call .ehciMsdBOTReadCapacity10
+    call .emiGetXactStatus
+    jc .emiAbortHost
+    jz .emiRCRR
+    call .ehciMsdBOTCheckTransaction
+    test ah, ah
+    jnz .emiRCRR
+    mov ecx, 5  ;Reset count for the next command
+    jmp short .emiModSen
+.emiRCRR:
+    call .ehciMsdBOTResetRecovery
+    dec ecx
+    jz .emiAbortBOT
+    jmp short .emiReadCap
+.emiModSen:
+    call .ehciMsdBOTModeSense6
+    call .emiGetXactStatus
+    jc .emiAbortHost
+    jz .emiInqMSRR
+    call .ehciMsdBOTCheckTransaction
+    test ah, ah     ;Also clears CF if zero
+    jz .emiExit
+.emiInqMSRR:
+    call .ehciMsdBOTResetRecovery
+    dec ecx
+    jz .emiAbortBOT
+    jmp short .emiModSen
+.emiExit:
+    xor eax, eax
+.emiExit1:
+    pop rcx
+    ret
 
+;Error exits
+.emiAbortHost:
+    mov ax, 1
+    jmp short .emiAbort
+.emiAbortBOT:
+    mov ax, 2
+.emiAbort:
+    push rax
+    mov ax, word [rsi]
+    call .ehciRemoveDevFromTables
+    pop rax
+    dec byte [numMSD]   ;Device was removed from tables, decrement
+    stc
+    jmp short .emiExit1
+
+.emiGetXactStatus:
+;Establishes what to do.
+;Output: CF=NC and ZF=NZ -> all is well, proceed.
+;        CF=NC and ZF=ZY -> Do reset recovery
+;        CF=CY -> Host error, fail!
+    jc .emigxsBad ;If entered with CF=CY, means host error, rip  
+    cmp byte [msdStatus], 20h   ;Host error
+    je .emigxsBad
+    cmp byte [msdStatus], 21h   ;EP Stall?
+    clc
+    ret
+.emigxsBad:
+    stc
+    ret
 .ehciMsdDeviceReset:
 ;Reset an MSD device on current active EHCI bus
 ;Input: rsi = Pointer to table data structure
@@ -1981,28 +2062,22 @@ USB:
     inc ax          ;Otherwise bCSWStatus = 0
 .embcmcResidueCheck:
     mov ecx, dword [msdCSW + 8] ;Get dCSWDataResidue
-
-    mov bx, 10h
-    or bx, ax   
     test ecx, ecx
-    cmovz ax, bx    ;If its zero, move bx with added bit from ax into ax
+    mov bx, 10h
     jz .embcmcExit
-
+    cmp ecx, dword [ehciDataOut + 8]    ;ehciDataOut + 8 = dCBWDataTransferLength
     mov bx, 20h
-    or bx, ax 
-    cmp ecx, dword [ehciDataOut + 8];ehciDataOut + 8 = dCBWDataTransferLength
-    cmovb ax, bx
     jb .embcmcExit
-
-    or ax, 40h  ;Else, it must be above, fail
+    mov bx, 40h  ;Else, it must be above, fail
 .embcmcExit:
+    or ax, bx   ;Add upper bits to ax
     pop rcx
     pop rbx
     ret
 
 .ehciMsdBOTCheckTransaction:
 ;Check successful return data here
-;Output: ax = 0                                 : CSW Valid and Meaningful
+;Output: ah = 0, al = CSW Meaningful bitfield   : CSW Valid and Meaningful
 ;        ah = 1, al = CSW Validity bitfield     : CSW NOT valid
 ;        ah = 2, al = CSW Meaningful bitfield   : CSW NOT meaningful
 ;   rax destroyed
@@ -2014,9 +2089,12 @@ USB:
     jmp .embhiehexit
 .embhiehcswmeaningful:
     call .ehciMsdBOTCheckMeaningfulCSW
-    and al, 4Ch     ;Check bad bits first and bCSWStatus=02 40h|08h|04h
-    jz .embhiehexit
-    mov ah, 2       ; CSW Not Meaningful signature
+    test al, 4Ch     ;Check bad bits first and bCSWStatus=02 40h|08h|04h
+    jz .embhiehcswmeaningfulOk
+    mov ah, 2        ;CSW Not Meaningful signature
+    jmp short .embhiehexit
+.embhiehcswmeaningfulOk:
+    xor ah, ah      ;Clear the upper bits.
 .embhiehexit:
     ret
 .ehciMsdBOTOO64I:   ;For devices with 64 byte max packet size
@@ -2412,18 +2490,18 @@ USB:
     call .ehciMsdBOTRequest
     jc .embfuerror
     call .ehciMsdBOTCheckTransaction
-    test ax, ax
+    test ah, ah
     jnz .embfuerror
 .embfu0:
     call .ehciMsdBOTTestReady
     jc .embfuerror
     call .ehciMsdBOTCheckTransaction
-    test ax, ax
+    test ah, ah
     jz .embfuexit
     call .ehciMsdBOTRequestSense
     jc .embfuerror
     call .ehciMsdBOTCheckTransaction
-    test ax, ax
+    test ah, ah
     jnz .embfu0
 .embfuexit:
     pop r15
@@ -2456,7 +2534,7 @@ USB:
     call .ehciMsdBOTRequest
     jc .embvbad
     call .ehciMsdBOTCheckTransaction
-    test ax, ax
+    test ah, ah
     jnz .embvbad
 .embvexit:
     pop r15
@@ -2562,12 +2640,12 @@ USB:
     call .ehciMsdBOTSector512
     jc .emboseerror
     call .ehciMsdBOTCheckTransaction
-    test ax, ax
+    test ah, ah
     jnz .emboseerror
     call .ehciMsdBOTTestReady   ;Seems to flush data onto disk
     jc .emboseerror
     call .ehciMsdBOTCheckTransaction
-    test ax, ax
+    test ah, ah
     jnz .emboseerror
 .embosexit:
     pop rax
@@ -2597,7 +2675,7 @@ USB:
     call .ehciMsdBOTSector512
     jc .emboseerror
     call .ehciMsdBOTCheckTransaction
-    test ax, ax
+    test ah, ah
     jnz .emboseerror
     jmp short .embosexit
 .ehciMsdBOTSector512:
