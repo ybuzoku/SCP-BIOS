@@ -20,14 +20,12 @@ disk_io:
     cmp ah, 16h
     jz .deviceChanged   ;Pick it off
 ;In the below, handle updating internal tables if a device swap occured.
-;MsdStatus set to 06 if an empty slot found.
+;MsdStatus set to 80h (Timeout) if an empty slot found.
 ;Any other error codes here are very serious so return immdediately!
-;Crucially though, if a device was swapped, the changeline status 
-;gets lost! This doesn't return with AH=06h in that case. For that
-;purpose, ah=16 is placed before the bus scan as this should be manually
-; checked first before doing an operation!
+;Crucially though, if a device was swapped, we initialise the device
+; and then error return with MsdStatus set to 06h (Dev swapped)
     call .busScan       ;Bus scan. Return CF=CY if an error occured.
-    jc .noDevInDrive
+    jc .badNotSameDev
 
     test ah, ah
     jz .reset           ;ah = 00h Reset Device
@@ -60,14 +58,14 @@ disk_io:
     je .lbareadparams
 .baddev:
     mov ah, 01h
+.badStore:
     mov byte [msdStatus], ah   ;Invalid function requested signature
 .bad:
     or byte [rsp + 2*8h], 1    ;Set Carry flag on for invalid function
     iretq
-.noDevInDrive:
+.badNotSameDev:
     mov ah, byte [msdStatus]
-    or byte [rsp + 2*8h], 1    ;Set Carry flag on for invalid function
-    iretq
+    jmp short .bad
 .reset: ;Device Reset
     push rsi
     push rdx
@@ -490,7 +488,8 @@ disk_io:
 
 ;If status changed bit set, call appropriate enumeration function.
 ;If enumeration returns empty device, keep current device data blocks in memory,
-; but return Int 33h error 06h = Change line active.
+; but return Int 33h error 80h = Timeout.
+;If a device swap detected, we return error Int 33h error 06h = Changeline on!
     push rax
     push rbx
     push rcx
@@ -532,9 +531,8 @@ disk_io:
     and edx, 10001h
     test edx, 10000h
     jnz .bsClearPortChangeStatus    ;If top bit set, clear port change bit
-.bsret:
     test dl, 1h
-    jz .bsrExit06h  ;Bottom bit not set, exit media changed Error (edx = 00000h)
+    jz .bsrExitEmpty  ;Bottom bit not set, nothing in port (edx = 00000h)
 .bsexit:    ;The fall through is (edx = 00001h), no change to dev in port
     mov byte [msdStatus], r11b  ;Get back the original status byte
 .bsErrorExit:
@@ -550,8 +548,12 @@ disk_io:
     pop rbx
     pop rax
     ret
-.bsrExit06h:    ;If nothing in port, return media changed error.
-    mov r11, 06h ;Change the msdStatus byte, media changed or removed
+.bsrExitChanged: ;If a device swap detected, return so!
+    mov r11, 06h
+    jmp short .bsrExitErrorSwap
+.bsrExitEmpty:    ;If nothing in port, return as if the request timed out!
+    mov r11, 80h ;Change the msdStatus byte, timeout!
+.bsrExitErrorSwap:
     stc
     jmp short .bsexit
 .bsClearPortChangeStatus:
@@ -568,11 +570,11 @@ disk_io:
     jc .bsErrorExit  ;If error exit by destroying the old msdStatus
 
     test dl, 1h
-    jz .bsrExit06h  ;Bottom bit not set, exit media changed error (edx = 10000h)
+    jz .bsrExitEmpty  ;Bottom bit not set, exit media changed error (edx = 10000h)
     jmp short .bsCommonEP   ;Else new device in port needs enum (edx = 10001h)
 .bsRtNoDev:
     or dword [eax + 4*ebx + ehciportsc], 2  ;Clear the bit
-    jmp short .bsrExit06h   ;Exit with changeline bit high!
+    jmp short .bsrExitEmpty   ;Exit timeout
 .bsRoot:
 ;Root hub procedure.
     call USB.ehciAdjustAsyncSchedCtrlr  ;Reset the bus if needed
@@ -582,11 +584,11 @@ disk_io:
     mov edx, dword [eax + 4*ebx + ehciportsc]  ;Get port status into eax
     and dl, 3h      ;Only save bottom two bits
     test dl, dl     ;No device in port  (dl=00b)
-    jz .bsrExit06h  ;Exit media changed error
+    jz .bsrExitEmpty  ;Exit timeout
     dec dl          ;Device in port     (dl=01b)
     jz .bsexit      ;Exit, no status change
-    dec dl          ;New device, Device removed from port   (dl=10b)
-    jz .bsRtNoDev   ;Clear state change bit and exit new device (empty port)
+    dec dl          ;Status change, Device removed from port   (dl=10b)
+    jz .bsRtNoDev   ;Clear state change bit and exit timeout (empty port)
 ;Fallthrough case, New device, Device inserted in port  (dl=11b)
     or dword [eax + 4*ebx + ehciportsc], 2  ;Clear the state change bit
     mov r8,  USB.ehciEnumerateRootPort   ;The enumeration function to call
@@ -630,9 +632,9 @@ disk_io:
     mov rdi, rax    ;Put the offset into the table into rdi
     call .deviceInit
     test al, al
-    jz .bsexit  ;Successful, exit!
+    jz .bsrExitChanged  ;Device swapped successfully, exit! Report swap!
     cmp al, 3
-    je .bsexit  ;Invalid device type, but ignore for now
+    je .bsrExitEmpty  ;Invalid device type, report no device!
 .bsrFail:
     mov r11, 20h ;Change the msdStatus byte to Gen. Ctrlr Failure
     stc
