@@ -708,7 +708,8 @@ MCP_int:
     int 30h
     mov rdx, r8
     call .dmcsaddrprint
-    xor bh, bh
+    ;xor bh, bh
+    mov bh, byte [scr_active_page]
     mov ah, 03h
     int 30h
     mov dl, 25
@@ -751,7 +752,8 @@ MCP_int:
 
 .dmmain21:
     pop r9
-    xor bh, bh
+    ;xor bh, bh
+    mov bh, byte [scr_active_page]
     mov ah, 03h
     int 30h
     mov dl, 62
@@ -783,7 +785,8 @@ MCP_int:
     call .dmcsaddrprint
 
     mov ah, 03h
-    xor bh, bh
+    ;xor bh, bh
+    mov bh, byte [scr_active_page]
     int 30h
     mov dl, 25
     mov ah, 02h
